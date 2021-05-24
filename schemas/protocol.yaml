@@ -1,0 +1,34 @@
+XmlDaReplyBase:
+  product:
+
+XmlDaServerStatus:
+  product:
+
+GetStatus:
+  product:
+    localeId: Text
+    clientRequestHandle: Text
+
+GetStatusResponse:
+  product:
+    result: Maybe XmlDaReplyBase
+    status: Maybe XmlDaServerStatus
+
+QualityBits:
+  enum:
+    - bad
+    - badConfigurationError
+    - badNotConnected
+    - badDeviceFailure
+    - badSensorFailure
+    - badLastKnownValue
+    - badCommFailure
+    - badOutOfService
+    - badWaitingForInitialData
+    - uncertain
+    - uncertainLastUsableValue
+    - uncertainSensorNotAccurate
+    - uncertainEUExceeded
+    - uncertainSubNormal
+    - good
+    - goodLocalOverride
