@@ -19,4 +19,7 @@ library
   other-modules:
     OpcXmlDaClient.Prelude
   build-depends:
-    base >=4.14 && <5
+    base >=4.14 && <5,
+    bytestring >=0.10 && <0.12,
+    text >=1 && <2,
+    vector >=0.12 && <0.13
