@@ -2,7 +2,6 @@ module OpcXmlDaClient.Protocol where
 
 import OpcXmlDaClient.Prelude
 import Domain
-import DomainOptics
 
 
 declare
@@ -20,7 +19,6 @@ declare
     hasFieldDeriver,
     constructorIsLabelDeriver,
     accessorIsLabelDeriver,
-    mapperIsLabelDeriver,
-    labelOpticDeriver
+    mapperIsLabelDeriver
     ])
   =<< loadSchema "schemas/protocol.yaml"
