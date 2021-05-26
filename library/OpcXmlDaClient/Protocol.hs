@@ -13,7 +13,6 @@ module OpcXmlDaClient.Protocol where
 import Data.Scientific (Scientific)
 import Data.Time (LocalTime, TimeZone)
 import Data.Vector (Vector)
-import Data.Vector.Instances ()
 import Domain
   ( accessorIsLabelDeriver,
     boundedDeriver,

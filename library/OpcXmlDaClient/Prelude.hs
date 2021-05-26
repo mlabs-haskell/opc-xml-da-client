@@ -99,3 +99,7 @@ import Data.Functor.Identity as Exports
 -- hashable-time
 -------------------------
 import Data.Hashable.Time ()
+
+-- vector-instances
+-------------------------
+import Data.Vector.Instances ()
