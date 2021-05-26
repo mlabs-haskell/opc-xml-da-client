@@ -23,9 +23,9 @@ library
     , base              >=4.14     && <5
     , bytestring        >=0.10     && <0.12
     , domain            ^>=0.1.1
-    , scientific        ^>=0.3.7.0
+    , scientific        ^>=0.3.6.2
     , text              >=1        && <2
-    , time              ^>=1.11.1.2
+    , time              >=1.9.3    && <1.12
     , transformers      ^>=0.5
     , vector            ^>=0.12
     , vector-instances  ^>=3.4
