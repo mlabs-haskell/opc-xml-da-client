@@ -1,19 +1,127 @@
-XmlDaReplyBase:
+# XML base types
+
+# Reference: https://www.w3schools.com/xml/schema_dtypes_date.asp
+#
+# TODO: It might be better to borrow this from an XML library.
+XmlDateTime:
+  product:
+    zone: Maybe TimeZone
+    dateTime: LocalTime
+
+# Reference: https://en.wikipedia.org/wiki/QName
+#
+# TODO: Either implement this or borrow from another library.
+XmlQName:
   product:
 
-XmlDaServerStatus:
+# TODO: Either implement this or borrow from another library.
+XmlValue:
   product:
+
+# XML-DA base types
 
 GetStatus:
   product:
-    localeId: Text
-    clientRequestHandle: Text
+    localeId: Maybe Text
+    clientRequestHandle: Maybe Text
 
 GetStatusResponse:
   product:
-    result: Maybe XmlDaReplyBase
-    status: Maybe XmlDaServerStatus
+    result: Maybe ReplyBase
+    status: Maybe ServerStatus
 
+ReplyBase:
+  product:
+    rcvTime: XmlDateTime
+    replyTime: XmlDateTime
+    clientRequestHandle: Maybe Text
+    revisedLocaleId: Maybe Text
+    serverState: ServerState
+
+ServerState:
+  enum:
+    - running
+    - failed
+    - noConfig
+    - suspended
+    - test
+    - commFault
+
+ServerStatus:
+  product:
+    statusInfo: Maybe Text
+    vendorInfo: Maybe Text
+    supportedLocaleIds: Vector Text
+    supportedInterfaceVersions: Vector InterfaceVersion
+    startTime: XmlDateTime
+    productVersion: Maybe Text
+
+# TODO: This might be better represented as a major-minor version number?
+InterfaceVersion:
+  enum:
+    - XML_DA_Version_1_0
+
+# TODO: Name clash with Haskell type class - how to resolve?
+Read:
+  product: 
+    options: Maybe RequestOptions
+    itemList: Maybe ReadRequestItemList
+
+RequestOptions:
+  product:
+    returnErrorText: Bool
+    returnDiagnosticInfo: Bool
+    returnItemTime: Bool
+    returnItemPath: Bool
+    returnItemName: Bool
+    requestDeadline: Maybe XmlDateTime
+    clientRequestHandle: Maybe Text
+    localeId: Maybe Text
+
+ReadRequestItemList:
+  product:
+    items: Vector ReadRequestItem
+    itemPath: Maybe Text
+    reqType: Maybe XmlQName
+    maxAge: Maybe Int32
+
+ReadRequestItem:
+  product:
+    itemPath: Maybe Text
+    reqType: Maybe XmlQName
+    itemName: Maybe Text
+    clientItemHandle: Maybe Text
+    maxAge: Maybe Int32
+
+ReadResponse:
+  product:
+    readResult: ReplyBase
+    rItemList: ReplyItemList
+    errors: Vector OPCError
+
+ReplyItemList:
+  product:
+    items: Vector ItemValue
+    reserved: Maybe Text
+
+ItemValue:
+  product:
+    diagnosticInfo: Maybe Text
+    value: Maybe XmlValue
+    quality: Maybe OPCQuality
+    valueTypeQualifier: Maybe XmlQName
+    itemPath: Maybe Text
+    itemName: Maybe Text
+    clientItemHandle: Maybe Text
+    timestamp: Maybe XmlDateTime
+    resultId: Maybe XmlQName
+
+OPCQuality:
+  product:
+    qualityField: QualityBits
+    limitField: LimitBits
+    vendorField: Word8
+    
 QualityBits:
   enum:
     - bad
@@ -32,3 +140,252 @@ QualityBits:
     - uncertainSubNormal
     - good
     - goodLocalOverride
+
+LimitBits:
+  enum:
+    - none
+    - low
+    - high
+    - constant
+
+OPCError:
+  product:
+    text: Maybe Text
+    id: XmlQName
+
+# TODO: This would be better just as unboxed Vector Float.
+ArrayOfFloat:
+  product:
+    float: Vector Float
+
+# TODO: This would be better just as unboxed Vector Int32.
+ArrayOfInt:
+  product:
+    int: Vector Int32
+
+# TODO: This would be better just as unboxed Vector Word32.
+ArrayOfUnsignedInt:
+  product:
+    unsignedInt: Vector Word32
+
+# TODO: This would be better just as unboxed Vector Int64
+ArrayOfLong:
+  product:
+    long: Vector Int64
+
+# TODO: This would be better just as unboxed Vector Word64
+ArrayOfUnsignedLong:
+  product:
+    unsignedLong: Vector Word64
+
+# TODO: This would be better just as unboxed Vector Double.
+ArrayOfDouble:
+  product:
+    double: Vector Double
+
+# TODO: This would be better just as unboxed Vector Word16.
+ArrayOfUnsignedShort:
+  product:
+    unsignedShort: Vector Word16
+
+# TODO: This would be better just as unboxed Vector Bool.
+ArrayOfBoolean:
+  product:
+    boolean: Vector Bool
+
+# TODO: This would be better just as Vector (Maybe Text).
+ArrayOfString:
+  product:
+    string: Vector (Maybe Text)
+
+# TODO: This would be better just as Vector XmlDateTime.
+ArrayOfDateTime:
+  product:
+    dateTime: Vector XmlDateTime
+
+# TODO: This would be better just as Vector (Maybe XmlValue).
+ArrayOfAnyType:
+  product:
+    anyType: Vector (Maybe XmlValue)
+
+# TODO: This would be better as Vector Scientific.
+ArrayOfDecimal:
+  product:
+    decimal: Vector Scientific
+
+# TODO: This would be better just as unboxed Vector Int8.
+ArrayOfByte:
+  product:
+    byte: Vector Int8
+
+# TODO: This would be better just as unboxed Vector Int16.
+ArrayOfShort:
+  product:
+    short: Vector Int16
+
+Write:
+  product:
+    options: Maybe RequestOptions
+    itemList: Maybe WriteRequestItemList
+    returnValuesOnReply: Bool
+
+WriteRequestItemList:
+  product:
+    items: Vector ItemValue
+    itemPath: Maybe Text
+
+WriteResponse:
+  product:
+    writeResult: Maybe ReplyBase
+    rItemList: Maybe ReplyItemList
+    errors: Vector OPCError
+
+Subscribe:
+  product:
+    options: Maybe RequestOptions
+    itemList: Maybe SubscribeRequestItemList
+    returnValuesOnReply: Bool
+    subscriptionPingRate: Int32
+
+SubscribeRequestItemList:
+  product:
+    items: Vector SubscribeRequestItem
+    itemPath: Maybe Text
+    reqType: Maybe XmlQName
+    deadband: Maybe Float
+    requestedSamplingRate: Maybe Int32
+    enableBuffering: Maybe Bool
+
+SubscribeRequestItem:
+  product:
+    itemPath: Maybe Text
+    reqType: Maybe XmlQName
+    itemName: Maybe Text
+    clientItemHandle: Maybe Text
+    deadband: Maybe Float
+    requestedSamplingRate: Maybe Int32
+    enableBuffering: Maybe Bool
+
+SubscribeReplyItemList:
+  product:
+    items: Vector SubscribeItemValue
+    revisedSamplingRate: Maybe Int32
+
+SubscribeItemValue:
+  product:
+    itemValue: ItemValue
+    revisedSamplingRate: Maybe Int
+
+SubscribeResponse:
+  product:
+    subscribeResult: Maybe ReplyBase
+    rItemList: Maybe SubscribeReplyItemList
+    errors: Vector OPCError
+    serverSubHandle: Maybe Text
+
+SubscriptionPolledRefresh:
+  product:
+    options: Maybe RequestOptions
+    serverSubHandles: Vector Text
+    holdTime: Maybe XmlDateTime
+    waitTime: Int32
+    returnAllItems: Bool
+
+SubscribePolledRefreshReplyItemList:
+  product:
+    items: Vector ItemValue
+    subscriptionHandle: Maybe Text
+
+SubscriptionPolledRefreshResponse:
+  product:
+    subscriptionPolledRefreshResult: Maybe ReplyBase
+    invalidServerSubHandles: Vector Text
+    rItemList: Vector SubscribePolledRefreshReplyItemList
+    errors: Vector OPCError
+    dataBufferOverflow: Bool
+
+SubscriptionCancel:
+  product:
+    serverSubHandle: Maybe Text
+    clientRequestHandle: Maybe Text
+
+SubscriptionCancelResponse:
+  product:
+    clientRequestHandle: Maybe Text
+
+Browse:
+  product:
+    propertyNames: Vector XmlQName
+    localeId: Maybe Text
+    clientRequestHandle: Maybe Text
+    itemPath: Maybe Text
+    itemName: Maybe Text
+    continuationPoint: Maybe Text
+    maxElementsReturned: Int32
+    browseFilter: BrowseFilter
+    elementNameFilter: Maybe Text
+    vendorFilter: Maybe Text
+    returnAllProperties: Bool
+    returnAllPropertyValues: Bool
+    returnErrorText: Bool
+
+BrowseFilter:
+  enum:
+    - all
+    - branch
+    - item
+
+BrowseElement:
+  product:
+    properties: Vector ItemProperty
+    name: Maybe Text
+    itemPath: Maybe Text
+    itemName: Maybe Text
+    isItem: Bool
+    hasChildren: Bool
+
+ItemProperty:
+  product:
+    value: Maybe XmlValue
+    name: XmlQName
+    description: Maybe Text
+    itemPath: Maybe Text
+    itemName: Maybe Text
+    resultId: Maybe XmlQName
+
+BrowseResponse:
+  product:
+    browseResult: Maybe ReplyBase
+    elements: Vector BrowseElement
+    errors: Vector OPCError
+    continuationPoint: Maybe Text
+    moreElements: Bool
+
+GetProperties:
+  product:
+    itemIds: Vector ItemIdentifier
+    propertyNames: Vector XmlQName
+    localeId: Maybe Text
+    clientRequestHandle: Maybe Text
+    itemPath: Maybe Text
+    returnAllProperties: Bool
+    returnPropertyValues: Bool
+    returnErrorText: Bool
+
+ItemIdentifier:
+  product:
+    itemPath: Maybe Text
+    itemName: Maybe Text
+
+PropertyReplyList:
+  product:
+    properties: Vector ItemProperty
+    itemPath: Maybe Text
+    itemName: Maybe Text
+    resultId: Maybe XmlQName
+
+GetPropertiesResponse:
+  product:
+    getPropertiesResult: Maybe ReplyBase
+    propertyLists: Vector PropertyReplyList
+    errors: Vector OPCError
