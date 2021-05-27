@@ -103,3 +103,15 @@ import Data.Hashable.Time ()
 -- vector-instances
 -------------------------
 import Data.Vector.Instances ()
+
+-- scientific
+-------------------------
+import Data.Scientific (Scientific)
+
+-- time
+-------------------------
+import Data.Time (LocalTime, TimeZone)
+
+-- vector
+-------------------------
+import Data.Vector (Vector)
