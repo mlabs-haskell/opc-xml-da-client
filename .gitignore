@@ -9,3 +9,4 @@ cabal.project.local*
 stack.yaml.lock
 cabal.project.local
 cabal.project.local~
+/specs/
