@@ -2,12 +2,7 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE LambdaCase #-}
 
-module OpcXmlDaClient.XmlTypes
-  ( XmlElement (..),
-    XmlQName (..),
-    XmlDateTime (..),
-  )
-where
+module OpcXmlDaClient.XmlTypes where
 
 import Data.Hashable (Hashable (hashWithSalt))
 import Data.Hashable.Generic (genericHashWithSalt)
