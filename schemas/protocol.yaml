@@ -61,13 +61,13 @@ ReadRequestItemList:
   product:
     items: Vector ReadRequestItem
     itemPath: Maybe Text
-    reqType: Maybe XmlQName
+    reqType: Maybe Xml.Name
     maxAge: Maybe Int32
 
 ReadRequestItem:
   product:
     itemPath: Maybe Text
-    reqType: Maybe XmlQName
+    reqType: Maybe Xml.Name
     itemName: Maybe Text
     clientItemHandle: Maybe Text
     maxAge: Maybe Int32
@@ -86,14 +86,14 @@ ReplyItemList:
 ItemValue:
   product:
     diagnosticInfo: Maybe Text
-    value: Maybe XmlElement
+    value: Maybe Xml.Element
     quality: Maybe OpcQuality
-    valueTypeQualifier: Maybe XmlQName
+    valueTypeQualifier: Maybe Xml.Name
     itemPath: Maybe Text
     itemName: Maybe Text
     clientItemHandle: Maybe Text
     timestamp: Maybe DateTime
-    resultId: Maybe XmlQName
+    resultId: Maybe Xml.Name
 
 OpcQuality:
   product:
@@ -130,7 +130,7 @@ LimitBits:
 OpcError:
   product:
     text: Maybe Text
-    id: XmlQName
+    id: Xml.Name
 
 # TODO: This would be better just as unboxed Vector Float.
 ArrayOfFloat:
@@ -182,10 +182,10 @@ ArrayOfDateTime:
   product:
     dateTime: Vector DateTime
 
-# TODO: This would be better just as Vector (Maybe XmlElement).
+# TODO: This would be better just as Vector (Maybe Xml.Element).
 ArrayOfAnyType:
   product:
-    anyType: Vector (Maybe XmlElement)
+    anyType: Vector (Maybe Xml.Element)
 
 # TODO: This would be better as Vector Scientific.
 ArrayOfDecimal:
@@ -230,7 +230,7 @@ SubscribeRequestItemList:
   product:
     items: Vector SubscribeRequestItem
     itemPath: Maybe Text
-    reqType: Maybe XmlQName
+    reqType: Maybe Xml.Name
     deadband: Maybe Float
     requestedSamplingRate: Maybe Int32
     enableBuffering: Maybe Bool
@@ -238,7 +238,7 @@ SubscribeRequestItemList:
 SubscribeRequestItem:
   product:
     itemPath: Maybe Text
-    reqType: Maybe XmlQName
+    reqType: Maybe Xml.Name
     itemName: Maybe Text
     clientItemHandle: Maybe Text
     deadband: Maybe Float
@@ -294,7 +294,7 @@ SubscriptionCancelResponse:
 
 Browse:
   product:
-    propertyNames: Vector XmlQName
+    propertyNames: Vector Xml.Name
     localeId: Maybe Text
     clientRequestHandle: Maybe Text
     itemPath: Maybe Text
@@ -325,12 +325,12 @@ BrowseElement:
 
 ItemProperty:
   product:
-    value: Maybe XmlElement
-    name: XmlQName
+    value: Maybe Xml.Element
+    name: Xml.Name
     description: Maybe Text
     itemPath: Maybe Text
     itemName: Maybe Text
-    resultId: Maybe XmlQName
+    resultId: Maybe Xml.Name
 
 BrowseResponse:
   product:
@@ -343,7 +343,7 @@ BrowseResponse:
 GetProperties:
   product:
     itemIds: Vector ItemIdentifier
-    propertyNames: Vector XmlQName
+    propertyNames: Vector Xml.Name
     localeId: Maybe Text
     clientRequestHandle: Maybe Text
     itemPath: Maybe Text
@@ -361,7 +361,7 @@ PropertyReplyList:
     properties: Vector ItemProperty
     itemPath: Maybe Text
     itemName: Maybe Text
-    resultId: Maybe XmlQName
+    resultId: Maybe Xml.Name
 
 GetPropertiesResponse:
   product:
