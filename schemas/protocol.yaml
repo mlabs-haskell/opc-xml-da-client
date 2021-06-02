@@ -41,7 +41,6 @@ InterfaceVersion:
     major: Int
     minor: Int
 
-# TODO: Name clash with Haskell type class - how to resolve?
 Read:
   product: 
     options: Maybe RequestOptions
