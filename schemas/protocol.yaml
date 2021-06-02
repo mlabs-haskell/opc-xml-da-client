@@ -12,8 +12,8 @@ GetStatusResponse:
 
 ReplyBase:
   product:
-    rcvTime: XmlDateTime
-    replyTime: XmlDateTime
+    rcvTime: DateTime
+    replyTime: DateTime
     clientRequestHandle: Maybe Text
     revisedLocaleId: Maybe Text
     serverState: ServerState
@@ -33,7 +33,7 @@ ServerStatus:
     vendorInfo: Maybe Text
     supportedLocaleIds: Vector Text
     supportedInterfaceVersions: Vector InterfaceVersion
-    startTime: XmlDateTime
+    startTime: DateTime
     productVersion: Maybe Text
 
 # TODO: This might be better represented as a major-minor version number?
@@ -54,7 +54,7 @@ RequestOptions:
     returnItemTime: Bool
     returnItemPath: Bool
     returnItemName: Bool
-    requestDeadline: Maybe XmlDateTime
+    requestDeadline: Maybe DateTime
     clientRequestHandle: Maybe Text
     localeId: Maybe Text
 
@@ -93,7 +93,7 @@ ItemValue:
     itemPath: Maybe Text
     itemName: Maybe Text
     clientItemHandle: Maybe Text
-    timestamp: Maybe XmlDateTime
+    timestamp: Maybe DateTime
     resultId: Maybe XmlQName
 
 OpcQuality:
@@ -178,10 +178,10 @@ ArrayOfString:
   product:
     string: Vector (Maybe Text)
 
-# TODO: This would be better just as Vector XmlDateTime.
+# TODO: This would be better just as Vector DateTime.
 ArrayOfDateTime:
   product:
-    dateTime: Vector XmlDateTime
+    dateTime: Vector DateTime
 
 # TODO: This would be better just as Vector (Maybe XmlElement).
 ArrayOfAnyType:
@@ -267,7 +267,7 @@ SubscriptionPolledRefresh:
   product:
     options: Maybe RequestOptions
     serverSubHandles: Vector Text
-    holdTime: Maybe XmlDateTime
+    holdTime: Maybe DateTime
     waitTime: Int32
     returnAllItems: Bool
 
@@ -369,3 +369,8 @@ GetPropertiesResponse:
     getPropertiesResult: Maybe ReplyBase
     propertyLists: Vector PropertyReplyList
     errors: Vector OpcError
+
+DateTime:
+  product:
+    local: LocalTime
+    timezone: Maybe TimeZone
