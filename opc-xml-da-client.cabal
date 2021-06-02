@@ -18,7 +18,6 @@ library
   other-modules:
     OpcXmlDaClient.Prelude
     OpcXmlDaClient.Protocol
-    OpcXmlDaClient.XmlTypes
 
   build-depends:
     , base              >=4.14    && <5
