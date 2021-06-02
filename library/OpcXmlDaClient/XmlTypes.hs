@@ -4,9 +4,6 @@
 
 module OpcXmlDaClient.XmlTypes where
 
-import Data.Hashable (Hashable (hashWithSalt))
-import Data.Hashable.Generic (genericHashWithSalt)
-import Data.Hashable.Lifted (liftHashWithSalt)
 import Data.XML.Types
   ( Content,
     Element (Element),

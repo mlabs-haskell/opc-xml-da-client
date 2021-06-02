@@ -36,6 +36,9 @@ import Data.Function as Exports hiding (id, (.))
 import Data.Functor as Exports
 import Data.Functor.Compose as Exports
 import Data.Functor.Identity as Exports
+import Data.Hashable as Exports (Hashable (hash, hashWithSalt))
+import Data.Hashable.Generic as Exports (genericHashWithSalt)
+import Data.Hashable.Lifted as Exports (liftHashWithSalt)
 import Data.Hashable.Time ()
 import Data.IORef as Exports
 import Data.Int as Exports
