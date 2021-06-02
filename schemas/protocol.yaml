@@ -77,7 +77,7 @@ ReadResponse:
   product:
     readResult: ReplyBase
     rItemList: ReplyItemList
-    errors: Vector OPCError
+    errors: Vector OpcError
 
 ReplyItemList:
   product:
@@ -88,7 +88,7 @@ ItemValue:
   product:
     diagnosticInfo: Maybe Text
     value: Maybe XmlElement
-    quality: Maybe OPCQuality
+    quality: Maybe OpcQuality
     valueTypeQualifier: Maybe XmlQName
     itemPath: Maybe Text
     itemName: Maybe Text
@@ -96,7 +96,7 @@ ItemValue:
     timestamp: Maybe XmlDateTime
     resultId: Maybe XmlQName
 
-OPCQuality:
+OpcQuality:
   product:
     qualityField: QualityBits
     limitField: LimitBits
@@ -128,7 +128,7 @@ LimitBits:
     - high
     - constant
 
-OPCError:
+OpcError:
   product:
     text: Maybe Text
     id: XmlQName
@@ -218,7 +218,7 @@ WriteResponse:
   product:
     writeResult: Maybe ReplyBase
     rItemList: Maybe ReplyItemList
-    errors: Vector OPCError
+    errors: Vector OpcError
 
 Subscribe:
   product:
@@ -260,7 +260,7 @@ SubscribeResponse:
   product:
     subscribeResult: Maybe ReplyBase
     rItemList: Maybe SubscribeReplyItemList
-    errors: Vector OPCError
+    errors: Vector OpcError
     serverSubHandle: Maybe Text
 
 SubscriptionPolledRefresh:
@@ -281,7 +281,7 @@ SubscriptionPolledRefreshResponse:
     subscriptionPolledRefreshResult: Maybe ReplyBase
     invalidServerSubHandles: Vector Text
     rItemList: Vector SubscribePolledRefreshReplyItemList
-    errors: Vector OPCError
+    errors: Vector OpcError
     dataBufferOverflow: Bool
 
 SubscriptionCancel:
@@ -337,7 +337,7 @@ BrowseResponse:
   product:
     browseResult: Maybe ReplyBase
     elements: Vector BrowseElement
-    errors: Vector OPCError
+    errors: Vector OpcError
     continuationPoint: Maybe Text
     moreElements: Bool
 
@@ -368,4 +368,4 @@ GetPropertiesResponse:
   product:
     getPropertiesResult: Maybe ReplyBase
     propertyLists: Vector PropertyReplyList
-    errors: Vector OPCError
+    errors: Vector OpcError
