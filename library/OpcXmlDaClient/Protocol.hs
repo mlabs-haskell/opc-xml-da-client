@@ -10,42 +10,26 @@
 
 module OpcXmlDaClient.Protocol where
 
-import Domain
-  ( accessorIsLabelDeriver,
-    boundedDeriver,
-    constructorIsLabelDeriver,
-    dataDeriver,
-    declare,
-    enumDeriver,
-    eqDeriver,
-    genericDeriver,
-    hasFieldDeriver,
-    hashableDeriver,
-    loadSchema,
-    mapperIsLabelDeriver,
-    ordDeriver,
-    showDeriver,
-    typeableDeriver,
-  )
+import qualified Domain
 import OpcXmlDaClient.Prelude hiding (Read)
 import OpcXmlDaClient.XmlTypes (XmlElement, XmlQName)
 
-declare
+Domain.declare
   (Just (True, False))
   ( mconcat
-      [ enumDeriver,
-        boundedDeriver,
-        showDeriver,
-        eqDeriver,
-        ordDeriver,
-        genericDeriver,
-        dataDeriver,
-        typeableDeriver,
-        hashableDeriver,
-        hasFieldDeriver,
-        constructorIsLabelDeriver,
-        accessorIsLabelDeriver,
-        mapperIsLabelDeriver
+      [ Domain.enumDeriver,
+        Domain.boundedDeriver,
+        Domain.showDeriver,
+        Domain.eqDeriver,
+        Domain.ordDeriver,
+        Domain.genericDeriver,
+        Domain.dataDeriver,
+        Domain.typeableDeriver,
+        Domain.hashableDeriver,
+        Domain.hasFieldDeriver,
+        Domain.constructorIsLabelDeriver,
+        Domain.accessorIsLabelDeriver,
+        Domain.mapperIsLabelDeriver
       ]
   )
-  =<< loadSchema "schemas/protocol.yaml"
+  =<< Domain.loadSchema "schemas/protocol.yaml"
