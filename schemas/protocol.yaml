@@ -36,10 +36,10 @@ ServerStatus:
     startTime: DateTime
     productVersion: Maybe Text
 
-# TODO: This might be better represented as a major-minor version number?
 InterfaceVersion:
-  enum:
-    - XML_DA_Version_1_0
+  product:
+    major: Int
+    minor: Int
 
 # TODO: Name clash with Haskell type class - how to resolve?
 Read:
