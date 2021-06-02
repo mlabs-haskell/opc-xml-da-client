@@ -3,7 +3,7 @@
 {-# LANGUAGE LambdaCase #-}
 
 module OpcXmlDaClient.XmlTypes
-  ( XmlValue (..),
+  ( XmlElement (..),
     XmlQName (..),
     XmlDateTime (..),
   )
@@ -79,7 +79,7 @@ instance Hashable XmlQName where
 -- | An XML fragment that does not necessarily constitute a full document.
 --
 -- @since 0.1
-newtype XmlValue = XmlValue Element
+newtype XmlElement = XmlElement Element
   deriving stock
     ( -- | @since 0.1
       Show,
@@ -95,9 +95,9 @@ newtype XmlValue = XmlValue Element
     via Element
 
 -- | @since 0.1
-instance Hashable XmlValue where
+instance Hashable XmlElement where
   {-# INLINEABLE hashWithSalt #-}
-  hashWithSalt salt (XmlValue el) = hashElement salt el
+  hashWithSalt salt (XmlElement el) = hashElement salt el
     where
       hashElement :: Int -> Element -> Int
       hashElement salt' (Element n as ns) =
