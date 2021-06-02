@@ -28,7 +28,7 @@ import Domain
     typeableDeriver,
   )
 import OpcXmlDaClient.Prelude hiding (Read)
-import OpcXmlDaClient.XmlTypes (XmlDateTime, XmlQName, XmlElement)
+import OpcXmlDaClient.XmlTypes (XmlDateTime, XmlElement, XmlQName)
 
 declare
   (Just (True, False))

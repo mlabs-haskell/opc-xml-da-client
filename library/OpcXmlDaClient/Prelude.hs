@@ -37,8 +37,8 @@ import Data.Functor as Exports
 import Data.Functor.Compose as Exports
 import Data.Functor.Identity as Exports
 import Data.Hashable.Time ()
-import Data.Int as Exports
 import Data.IORef as Exports
+import Data.Int as Exports
 import Data.Ix as Exports
 import Data.List as Exports hiding (all, and, any, concat, concatMap, elem, find, foldl, foldl', foldl1, foldr, foldr1, isSubsequenceOf, mapAccumL, mapAccumR, maximum, maximumBy, minimum, minimumBy, notElem, or, product, sortOn, sum, uncons)
 import Data.List.NonEmpty as Exports (NonEmpty (..))
@@ -47,9 +47,9 @@ import Data.Monoid as Exports hiding (Alt)
 import Data.Ord as Exports
 import Data.Proxy as Exports
 import Data.Ratio as Exports
+import Data.STRef as Exports
 import Data.Scientific as Exports (Scientific)
 import Data.Semigroup as Exports hiding (First (..), Last (..))
-import Data.STRef as Exports
 import Data.String as Exports
 import Data.Text as Exports (Text)
 import Data.Time as Exports (LocalTime, TimeZone)
@@ -72,7 +72,6 @@ import GHC.Generics as Exports (Generic)
 import GHC.IO.Exception as Exports
 import GHC.OverloadedLabels as Exports
 import Numeric as Exports
-import Prelude as Exports hiding (all, and, any, concat, concatMap, elem, fail, foldl, foldl1, foldr, foldr1, id, mapM, mapM_, maximum, minimum, notElem, or, product, sequence, sequence_, sum, (.))
 import System.Environment as Exports
 import System.Exit as Exports
 import System.IO as Exports (Handle, hClose)
@@ -86,3 +85,4 @@ import Text.ParserCombinators.ReadPrec as Exports (ReadPrec, readP_to_Prec, read
 import Text.Printf as Exports (hPrintf, printf)
 import Text.Read as Exports (Read (..), readEither, readMaybe)
 import Unsafe.Coerce as Exports
+import Prelude as Exports hiding (all, and, any, concat, concatMap, elem, fail, foldl, foldl1, foldr, foldr1, id, mapM, mapM_, maximum, minimum, notElem, or, product, sequence, sequence_, sum, (.))
