@@ -87,7 +87,7 @@ ReplyItemList:
 ItemValue:
   product:
     diagnosticInfo: Maybe Text
-    value: Maybe XmlValue
+    value: Maybe XmlElement
     quality: Maybe OPCQuality
     valueTypeQualifier: Maybe XmlQName
     itemPath: Maybe Text
@@ -183,10 +183,10 @@ ArrayOfDateTime:
   product:
     dateTime: Vector XmlDateTime
 
-# TODO: This would be better just as Vector (Maybe XmlValue).
+# TODO: This would be better just as Vector (Maybe XmlElement).
 ArrayOfAnyType:
   product:
-    anyType: Vector (Maybe XmlValue)
+    anyType: Vector (Maybe XmlElement)
 
 # TODO: This would be better as Vector Scientific.
 ArrayOfDecimal:
@@ -326,7 +326,7 @@ BrowseElement:
 
 ItemProperty:
   product:
-    value: Maybe XmlValue
+    value: Maybe XmlElement
     name: XmlQName
     description: Maybe Text
     itemPath: Maybe Text
