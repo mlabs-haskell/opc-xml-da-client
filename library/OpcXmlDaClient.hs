@@ -1,7 +1,16 @@
 {-# LANGUAGE DerivingVia #-}
 
 module OpcXmlDaClient
-  ( -- * Operations
+  ( -- * Connection
+    Connection,
+    ConnectionParams,
+    ConnectionError,
+    OpError,
+    connect,
+    operate,
+    disconnect,
+
+    -- * Operations
     Op,
     getStatus,
     read,
@@ -20,17 +29,52 @@ where
 import OpcXmlDaClient.Prelude hiding (Read, read)
 import OpcXmlDaClient.Protocol
 
--- @since 0.1
-newtype Op a = Op (Identity a)
+-- |
+-- Connection to the server.
+data Connection
+
+-- |
+-- Connection parameters.
+--
+-- TODO: Blank until implemented.
+data ConnectionParams
+
+-- |
+-- Error during the establishment of connection.
+--
+-- TODO: Blank until implemented.
+data ConnectionError
+
+-- |
+-- Error during the execution of an operation.
+--
+-- TODO: Blank until implemented.
+data OpError
+
+-- |
+-- Establish a connection given the params.
+connect :: ConnectionParams -> IO (Either ConnectionError Connection)
+connect =
+  error "TODO"
+
+-- |
+-- Execute series of operations on a connection.
+operate :: Connection -> Op a -> IO (Either OpError a)
+operate =
+  error "TODO"
+
+-- |
+-- Close a connection releasing all resources.
+disconnect :: Connection -> IO ()
+disconnect =
+  error "TODO"
+
+-- |
+-- Composable series of interactions with the server.
+newtype Op a = Op (Connection -> IO (Either OpError a))
   deriving
-    ( -- | @since 0.1
-      Functor,
-      -- | @since 0.1
-      Applicative,
-      -- | @since 0.1
-      Monad
-    )
-    via Identity
+    (Functor, Applicative, Monad)
+    via (ReaderT Connection (ExceptT OpError IO))
 
 -- | @since 0.1
 getStatus :: GetStatus -> Op GetStatusResponse
