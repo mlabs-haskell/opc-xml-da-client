@@ -3,8 +3,6 @@ module OpcXmlDaClient.Prelude
   )
 where
 
--- base
--------------------------
 import Control.Applicative as Exports hiding (WrappedArrow (..))
 import Control.Arrow as Exports hiding (first, second)
 import Control.Category as Exports
@@ -13,14 +11,6 @@ import Control.Exception as Exports
 import Control.Monad as Exports hiding (fail, forM, forM_, mapM, mapM_, msum, sequence, sequence_)
 import Control.Monad.Fail as Exports
 import Control.Monad.Fix as Exports hiding (fix)
--- bytestring
--------------------------
-
--- text
--------------------------
-
--- transformers
--------------------------
 import Control.Monad.IO.Class as Exports
 import Control.Monad.ST as Exports
 import Control.Monad.Trans.Class as Exports
@@ -46,11 +36,9 @@ import Data.Function as Exports hiding (id, (.))
 import Data.Functor as Exports
 import Data.Functor.Compose as Exports
 import Data.Functor.Identity as Exports
--- hashable-time
--------------------------
 import Data.Hashable.Time ()
-import Data.IORef as Exports
 import Data.Int as Exports
+import Data.IORef as Exports
 import Data.Ix as Exports
 import Data.List as Exports hiding (all, and, any, concat, concatMap, elem, find, foldl, foldl', foldl1, foldr, foldr1, isSubsequenceOf, mapAccumL, mapAccumR, maximum, maximumBy, minimum, minimumBy, notElem, or, product, sortOn, sum, uncons)
 import Data.List.NonEmpty as Exports (NonEmpty (..))
@@ -59,24 +47,15 @@ import Data.Monoid as Exports hiding (Alt)
 import Data.Ord as Exports
 import Data.Proxy as Exports
 import Data.Ratio as Exports
-import Data.STRef as Exports
--- vector-instances
--------------------------
-
--- scientific
--------------------------
 import Data.Scientific as Exports (Scientific)
 import Data.Semigroup as Exports hiding (First (..), Last (..))
+import Data.STRef as Exports
 import Data.String as Exports
 import Data.Text as Exports (Text)
--- time
--------------------------
 import Data.Time as Exports (LocalTime, TimeZone)
 import Data.Traversable as Exports
 import Data.Tuple as Exports
 import Data.Unique as Exports
--- vector
--------------------------
 import Data.Vector as Exports (Vector)
 import Data.Vector.Instances ()
 import Data.Version as Exports
@@ -93,6 +72,7 @@ import GHC.Generics as Exports (Generic)
 import GHC.IO.Exception as Exports
 import GHC.OverloadedLabels as Exports
 import Numeric as Exports
+import Prelude as Exports hiding (all, and, any, concat, concatMap, elem, fail, foldl, foldl1, foldr, foldr1, id, mapM, mapM_, maximum, minimum, notElem, or, product, sequence, sequence_, sum, (.))
 import System.Environment as Exports
 import System.Exit as Exports
 import System.IO as Exports (Handle, hClose)
@@ -106,4 +86,3 @@ import Text.ParserCombinators.ReadPrec as Exports (ReadPrec, readP_to_Prec, read
 import Text.Printf as Exports (hPrintf, printf)
 import Text.Read as Exports (Read (..), readEither, readMaybe)
 import Unsafe.Coerce as Exports
-import Prelude as Exports hiding (all, and, any, concat, concatMap, elem, fail, foldl, foldl1, foldr, foldr1, id, mapM, mapM_, maximum, minimum, notElem, or, product, sequence, sequence_, sum, (.))
