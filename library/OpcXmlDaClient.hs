@@ -1,5 +1,3 @@
-{-# LANGUAGE DerivingVia #-}
-
 module OpcXmlDaClient
   ( -- * Connection
     Connection,
@@ -76,34 +74,26 @@ newtype Op a = Op (Connection -> IO (Either OperationError a))
     (Functor, Applicative, Monad)
     via (ReaderT Connection (ExceptT OperationError IO))
 
--- | @since 0.1
 getStatus :: GetStatus -> Op GetStatusResponse
 getStatus = error "TODO"
 
--- | @since 0.1
 read :: Read -> Op ReadResponse
 read = error "TODO"
 
--- | @since 0.1
 write :: Write -> Op WriteResponse
 write = error "TODO"
 
--- | @since 0.1
 subscribe :: Subscribe -> Op SubscribeResponse
 subscribe = error "TODO"
 
--- | @since 0.1
 subscriptionPolledRefresh :: SubscriptionPolledRefresh -> Op SubscriptionPolledRefreshResponse
 subscriptionPolledRefresh = error "TODO"
 
--- | @since 0.1
 subscriptionCancel :: SubscriptionCancel -> Op SubscriptionCancelResponse
 subscriptionCancel = error "TODO"
 
--- | @since 0.1
 browse :: Browse -> Op BrowseResponse
 browse = error "TODO"
 
--- | @since 0.1
 getProperties :: GetProperties -> Op GetPropertiesResponse
 getProperties = error "TODO"
