@@ -45,6 +45,7 @@ import Data.Int as Exports
 import Data.Ix as Exports
 import Data.List as Exports hiding (all, and, any, concat, concatMap, elem, find, foldl, foldl', foldl1, foldr, foldr1, isSubsequenceOf, mapAccumL, mapAccumR, maximum, maximumBy, minimum, minimumBy, notElem, or, product, sortOn, sum, uncons)
 import Data.List.NonEmpty as Exports (NonEmpty (..))
+import Data.Map.Strict as Exports (Map)
 import Data.Maybe as Exports
 import Data.Monoid as Exports hiding (Alt)
 import Data.Ord as Exports

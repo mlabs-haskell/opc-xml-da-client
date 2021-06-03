@@ -22,12 +22,12 @@ module OpcXmlDaClient
     getProperties,
 
     -- * Data types
-    module OpcXmlDaClient.Protocol,
+    module OpcXmlDaClient.Protocol.Types,
   )
 where
 
 import OpcXmlDaClient.Prelude hiding (Read, read)
-import OpcXmlDaClient.Protocol
+import OpcXmlDaClient.Protocol.Types
 
 -- |
 -- Connection to the server.

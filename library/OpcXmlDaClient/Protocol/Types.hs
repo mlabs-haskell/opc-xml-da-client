@@ -1,4 +1,4 @@
-module OpcXmlDaClient.Protocol where
+module OpcXmlDaClient.Protocol.Types where
 
 import qualified Data.XML.Types as Xml
 import qualified Domain
