@@ -17,8 +17,7 @@ Domain.declare
         Domain.typeableDeriver,
         Domain.hasFieldDeriver,
         Domain.constructorIsLabelDeriver,
-        Domain.accessorIsLabelDeriver,
-        Domain.mapperIsLabelDeriver
+        Domain.accessorIsLabelDeriver
       ]
   )
   =<< Domain.loadSchema "schemas/protocol.yaml"
