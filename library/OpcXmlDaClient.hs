@@ -5,7 +5,7 @@ module OpcXmlDaClient
     Connection,
     ConnectionParams,
     ConnectionError,
-    OpError,
+    OperationError,
     connect,
     operate,
     disconnect,
@@ -49,7 +49,7 @@ data ConnectionError
 -- Error during the execution of an operation.
 --
 -- TODO: Blank until implemented.
-data OpError
+data OperationError
 
 -- |
 -- Establish a connection given the params.
@@ -59,7 +59,7 @@ connect =
 
 -- |
 -- Execute series of operations on a connection.
-operate :: Connection -> Op a -> IO (Either OpError a)
+operate :: Connection -> Op a -> IO (Either OperationError a)
 operate =
   error "TODO"
 
@@ -71,10 +71,10 @@ disconnect =
 
 -- |
 -- Composable series of interactions with the server.
-newtype Op a = Op (Connection -> IO (Either OpError a))
+newtype Op a = Op (Connection -> IO (Either OperationError a))
   deriving
     (Functor, Applicative, Monad)
-    via (ReaderT Connection (ExceptT OpError IO))
+    via (ReaderT Connection (ExceptT OperationError IO))
 
 -- | @since 0.1
 getStatus :: GetStatus -> Op GetStatusResponse
