@@ -85,7 +85,7 @@ subscribe ns name x =
             if #returnValuesOnReply x then "true" else "false"
           ),
           ( Xml.Name "SubcriptionPingRate" Nothing Nothing,
-            show (#subscriptionPingRate x)
+            showText (#subscriptionPingRate x)
           )
         ]
     )
