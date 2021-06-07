@@ -11,4 +11,5 @@ cabal.project.local
 cabal.project.local~
 /specs/
 .nvimrc
+.stylish-haskell.yaml
 cabal.project
