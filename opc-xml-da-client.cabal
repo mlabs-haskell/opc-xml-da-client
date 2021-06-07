@@ -19,10 +19,10 @@ library
     OpcXmlDaClient
   other-modules:
     OpcXmlDaClient.Prelude
-    OpcXmlDaClient.Protocol.Parser
-    OpcXmlDaClient.Protocol.Types
-    OpcXmlDaClient.Protocol.XmlConstruction
-    OpcXmlDaClient.Protocol.XmlParsing
+    OpcXmlDaClient.Types
+    OpcXmlDaClient.XmlConstruction
+    OpcXmlDaClient.XmlParsing
+    OpcXmlDaClient.XmlParsing.Internal
   build-depends:
     base >=4.14 && <5,
     bytestring >=0.10 && <0.12,

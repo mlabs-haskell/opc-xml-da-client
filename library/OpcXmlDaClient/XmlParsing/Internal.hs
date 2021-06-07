@@ -1,10 +1,10 @@
-module OpcXmlDaClient.Protocol.Parser where
+module OpcXmlDaClient.XmlParsing.Internal where
 
 import Control.Lens hiding (element)
 import Data.Kind
 import Data.Text.Lazy.Lens (packed)
 import OpcXmlDaClient.Prelude
-import OpcXmlDaClient.Protocol.Types
+import OpcXmlDaClient.Types
 import qualified Text.XML as Xml
 import Text.XML.Cursor
 import qualified Text.XML.Cursor as Cursor

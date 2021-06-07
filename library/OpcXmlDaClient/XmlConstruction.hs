@@ -1,8 +1,8 @@
-module OpcXmlDaClient.Protocol.XmlConstruction where
+module OpcXmlDaClient.XmlConstruction where
 
 import qualified Data.Map.Strict as Map
 import OpcXmlDaClient.Prelude hiding (Read, bool)
-import OpcXmlDaClient.Protocol.Types
+import OpcXmlDaClient.Types
 import qualified Text.XML as Xml
 
 -- |
