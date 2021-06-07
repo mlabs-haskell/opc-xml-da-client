@@ -13,3 +13,7 @@ cabal.project.local~
 .nvimrc
 .stylish-haskell.yaml
 cabal.project
+flake.lock
+flake.nix
+shell.nix
+.pre-commit-config.yaml
