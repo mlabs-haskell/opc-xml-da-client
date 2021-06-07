@@ -1,4 +1,0 @@
-packages: ./opc-xml-da-client.cabal
-
-package opc-xml-da-client
-  ghc-options: -Werror

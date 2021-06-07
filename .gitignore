@@ -11,3 +11,4 @@ cabal.project.local
 cabal.project.local~
 /specs/
 .nvimrc
+cabal.project
