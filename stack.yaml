@@ -3,13 +3,12 @@ extra-deps:
   - acc-0.1.3
   - attoparsec-data-1.0.5.1
   - attoparsec-time-1.0.1.1
-  - data-default-0.7.1.1
   - domain-0.1.1
   - domain-core-0.1
   - domain-optics-0.1
   - hashable-1.3.2.0
-  - indexed-traversable-0.1.1
-  - indexed-traversable-instances-0.1
-  - lens-5.0.1
   - th-lego-0.2.3
   - yaml-unscrambler-0.1.0.2
+  - data-default-0.7.1.1
+  - constraints-0.13
+  - lens-5.0.1

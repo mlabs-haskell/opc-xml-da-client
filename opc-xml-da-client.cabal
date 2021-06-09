@@ -12,22 +12,22 @@ source-repository head
 
 library
   hs-source-dirs: library
-  default-extensions: ApplicativeDo, BangPatterns, BinaryLiterals, BlockArguments, ConstraintKinds, DataKinds, DefaultSignatures, DeriveDataTypeable, DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveLift, DeriveTraversable, DerivingVia, DuplicateRecordFields, EmptyDataDecls, FlexibleContexts, FlexibleInstances, FunctionalDependencies, GADTs, GeneralizedNewtypeDeriving, HexFloatLiterals, InstanceSigs, LambdaCase, LiberalTypeSynonyms, MagicHash, MultiParamTypeClasses, MultiWayIf, NamedFieldPuns, NoImplicitPrelude, NoMonomorphismRestriction, NumericUnderscores, OverloadedLabels, OverloadedStrings, PatternGuards, PatternSynonyms, ParallelListComp, QuasiQuotes, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, StrictData, TemplateHaskell, TupleSections, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns
+  default-extensions: ApplicativeDo, BangPatterns, BinaryLiterals, BlockArguments, ConstraintKinds, DataKinds, DefaultSignatures, DeriveDataTypeable, DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveLift, DeriveTraversable, DerivingVia, DuplicateRecordFields, EmptyDataDecls, FlexibleContexts, FlexibleInstances, FunctionalDependencies, GADTs, GeneralizedNewtypeDeriving, HexFloatLiterals, InstanceSigs, LambdaCase, LiberalTypeSynonyms, MagicHash, MultiParamTypeClasses, MultiWayIf, NoImplicitPrelude, NoMonomorphismRestriction, NumericUnderscores, OverloadedLabels, OverloadedStrings, PatternGuards, PatternSynonyms, ParallelListComp, QuasiQuotes, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, StrictData, TemplateHaskell, TupleSections, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns
   default-language: Haskell2010
   ghc-options: -funbox-strict-fields
   exposed-modules:
     OpcXmlDaClient
   other-modules:
     OpcXmlDaClient.Prelude
-    OpcXmlDaClient.Types
-    OpcXmlDaClient.XmlConstruction
-    OpcXmlDaClient.XmlParsing
-    OpcXmlDaClient.XmlParsing.Internal
+    OpcXmlDaClient.Protocol.Parser
+    OpcXmlDaClient.Protocol.Types
+    OpcXmlDaClient.Protocol.XmlConstruction
   build-depends:
     base >=4.14 && <5,
     bytestring >=0.10 && <0.12,
-    data-default ^>=0.7.1.1,
-    lens ^>=5.0,
+    data-default ^>= 0.7.1.1,
+    lens == 5.0.1,
+    constraints ^>= 0.13,
     containers ^>=0.6.2.1,
     domain ^>=0.1.1,
     hashable ^>=1.3.2.0,
@@ -41,3 +41,6 @@ library
     xml-conduit ^>=1.9.1.1,
     xml-types ^>=0.3.8,
     xml-lens ^>= 0.3,
+    shower ^>= 0.2.0.2,
+    attoparsec ^>= 0.13.2.5,
+    attoparsec-time ^>= 1.0.1.1,
