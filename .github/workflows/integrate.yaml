@@ -1,0 +1,54 @@
+on: [push]
+jobs:
+  check-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mrkkrp/ormolu-action@v2
+        with:
+          extra-args: -o -XAllowAmbiguousTypes -o -XBlockArguments -o -XConstraintKinds -o -XDataKinds -o -XDefaultSignatures -o -XDeriveAnyClass -o -XDeriveFunctor -o -XDeriveGeneric -o -XDerivingStrategies -o -XDuplicateRecordFields -o -XEmptyCase -o -XExplicitNamespaces -o -XFlexibleContexts -o -XFlexibleInstances -o -XGeneralizedNewtypeDeriving -o -XInstanceSigs -o -XLambdaCase -o -XMultiParamTypeClasses -o -XMultiWayIf -o -XNamedFieldPuns -o -XNoImplicitPrelude -o -XNumericUnderscores -o -XOverloadedLabels -o -XOverloadedStrings -o -XPatternSynonyms -o -XRecordWildCards -o -XScopedTypeVariables -o -XStandaloneDeriving -o -XTemplateHaskell -o -XTupleSections -o -XTypeApplications -o -XTypeFamilies -o -XTypeOperators -o -XTypeSynonymInstances -o -XUndecidableInstances -o -XViewPatterns
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2.1.4
+        name: Cache Stack
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-stack-lint
+          restore-keys: ${{ runner.os }}-stack-
+
+      - run: stack install hlint
+        name: Setup
+
+      - run: ~/.local/bin/hlint .
+        name: Lint
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-haskell@v1.1.4
+        name: Setup
+        with:
+          enable-stack: true
+          stack-version: 2.5.1
+          stack-no-global: true
+
+      - uses: actions/cache@v2.1.4
+        name: Cache
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
+          restore-keys: ${{ runner.os }}-stack-
+
+      - name: Install dependencies
+        run: stack build --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
+
+      - name: Build
+        run: stack build --test --bench --no-run-tests --no-run-benchmarks
+
+      - name: Test
+        run: stack test
