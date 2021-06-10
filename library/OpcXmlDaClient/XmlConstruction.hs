@@ -131,7 +131,7 @@ subscribeRequestItemList ns name x =
     (Xml.Name name ns Nothing)
     ( Map.fromList
         ( catMaybes
-            [ fmap (("ItemPath",)) (#itemPath x),
+            [ fmap ("ItemPath",) (#itemPath x),
               fmap (("ReqType",) . qName) (#reqType x),
               fmap (("Deadband",) . float) (#deadband x),
               fmap (("RequestedSamplingRate",) . int) (#requestedSamplingRate x),
