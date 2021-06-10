@@ -47,7 +47,7 @@ inSoapEnvelope elementByNamespace =
         [ Xml.NodeElement
             ( Xml.Element
                 (Xml.Name "Header" (Just "SOAP-ENV") Nothing)
-                (Map.empty)
+                Map.empty
                 []
             ),
           Xml.NodeElement
@@ -112,9 +112,9 @@ requestOptions ns name x =
               if #returnItemTime x then Just ("ReturnItemTime", "true") else Nothing,
               if #returnItemPath x then Just ("ReturnItemPath", "true") else Nothing,
               if #returnItemName x then Just ("ReturnItemName", "true") else Nothing,
-              fmap ((,) "RequestDeadline" . dateTime) (#requestDeadline x),
-              fmap ((,) "ClientRequestHandle") (#clientRequestHandle x),
-              fmap ((,) "LocaleID") (#localeId x)
+              fmap (("RequestDeadline",) . dateTime) (#requestDeadline x),
+              fmap ("ClientRequestHandle",) (#clientRequestHandle x),
+              fmap ("LocaleID",) (#localeId x)
             ]
         )
     )
@@ -149,10 +149,10 @@ subscribeRequestItem ns name x =
     (Xml.Name name ns Nothing)
     ( Map.fromList
         ( catMaybes
-            [ fmap (("ItemPath",)) (#itemPath x),
+            [ fmap ("ItemPath",) (#itemPath x),
               fmap (("ReqType",) . qName) (#reqType x),
-              fmap (("ItemName",)) (#itemName x),
-              fmap (("ClientItemHandle",)) (#clientItemHandle x),
+              fmap ("ItemName",) (#itemName x),
+              fmap ("ClientItemHandle",) (#clientItemHandle x),
               fmap (("Deadband",) . float) (#deadband x),
               fmap (("RequestedSamplingRate",) . int) (#requestedSamplingRate x),
               fmap (("EnableBuffering",) . boolean) (#enableBuffering x)
