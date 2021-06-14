@@ -1,6 +1,8 @@
 module OpcXmlDaClient.Prelude
   ( module Exports,
     showText,
+    takeFromEnd,
+    mbSingleton,
   )
 where
 
@@ -98,3 +100,10 @@ import Prelude as Exports hiding (all, and, any, concat, concatMap, elem, fail, 
 {-# SPECIALIZE showText :: String -> Text #-}
 showText :: Show a => a -> Text
 showText = fromString . show
+
+mbSingleton :: [a] -> Maybe a
+mbSingleton [x] = pure x
+mbSingleton _ = Nothing
+
+takeFromEnd :: Int -> [a] -> [a]
+takeFromEnd n = take n . reverse
