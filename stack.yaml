@@ -12,3 +12,4 @@ extra-deps:
   - data-default-0.7.1.1
   - constraints-0.13
   - lens-5.0.1
+  - shower-0.2.0.2
