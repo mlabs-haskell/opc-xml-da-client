@@ -42,7 +42,7 @@ InterfaceVersion:
     minor: Int
 
 Read:
-  product: 
+  product:
     options: Maybe RequestOptions
     itemList: Maybe ReadRequestItemList
 
@@ -100,7 +100,7 @@ OpcQuality:
     qualityField: QualityBits
     limitField: LimitBits
     vendorField: Word8
-    
+
 QualityBits:
   enum:
     - bad
@@ -371,5 +371,4 @@ GetPropertiesResponse:
 
 DateTime:
   product:
-    local: LocalTime
-    timezone: Maybe TimeZone
+    utcTime: UTCTime
