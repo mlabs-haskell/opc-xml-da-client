@@ -13,3 +13,4 @@ extra-deps:
   - constraints-0.13
   - lens-5.0.1
   - shower-0.2.0.2
+  - indexed-traversable-instances-0.1
