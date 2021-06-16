@@ -1,41 +1,58 @@
-module OpcXmlDaClient.XmlConstruction where
+{-# LANGUAGE NamedFieldPuns #-}
+
+module OpcXmlDaClient.XmlConstruction
+  ( -- * Documents
+    subscribeDocument,
+    getStatusDocument,
+    writeDocument,
+    readDocument,
+    subscriptionPolledRefreshDocument,
+    subscriptionCancelDocument,
+    browseDocument,
+    getPropertiesDocument,
+
+    -- * Elements
+    subscribeElement,
+    requestOptionsElement,
+    subscribeRequestItemListElement,
+    subscribeRequestItemElement,
+    getStatusElement,
+    itemValueElement,
+    diagnosticInfoElement,
+    opcQualityElement,
+    writeRequestItemListElement,
+    writeElement,
+    readRequestItemElement,
+    readRequestItemListElement,
+    readElement,
+    subscriptionPolledRefreshElement,
+    serverSubHandlesElement,
+    subscriptionCancelElement,
+    browseElement,
+    propertyNamesElement,
+    getPropertiesElement,
+    itemIdentifierElement,
+
+    -- * Parsers
+    limitBitsText,
+    qualityBitsText,
+    browseFilterText,
+    qName,
+  )
+where
 
 import qualified Data.Map.Strict as Map
+import qualified Data.Text as Text
+import Data.Time.Format.ISO8601 (iso8601Show)
 import OpcXmlDaClient.Prelude hiding (Read, bool)
 import OpcXmlDaClient.Types
 import qualified Text.XML as Xml
 
--- * Final documents
-
-getStatusDocument :: GetStatus -> Xml.Document
-getStatusDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
-
-readDocument :: Read -> Xml.Document
-readDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
-
-writeDocument :: Write -> Xml.Document
-writeDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
-
-subscribeDocument :: Subscribe -> Xml.Document
-subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribe "Subscribe"
-
-subscriptionPolledRefreshDocument :: SubscriptionPolledRefresh -> Xml.Document
-subscriptionPolledRefreshDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
-
-subscriptionCancelDocument :: SubscriptionCancel -> Xml.Document
-subscriptionCancelDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
-
-browseDocument :: Browse -> Xml.Document
-browseDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
-
-getPropertiesDocument :: GetProperties -> Xml.Document
-getPropertiesDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+----------------------------------------------------------------
 
 -- * Names
 
-unnamespacedName :: Text -> Xml.Name
-unnamespacedName name =
-  Xml.Name name Nothing Nothing
+----------------------------------------------------------------
 
 soapEncodingName :: Text -> Xml.Name
 soapEncodingName name =
@@ -95,7 +112,20 @@ inSoapEnvelope bodyChild =
     )
     []
 
+----------------------------------------------------------------
+
+-- * Helpers
+
+----------------------------------------------------------------
+
+constructElement :: Text -> [(Xml.Name, Text)] -> [Xml.Node] -> Xml.Element
+constructElement name attributes = Xml.Element (xmlDaName name) (Map.fromList attributes)
+
+----------------------------------------------------------------
+
 -- * Elements
+
+----------------------------------------------------------------
 
 -- |
 -- > <ns1:Subscribe ReturnValuesOnReply="true" SubscriptionPingRate="3000">
@@ -106,57 +136,78 @@ inSoapEnvelope bodyChild =
 -- >     <ns1:Items ClientItemHandle="SubscribeItem_2" ItemName="C"/>
 -- >   </ns1:ItemList>
 -- > </ns1:Subscribe>
-subscribe :: Text -> Subscribe -> Xml.Element
-subscribe name x =
-  Xml.Element
-    (xmlDaName name)
-    ( Map.fromList
-        [ ( unnamespacedName "ReturnValuesOnReply",
-            if #returnValuesOnReply x then "true" else "false"
-          ),
-          ( unnamespacedName "SubcriptionPingRate",
-            showText (#subscriptionPingRate x)
-          )
+subscribeElement :: Subscribe -> Xml.Element
+subscribeElement x =
+  constructElement
+    "Subscribe"
+    do
+      catMaybes
+        [ pure ("ReturnValuesOnReply", bool do #returnValuesOnReply x),
+          ("SubcriptionPingRate",) . int <$> #subscriptionPingRate x
         ]
-    )
     ( catMaybes
-        [ fmap (Xml.NodeElement . requestOptions "Options") (#options x),
-          fmap (Xml.NodeElement . subscribeRequestItemList "ItemList") (#itemList x)
+        [ fmap (Xml.NodeElement . requestOptionsElement) (#options x),
+          fmap (Xml.NodeElement . subscribeRequestItemListElement "ItemList") (#itemList x)
         ]
     )
+  where
+    s = #subscriptionPingRate x
+    r = int <$> s
+
+subscribeDocument :: Subscribe -> Xml.Document
+subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
 
 -- |
+-- > RequestOptions:
+-- >   product:
+-- >    returnErrorText: Bool
+-- >    returnDiagnosticInfo: Bool
+-- >    returnItemTime: Bool
+-- >    returnItemPath: Bool
+-- >    returnItemName: Bool
+-- >    requestDeadline: Maybe DateTime
+-- >    clientRequestHandle: Maybe Text
+-- >    localeId: Maybe Text
+--
 -- > <ns1:Options
 -- >   ClientRequestHandle="Subscribe"
 -- >   ReturnErrorText="true"
 -- >   ReturnItemName="true"
 -- >   ReturnItemPath="true"/>
-requestOptions :: Text -> RequestOptions -> Xml.Element
-requestOptions name x =
-  Xml.Element
-    (xmlDaName name)
-    ( Map.fromList
-        ( catMaybes
-            [ if #returnErrorText x then Nothing else Just ("ReturnErrorText", "true"),
-              if #returnDiagnosticInfo x then Just ("ReturnDiagnosticInfo", "true") else Nothing,
-              if #returnItemTime x then Just ("ReturnItemTime", "true") else Nothing,
-              if #returnItemPath x then Just ("ReturnItemPath", "true") else Nothing,
-              if #returnItemName x then Just ("ReturnItemName", "true") else Nothing,
-              fmap (("RequestDeadline",) . dateTime) (#requestDeadline x),
-              fmap ("ClientRequestHandle",) (#clientRequestHandle x),
-              fmap ("LocaleID",) (#localeId x)
-            ]
-        )
-    )
+requestOptionsElement :: RequestOptions -> Xml.Element
+requestOptionsElement x =
+  constructElement
+    "Options"
+    do
+      catMaybes
+        [ if #returnErrorText x then Nothing else Just ("ReturnErrorText", "true"),
+          if #returnDiagnosticInfo x then Just ("ReturnDiagnosticInfo", "true") else Nothing,
+          if #returnItemTime x then Just ("ReturnItemTime", "true") else Nothing,
+          if #returnItemPath x then Just ("ReturnItemPath", "true") else Nothing,
+          if #returnItemName x then Just ("ReturnItemName", "true") else Nothing,
+          fmap (("RequestDeadline",) . dateTime) (#requestDeadline x),
+          fmap ("ClientRequestHandle",) (#clientRequestHandle x),
+          fmap ("LocaleID",) (#localeId x)
+        ]
     []
 
 -- |
+-- > SubscribeRequestItemList:
+-- >   product:
+-- >    items: Vector SubscribeRequestItem
+-- >    itemPath: Maybe Text
+-- >    reqType: Maybe Xml.Name
+-- >    deadband: Maybe Float
+-- >    requestedSamplingRate: Maybe Int32
+-- >    enableBuffering: Maybe Bool
+--
 -- > <ns1:ItemList>
 -- >   <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
 -- >   <ns1:Items ClientItemHandle="SubscribeItem_1" ItemName="B"/>
 -- >   <ns1:Items ClientItemHandle="SubscribeItem_2" ItemName="C"/>
-subscribeRequestItemList :: Text -> SubscribeRequestItemList -> Xml.Element
-subscribeRequestItemList name x =
+-- > </ns1:ItemList>
+subscribeRequestItemListElement :: Text -> SubscribeRequestItemList -> Xml.Element
+subscribeRequestItemListElement name x =
   Xml.Element
     (xmlDaName name)
     ( Map.fromList
@@ -165,16 +216,16 @@ subscribeRequestItemList name x =
               fmap (("ReqType",) . qName) (#reqType x),
               fmap (("Deadband",) . float) (#deadband x),
               fmap (("RequestedSamplingRate",) . int) (#requestedSamplingRate x),
-              fmap (("EnableBuffering",) . boolean) (#enableBuffering x)
+              fmap (("EnableBuffering",) . bool) (#enableBuffering x)
             ]
         )
     )
-    (fmap (Xml.NodeElement . subscribeRequestItem "Items") (toList (#items x)))
+    (fmap (Xml.NodeElement . subscribeRequestItemElement "Items") (toList (#items x)))
 
 -- |
 -- > <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
-subscribeRequestItem :: Text -> SubscribeRequestItem -> Xml.Element
-subscribeRequestItem name x =
+subscribeRequestItemElement :: Text -> SubscribeRequestItem -> Xml.Element
+subscribeRequestItemElement name x =
   Xml.Element
     (xmlDaName name)
     ( Map.fromList
@@ -185,28 +236,480 @@ subscribeRequestItem name x =
               fmap ("ClientItemHandle",) (#clientItemHandle x),
               fmap (("Deadband",) . float) (#deadband x),
               fmap (("RequestedSamplingRate",) . int) (#requestedSamplingRate x),
-              fmap (("EnableBuffering",) . boolean) (#enableBuffering x)
+              fmap (("EnableBuffering",) . bool) (#enableBuffering x)
             ]
         )
     )
     []
 
+-- |
+-- > GetStatus:
+-- >  product:
+-- >    localeId: Maybe Text
+-- >    clientRequestHandle: Maybe Text
+--
+-- > <GetStatus ClientRequestHandle="qewr" LocaleID="test"></GetStatus>
+getStatusElement :: GetStatus -> Xml.Element
+getStatusElement gs =
+  constructElement
+    "GetStatus"
+    do
+      catMaybes
+        [ ("LocaleID",) <$> #localeId gs,
+          ("ClientRequestHandle",) <$> #clientRequestHandle gs
+        ]
+    []
+
+getStatusDocument :: GetStatus -> Xml.Document
+getStatusDocument = inSoapEnvelope . Xml.NodeElement . getStatusElement
+
+-- |
+-- > ItemValue:
+-- >  product:
+-- >    diagnosticInfoElement: Maybe Text
+-- >    value: Maybe Xml.Element
+-- >    quality: Maybe OpcQuality
+-- >    valueTypeQualifier: Maybe Xml.Name
+-- >    itemPath: Maybe Text
+-- >    itemName: Maybe Text
+-- >    clientItemHandle: Maybe Text
+-- >    timestamp: Maybe DateTime
+-- >    resultId: Maybe Xml.Name
+--
+-- > <Items
+-- >   ClientItemHandle="qwer_jklsd"
+-- >   ItemName="item"
+-- >   ItemPath="some/path">
+-- >  <DiagnosticInfo>qwer</DiagnosticInfo>
+-- >  <Quality
+-- >     LimitField="high"
+-- >     QualityField="badLastKnownValue"
+-- >     VendorField="3"></Quality>
+-- > </Items>
+itemValueElement :: ItemValue -> Xml.Element
+itemValueElement iv =
+  constructElement
+    "Items"
+    do
+      catMaybes
+        [ ("ValueTypeQualifier",) . qName <$> #valueTypeQualifier iv,
+          ("ItemPath",) <$> #itemPath iv,
+          ("ItemName",) <$> #itemName iv,
+          ("ClientItemHandle",) <$> #clientItemHandle iv,
+          ("Timestamp",) . dateTime <$> #timestamp iv,
+          ("ResultID",) . qName <$> #resultId iv
+        ]
+    ( catMaybes
+        [ Xml.NodeElement . diagnosticInfoElement <$> #diagnosticInfo iv,
+          Xml.NodeElement <$> #value iv,
+          Xml.NodeElement . opcQualityElement <$> #quality iv
+        ]
+    )
+
+-- |
+-- > <DiagnosticInfo>sss</DiagnosticInfo>
+diagnosticInfoElement :: Text -> Xml.Element
+diagnosticInfoElement info =
+  constructElement
+    "DiagnosticInfo"
+    []
+    [Xml.NodeContent info]
+
+-- |
+-- > OpcQuality:
+-- >  product:
+-- >    qualityField: QualityBits
+-- >    limitField: LimitBits
+-- >    vendorField: Word8
+--
+-- > <Quality LimitField="high" QualityField="badLastKnownValue" VendorField="3"></Quality>
+opcQualityElement :: OpcQuality -> Xml.Element
+opcQualityElement opcq =
+  constructElement
+    "Quality"
+    [ ("QualityField", qualityBitsText do #qualityField opcq),
+      ("LimitField", limitBitsText do #limitField opcq),
+      ("VendorField", packed do #vendorField opcq)
+    ]
+    []
+
+-- > QualityBits:
+-- >  enum:
+-- >    - bad
+-- >    - badConfigurationError
+-- >    - badNotConnected
+-- >    - badDeviceFailure
+-- >    - badSensorFailure
+-- >    - badLastKnownValue
+-- >    - badCommFailure
+-- >    - badOutOfService
+-- >    - badWaitingForInitialData
+-- >    - uncertain
+-- >    - uncertainLastUsableValue
+-- >    - uncertainSensorNotAccurate
+-- >    - uncertainEUExceeded
+-- >    - uncertainSubNormal
+-- >    - good
+-- >    - goodLocalOverride
+qualityBitsText :: QualityBits -> Text
+qualityBitsText = \case
+  BadQualityBits -> "bad"
+  BadConfigurationErrorQualityBits -> "badConfigurationError"
+  BadNotConnectedQualityBits -> "badNotConnected"
+  BadDeviceFailureQualityBits -> "badDeviceFailure"
+  BadSensorFailureQualityBits -> "badSensorFailure"
+  BadLastKnownValueQualityBits -> "badLastKnownValue"
+  BadCommFailureQualityBits -> "badCommFailure"
+  BadOutOfServiceQualityBits -> "badOutOfService"
+  BadWaitingForInitialDataQualityBits -> "badWaitingForInitialData"
+  UncertainQualityBits -> "uncertain"
+  UncertainLastUsableValueQualityBits -> "uncertainLastUsableValue"
+  UncertainSensorNotAccurateQualityBits -> "uncertainSensorNotAccurate"
+  UncertainEUExceededQualityBits -> "uncertainEUExceededQualityBits"
+  UncertainSubNormalQualityBits -> "uncertainSubNormal"
+  GoodQualityBits -> "good"
+  GoodLocalOverrideQualityBits -> "goodLocalOverride"
+
+-- |
+-- > LimitBits:
+-- >  enum:
+-- >    - none
+-- >    - low
+-- >    - high
+-- >    - constant
+limitBitsText :: LimitBits -> Text
+limitBitsText = \case
+  NoneLimitBits -> "none"
+  LowLimitBits -> "low"
+  HighLimitBits -> "high"
+  ConstantLimitBits -> "constant"
+
+-- |
+-- > WriteRequestItemList:
+-- >  product:
+-- >    items: Vector ItemValue
+-- >    itemPath: Maybe Text
+--
+-- > <WriteRequestItemList ItemPath="ss">
+-- >  <Items ClientItemHandle="qwer_jklsd" ItemName="item" ItemPath="some/path">
+-- >    <DiagnosticInfo>qwer</DiagnosticInfo>
+-- >    <Quality LimitField="high" QualityField="badLastKnownValue" VendorField="3"></Quality>
+-- >  </Items>
+-- > </WriteRequestItemList>
+writeRequestItemListElement :: WriteRequestItemList -> Xml.Element
+writeRequestItemListElement wril =
+  constructElement
+    "WriteRequestItemList"
+    do
+      catMaybes
+        [("ItemPath",) <$> #itemPath wril]
+    (Xml.NodeElement . itemValueElement <$> toList do #items wril)
+
+-- |
+-- > Write:
+-- >  product:
+-- >    options: Maybe RequestOptions
+-- >    itemList: Maybe WriteRequestItemList
+-- >    returnValuesOnReply: Bool
+--
+-- > <Write ReturnValuesOnReply="true">
+-- >  <WriteRequestItemList ItemPath="ss">
+-- >    <Items ClientItemHandle="qwer_jklsd" ItemName="item" ItemPath="some/path">
+-- >      <DiagnosticInfo>qwer</DiagnosticInfo>
+-- >      <Quality LimitField="high" QualityField="badLastKnownValue" VendorField="3"></Quality>
+-- >    </Items>
+-- >  </WriteRequestItemList>
+-- > </Write>
+writeElement :: Write -> Xml.Element
+writeElement w =
+  constructElement
+    "Write"
+    [("ReturnValuesOnReply", bool do #returnValuesOnReply w)]
+    ( catMaybes
+        [ Xml.NodeElement . writeRequestItemListElement <$> #itemList w,
+          Xml.NodeElement . requestOptionsElement <$> #options w
+        ]
+    )
+
+writeDocument :: Write -> Xml.Document
+writeDocument = inSoapEnvelope . Xml.NodeElement . writeElement
+
+-- |
+-- > ReadRequestItem:
+-- >  product:
+-- >    itemPath: Maybe Text
+-- >    reqType: Maybe Xml.Name
+-- >    itemName: Maybe Text
+-- >    clientItemHandle: Maybe Text
+-- >    maxAge: Maybe Int32
+--
+-- > <Items
+-- >   ClientItemHandle="test"
+-- >   ItemName="qwer"
+-- >   ItemPath="some/path"
+-- >   MaxAge="234"
+-- >   ReqType="ss"></Items>
+readRequestItemElement :: ReadRequestItem -> Xml.Element
+readRequestItemElement rri =
+  constructElement
+    "Items"
+    do
+      catMaybes
+        [ ("ItemPath",) <$> #itemPath rri,
+          ("ReqType",) . qName <$> #reqType rri,
+          ("ItemName",) <$> #itemName rri,
+          ("ClientItemHandle",) <$> #clientItemHandle rri,
+          ("MaxAge",) . int <$> #maxAge rri
+        ]
+    []
+
+-- |
+-- > ReadRequestItemList:
+-- >  product:
+-- >    items: Vector ReadRequestItem
+-- >    itemPath: Maybe Text
+-- >    reqType: Maybe Xml.Name
+-- >    maxAge: Maybe Int32
+--
+-- > <ItemList
+-- >    ItemPath="some/path"
+-- >    MaxAge="234"
+-- >    ReqType="Q:String">
+-- >   <Items ClientItemHandle="test" ItemName="qwer" ItemPath="some/path" MaxAge="234" ReqType="ss"></Items>
+-- > </ItemList>
+readRequestItemListElement :: ReadRequestItemList -> Xml.Element
+readRequestItemListElement rril =
+  constructElement
+    "ItemList"
+    do
+      catMaybes
+        [ ("ItemPath",) <$> #itemPath rril,
+          ("ReqType",) . qName <$> #reqType rril,
+          ("MaxAge",) . int <$> #maxAge rril
+        ]
+    (Xml.NodeElement . readRequestItemElement <$> toList do #items rril)
+
+-- |
+-- > Read:
+-- >  product:
+-- >    options: Maybe RequestOptions
+-- >    itemList: Maybe ReadRequestItemList
+--
+-- > <Read>
+-- >   <Options ClientRequestHandle="qwer" LocaleID="qwer" ReturnItemName="true" ReturnItemPath="true"></Options>
+-- >   <ItemList ItemPath="some/path" MaxAge="234" ReqType="Q:String">
+-- >     <Items ClientItemHandle="test" ItemName="qwer" ItemPath="some/path" MaxAge="234" ReqType="ss"></Items>
+-- >   </ItemList>
+-- > </Read>
+readElement :: Read -> Xml.Element
+readElement r =
+  constructElement
+    "Read"
+    []
+    ( catMaybes
+        [ Xml.NodeElement . requestOptionsElement <$> #options r,
+          Xml.NodeElement . readRequestItemListElement <$> #itemList r
+        ]
+    )
+
+readDocument :: Read -> Xml.Document
+readDocument = inSoapEnvelope . Xml.NodeElement . readElement
+
+-- |
+-- > SubscriptionPolledRefresh:
+-- > product:
+-- >   options: Maybe RequestOptions
+-- >   serverSubHandles: Vector Text
+-- >   holdTime: Maybe DateTime
+-- >   waitTime: Int32
+-- >   returnAllItems: Bool
+--
+-- > <ns1:SubscriptionPolledRefresh HoldTime="2026-19-23T16:34:38.004Z" ReturnAllItems="false" WaitTime="1000">
+-- >   <ns1:Options ClientRequestHandle="ajskdlf_SubscriptionPolledRefresh" ReturnErrorText="true" ReturnItemName="true" ReturnItemPath="true">
+-- >   </ns1:Options>
+-- >   <ns1:ServerSubHandles>1000222</ns1:ServerSubHandles>
+-- >   <ns1:ServerSubHandles>1002222</ns1:ServerSubHandles>
+-- > </ns1:SubscriptionPolledRefresh>>
+subscriptionPolledRefreshElement :: SubscriptionPolledRefresh -> Xml.Element
+subscriptionPolledRefreshElement spr =
+  constructElement
+    "SubscriptionPolledRefresh"
+    do
+      catMaybes
+        [ ("HoldTime",) . dateTime <$> #holdTime spr,
+          pure ("WaitTime", int do #waitTime spr),
+          pure ("ReturnAllItems", bool do #returnAllItems spr)
+        ]
+    ( catMaybes [Xml.NodeElement . requestOptionsElement <$> #options spr]
+        ++ fmap (Xml.NodeElement . serverSubHandlesElement) (toList (#serverSubHandles spr))
+    )
+
+serverSubHandlesElement :: Text -> Xml.Element
+serverSubHandlesElement name =
+  constructElement
+    "ServerSubHandles"
+    []
+    [Xml.NodeContent name]
+
+subscriptionPolledRefreshDocument :: SubscriptionPolledRefresh -> Xml.Document
+subscriptionPolledRefreshDocument = inSoapEnvelope . Xml.NodeElement . subscriptionPolledRefreshElement
+
+-- |
+-- > SubscriptionCancel:
+-- >   product:
+-- >     serverSubHandle: Maybe Text
+-- >     clientRequestHandle: Maybe Text
+--
+-- > <ns1:SubscriptionCancel ClientRequestHandle="asdffhhkl_SubscriptionCancel" ServerSubHandle="1111"></ns1:SubscriptionCancel>
+subscriptionCancelElement :: SubscriptionCancel -> Xml.Element
+subscriptionCancelElement sc =
+  constructElement
+    "SubscriptionCancel"
+    do
+      catMaybes
+        [ ("ClientRequestHandle",) <$> #clientRequestHandle sc,
+          ("ServerSubHandle",) <$> #serverSubHandle sc
+        ]
+    []
+
+subscriptionCancelDocument :: SubscriptionCancel -> Xml.Document
+subscriptionCancelDocument = inSoapEnvelope . Xml.NodeElement . subscriptionCancelElement
+
+browseFilterText :: BrowseFilter -> Text
+browseFilterText = \case
+  AllBrowseFilter -> "all"
+  BranchBrowseFilter -> "branch"
+  ItemBrowseFilter -> "item"
+
+-- |
+-- > Browse:
+-- >   product:
+-- >     propertyNames: Vector Xml.Name
+-- >     localeId: Maybe Text
+-- >     clientRequestHandle: Maybe Text
+-- >     itemPath: Maybe Text
+-- >     itemName: Maybe Text
+-- >     continuationPoint: Maybe Text
+-- >     maxElementsReturned: Int32
+-- >     browseFilter: BrowseFilter
+-- >     elementNameFilter: Maybe Text
+-- >     vendorFilter: Maybe Text
+-- >     returnAllProperties: Bool
+-- >     returnAllPropertyValues: Bool
+-- >     returnErrorText: Bool
+--
+-- > <Browse BrowseFilter="all" ClientRequestHandle="qwer_rew" ContinuationPoint="endpoint" ElementNameFilter="qq" ItemName="someName" ItemPath="some/path" LocaleID="en" MaxElementsReturned="23" ReturnAllProperties="true" ReturnAllPropertyValues="false" ReturnErrorText="true" VendorFilter="ww">
+-- >   <PropertyNames>test</PropertyNames>
+-- >   <PropertyNames>qewr</PropertyNames>
+-- > </Browse>
+browseElement :: Browse -> Xml.Element
+browseElement b =
+  constructElement
+    "Browse"
+    do
+      catMaybes
+        [ ("LocaleID",) <$> #localeId b,
+          ("ClientRequestHandle",) <$> #clientRequestHandle b,
+          ("ItemPath",) <$> #itemPath b,
+          ("ItemName",) <$> #itemName b,
+          ("ContinuationPoint",) <$> #continuationPoint b,
+          pure ("MaxElementsReturned", int do #maxElementsReturned b),
+          pure ("BrowseFilter", browseFilterText do #browseFilter b),
+          ("ElementNameFilter",) <$> #elementNameFilter b,
+          ("VendorFilter",) <$> #vendorFilter b,
+          pure ("ReturnAllProperties", bool do #returnAllProperties b),
+          pure ("ReturnAllPropertyValues", bool do #returnAllPropertyValues b),
+          pure ("ReturnErrorText", bool do #returnErrorText b)
+        ]
+    do
+      Xml.NodeElement . propertyNamesElement . qName <$> toList do #propertyNames b
+
+browseDocument :: Browse -> Xml.Document
+browseDocument = inSoapEnvelope . Xml.NodeElement . browseElement
+
+-- |
+-- > <PropertyNames>ss</PropertyNames>
+propertyNamesElement :: Text -> Xml.Element
+propertyNamesElement name =
+  constructElement
+    "PropertyNames"
+    []
+    [Xml.NodeContent name]
+
+-- |
+-- > GetProperties:
+-- >   product:
+-- >     itemIds: Vector ItemIdentifier
+-- >     propertyNames: Vector Xml.Name
+-- >     localeId: Maybe Text
+-- >     clientRequestHandle: Maybe Text
+-- >     itemPath: Maybe Text
+-- >     returnAllProperties: Bool
+-- >     returnPropertyValues: Bool
+-- >     returnErrorText: Bool
+--
+-- > <GetProperties ClientRequestHandle="test" ItemPath="some/path" LocaleID="ww" ReturnAllProperties="true" ReturnErrorText="false" ReturnPropertyValues="false">
+-- >   <PropertyNames>name1</PropertyNames>
+-- >   <PropertyNames>name2</PropertyNames>
+-- >   <ItemIdentifier ItemName="name" ItemPath="some/path"></ItemIdentifier>
+-- >   <ItemIdentifier ItemName="name" ItemPath="some/path"></ItemIdentifier>
+-- > </GetProperties>
+getPropertiesElement :: GetProperties -> Xml.Element
+getPropertiesElement gp =
+  constructElement
+    "GetProperties"
+    do
+      catMaybes
+        [ ("LocaleID",) <$> #localeId gp,
+          ("ClientRequestHandle",) <$> #clientRequestHandle gp,
+          ("ItemPath",) <$> #itemPath gp,
+          pure ("ReturnAllProperties", bool do #returnAllProperties gp),
+          pure ("ReturnPropertyValues", bool do #returnPropertyValues gp),
+          pure ("ReturnErrorText", bool do #returnErrorText gp)
+        ]
+    do
+      mconcat
+        [ Xml.NodeElement . propertyNamesElement . qName <$> toList do #propertyNames gp,
+          Xml.NodeElement . itemIdentifierElement <$> toList do #itemIds gp
+        ]
+
+getPropertiesDocument :: GetProperties -> Xml.Document
+getPropertiesDocument = inSoapEnvelope . Xml.NodeElement . getPropertiesElement
+
+-- |
+-- > ItemIdentifier:
+-- >   product:
+-- >     itemPath: Maybe Text
+-- >     itemName: Maybe Text
+--
+-- > <ItemIdentifier ItemName="name" ItemPath="some/path"></ItemIdentifier>
+itemIdentifierElement :: ItemIdentifier -> Xml.Element
+itemIdentifierElement ii =
+  constructElement
+    "ItemIdentifier"
+    do
+      catMaybes
+        [ ("ItemPath",) <$> #itemPath ii,
+          ("ItemName",) <$> #itemName ii
+        ]
+    []
+
+packed :: Show a => a -> Text
+packed = Text.pack . show
+
 dateTime :: DateTime -> Text
-dateTime =
-  error "TODO"
+dateTime = Text.pack . iso8601Show . _utcTime
+
+bool :: Bool -> Text
+bool = Text.toLower . packed
 
 float :: Float -> Text
-float =
-  error "TODO"
+float = packed
 
 int :: Int32 -> Text
-int =
-  error "TODO"
+int = packed
 
-boolean :: Bool -> Text
-boolean =
-  error "TODO"
-
+-- TODO: may be wrong
 qName :: Xml.Name -> Text
-qName =
-  error "TODO"
+qName Xml.Name {nameLocalName, namePrefix = Just prefix} = nameLocalName <> ":" <> prefix
+qName Xml.Name {nameLocalName} = nameLocalName
