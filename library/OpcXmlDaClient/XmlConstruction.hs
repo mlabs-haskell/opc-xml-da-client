@@ -5,6 +5,32 @@ import OpcXmlDaClient.Prelude hiding (Read, bool)
 import OpcXmlDaClient.Types
 import qualified Text.XML as Xml
 
+-- * Final documents
+
+getStatusDocument :: GetStatus -> Xml.Document
+getStatusDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
+readDocument :: Read -> Xml.Document
+readDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
+writeDocument :: Write -> Xml.Document
+writeDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
+subscribeDocument :: Subscribe -> Xml.Document
+subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribe "Subscribe"
+
+subscriptionPolledRefreshDocument :: SubscriptionPolledRefresh -> Xml.Document
+subscriptionPolledRefreshDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
+subscriptionCancelDocument :: SubscriptionCancel -> Xml.Document
+subscriptionCancelDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
+browseDocument :: Browse -> Xml.Document
+browseDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
+getPropertiesDocument :: GetProperties -> Xml.Document
+getPropertiesDocument = inSoapEnvelope . Xml.NodeElement . error "TODO"
+
 -- * Names
 
 unnamespacedName :: Text -> Xml.Name
