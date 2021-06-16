@@ -42,7 +42,7 @@ InterfaceVersion:
     minor: Int
 
 Read:
-  product: 
+  product:
     options: Maybe RequestOptions
     itemList: Maybe ReadRequestItemList
 
@@ -74,8 +74,8 @@ ReadRequestItem:
 
 ReadResponse:
   product:
-    readResult: ReplyBase
-    rItemList: ReplyItemList
+    readResult: Maybe ReplyBase
+    rItemList: Maybe ReplyItemList
     errors: Vector OpcError
 
 ReplyItemList:
@@ -100,7 +100,7 @@ OpcQuality:
     qualityField: QualityBits
     limitField: LimitBits
     vendorField: Word8
-    
+
 QualityBits:
   enum:
     - bad
@@ -224,7 +224,7 @@ Subscribe:
     options: Maybe RequestOptions
     itemList: Maybe SubscribeRequestItemList
     returnValuesOnReply: Bool
-    subscriptionPingRate: Int32
+    subscriptionPingRate: Maybe Int32
 
 SubscribeRequestItemList:
   product:
@@ -371,5 +371,4 @@ GetPropertiesResponse:
 
 DateTime:
   product:
-    local: LocalTime
-    timezone: Maybe TimeZone
+    utcTime: UTCTime
