@@ -69,11 +69,11 @@ inSoapEnvelope elementByNamespace =
 
 -- |
 -- > <ns1:Subscribe ReturnValuesOnReply="true" SubscriptionPingRate="3000">
--- >   <ns1:Options ClientRequestHandle="ZSI_mc3RFGFSn7_Subscribe" ReturnErrorText="true" ReturnItemName="true" ReturnItemPath="true"/>
+-- >   <ns1:Options ClientRequestHandle="Subscribe" ReturnErrorText="true" ReturnItemName="true" ReturnItemPath="true"/>
 -- >   <ns1:ItemList>
--- >     <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_0" ItemName="Loc/Wec/Plant3/Vwind"/>
--- >     <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_1" ItemName="Loc/Wec/Plant3/P"/>
--- >     <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_2" ItemName="Loc/Wec/Plant3/Status/St"/>
+-- >     <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
+-- >     <ns1:Items ClientItemHandle="SubscribeItem_1" ItemName="B"/>
+-- >     <ns1:Items ClientItemHandle="SubscribeItem_2" ItemName="C"/>
 -- >   </ns1:ItemList>
 -- > </ns1:Subscribe>
 subscribe :: Maybe Text -> Text -> Subscribe -> Xml.Element
@@ -97,7 +97,7 @@ subscribe ns name x =
 
 -- |
 -- > <ns1:Options
--- >   ClientRequestHandle="ZSI_mc3RFGFSn7_Subscribe"
+-- >   ClientRequestHandle="Subscribe"
 -- >   ReturnErrorText="true"
 -- >   ReturnItemName="true"
 -- >   ReturnItemPath="true"/>
@@ -122,9 +122,9 @@ requestOptions ns name x =
 
 -- |
 -- > <ns1:ItemList>
--- >   <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_0" ItemName="Loc/Wec/Plant3/Vwind"/>
--- >   <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_1" ItemName="Loc/Wec/Plant3/P"/>
--- >   <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_2" ItemName="Loc/Wec/Plant3/Status/St"/>
+-- >   <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
+-- >   <ns1:Items ClientItemHandle="SubscribeItem_1" ItemName="B"/>
+-- >   <ns1:Items ClientItemHandle="SubscribeItem_2" ItemName="C"/>
 subscribeRequestItemList :: Maybe Text -> Text -> SubscribeRequestItemList -> Xml.Element
 subscribeRequestItemList ns name x =
   Xml.Element
@@ -142,7 +142,7 @@ subscribeRequestItemList ns name x =
     (fmap (Xml.NodeElement . subscribeRequestItem ns "Items") (toList (#items x)))
 
 -- |
--- > <ns1:Items ClientItemHandle="ZSI_mc3RFGFSn7_SubscribeItem_0" ItemName="Loc/Wec/Plant3/Vwind"/>
+-- > <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
 subscribeRequestItem :: Maybe Text -> Text -> SubscribeRequestItem -> Xml.Element
 subscribeRequestItem ns name x =
   Xml.Element
