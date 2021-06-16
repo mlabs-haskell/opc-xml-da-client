@@ -24,33 +24,33 @@ inSoapEnvelope elementByNamespace =
   Xml.Document
     (Xml.Prologue [] Nothing [])
     ( Xml.Element
-        (Xml.Name "Envelope" (Just "SOAP-ENV") Nothing)
+        (Xml.Name "Envelope" Nothing (Just "SOAP-ENV"))
         ( Map.fromList
-            [ ( Xml.Name "SOAP-ENC" (Just "xmlns") Nothing,
+            [ ( Xml.Name "SOAP-ENC" Nothing (Just "xmlns"),
                 "http://schemas.xmlsoap.org/soap/encoding/"
               ),
-              ( Xml.Name "SOAP-ENV" (Just "xmlns") Nothing,
+              ( Xml.Name "SOAP-ENV" Nothing (Just "xmlns"),
                 "http://schemas.xmlsoap.org/soap/envelope/"
               ),
-              ( Xml.Name "xsd" (Just "xmlns") Nothing,
+              ( Xml.Name "xsd" Nothing (Just "xmlns"),
                 "http://www.w3.org/2001/XMLSchema"
               ),
-              ( Xml.Name "xsi" (Just "xmlns") Nothing,
+              ( Xml.Name "xsi" Nothing (Just "xmlns"),
                 "http://www.w3.org/2001/XMLSchema-instance"
               )
             ]
         )
         [ Xml.NodeElement
             ( Xml.Element
-                (Xml.Name "Header" (Just "SOAP-ENV") Nothing)
+                (Xml.Name "Header" Nothing (Just "SOAP-ENV"))
                 Map.empty
                 []
             ),
           Xml.NodeElement
             ( Xml.Element
-                (Xml.Name "Body" (Just "SOAP-ENV") Nothing)
+                (Xml.Name "Body" Nothing (Just "SOAP-ENV"))
                 ( Map.fromList
-                    [ ( Xml.Name namespace (Just "xmlns") Nothing,
+                    [ ( Xml.Name namespace Nothing (Just "xmlns"),
                         "http://opcfoundation.org/webservices/XMLDA/1.0/"
                       )
                     ]
@@ -75,7 +75,7 @@ inSoapEnvelope elementByNamespace =
 subscribe :: Maybe Text -> Text -> Subscribe -> Xml.Element
 subscribe ns name x =
   Xml.Element
-    (Xml.Name name ns Nothing)
+    (Xml.Name name Nothing ns)
     ( Map.fromList
         [ ( Xml.Name "ReturnValuesOnReply" Nothing Nothing,
             if #returnValuesOnReply x then "true" else "false"
@@ -124,7 +124,7 @@ requestOptions ns name x =
 subscribeRequestItemList :: Maybe Text -> Text -> SubscribeRequestItemList -> Xml.Element
 subscribeRequestItemList ns name x =
   Xml.Element
-    (Xml.Name name ns Nothing)
+    (Xml.Name name Nothing ns)
     ( Map.fromList
         ( catMaybes
             [ fmap ("ItemPath",) (#itemPath x),
@@ -142,7 +142,7 @@ subscribeRequestItemList ns name x =
 subscribeRequestItem :: Maybe Text -> Text -> SubscribeRequestItem -> Xml.Element
 subscribeRequestItem ns name x =
   Xml.Element
-    (Xml.Name name ns Nothing)
+    (Xml.Name name Nothing ns)
     ( Map.fromList
         ( catMaybes
             [ fmap ("ItemPath",) (#itemPath x),
