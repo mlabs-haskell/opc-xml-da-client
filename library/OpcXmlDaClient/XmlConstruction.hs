@@ -12,7 +12,6 @@ import qualified Text.XML as Xml
 -- > <SOAP-ENV:Envelope
 -- >   xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
 -- >   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
--- >   xmlns:ZSI="http://www.zolera.com/schemas/ZSI/"
 -- >   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 -- >   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 -- >   <SOAP-ENV:Header/>
@@ -32,9 +31,6 @@ inSoapEnvelope elementByNamespace =
               ),
               ( Xml.Name "SOAP-ENV" (Just "xmlns") Nothing,
                 "http://schemas.xmlsoap.org/soap/envelope/"
-              ),
-              ( Xml.Name "ZSI" (Just "xmlns") Nothing,
-                "http://www.zolera.com/schemas/ZSI/"
               ),
               ( Xml.Name "xsd" (Just "xmlns") Nothing,
                 "http://www.w3.org/2001/XMLSchema"
