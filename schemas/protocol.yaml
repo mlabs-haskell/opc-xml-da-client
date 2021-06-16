@@ -224,7 +224,7 @@ Subscribe:
     options: Maybe RequestOptions
     itemList: Maybe SubscribeRequestItemList
     returnValuesOnReply: Bool
-    subscriptionPingRate: Int32
+    subscriptionPingRate: Maybe Int32
 
 SubscribeRequestItemList:
   product:

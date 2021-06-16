@@ -44,26 +44,6 @@ lookupAttribute' attrName attributes =
       do Left . OtherParseError $ "\"" <> attrName <> "\" not found"
       pure
 
--- | Run specific parser and extract error it returns.
---
--- This functions helps to reduce
---
--- @
--- newtype T = T { t :: Maybe Int }
---
--- g :: Int -> Either String Int
--- g _ = Left "g"
---
--- h :: Maybe Int -> Either String T
--- h x = do
---   t <- maybe (pure Nothing) (sequence . Just . g) x
---   pure T { t }
--- @
---
--- pattern
-tryParse :: Monad m => (a -> m b) -> Maybe a -> m (Maybe b)
-tryParse parser = maybe (pure Nothing) (sequence . pure . parser)
-
 withSOAPElement ::
   -- | element name to match
   Name ->
@@ -115,22 +95,22 @@ lookupElement' name nodes =
 -- | Construct a vector of successfully parsed elements
 -- and fail if one of them fails
 -- TODO: test it
-tryParseMany ::
+parseMany ::
   (XML.Element -> Either ParseError b) ->
   [XML.Node] ->
   Either ParseError (Vector b)
-tryParseMany parser =
+parseMany parser =
   foldr' (curry matchParsed) (pure mempty)
   where
     matchParsed = \case
       (NodeElement e, Right acc) -> (`cons` acc) <$> parser e
       (_, acc) -> acc
 
-tryParseManyValues ::
+parseManyValues ::
   (Text -> Either ParseError b) ->
   [XML.Node] ->
   Either ParseError (Vector b)
-tryParseManyValues parser =
+parseManyValues parser =
   foldr' (curry matchParsed) (pure mempty)
   where
     matchParsed = \case
@@ -294,7 +274,7 @@ parseServerStatus = withSOAPElement
         _vendorInfo = lookupAttribute "VendorInfo" attributes
         _productVersion = lookupAttribute "ProductVersion" attributes
         _supportedLocaleIds = error "TODO"
-    -- _supportedLocaleIds <- tryParseMany
+    -- _supportedLocaleIds <- parseMany
     --   ( withSOAPElement
     --     "SupportedLocaleIDs"
     --     Nothing
@@ -303,7 +283,7 @@ parseServerStatus = withSOAPElement
     --   )
     _supportedInterfaceVersions <-
       sequence
-        =<< tryParseMany
+        =<< parseMany
           ( withSOAPElement
               "SupportedInterfaceVersions"
               (Just "interfaceVersion")
@@ -353,8 +333,8 @@ parseRead = withSOAPElement
   Nothing
   ReadParseError
   \attributes nodes -> do
-    _options <- tryParse parseRequestOptions do lookupElement "Options" nodes
-    _itemList <- tryParse parseReadRequestItemList do lookupElement "ItemList" nodes
+    _options <- traverse parseRequestOptions do lookupElement "Options" nodes
+    _itemList <- traverse parseReadRequestItemList do lookupElement "ItemList" nodes
     pure Read {_options, _itemList}
 
 -- RequestOptions:
@@ -408,7 +388,7 @@ parseReadRequestItemList = withSOAPElement
   Nothing
   ReadRequestItemListParseError
   \attributes nodes -> do
-    _items <- tryParseMany parseReadRequestItem nodes
+    _items <- parseMany parseReadRequestItem nodes
     let _itemPath = lookupAttribute "ItemPath" attributes
     -- _reqType <- lookupAttribute "ReqType" attributes
     _reqType <- error "TODO"
@@ -465,7 +445,7 @@ parseReadResponse = withSOAPElement
     _rItemList <- sequence do
       element <- lookupElement "RItemList" nodes
       pure do parseReplyItemList element
-    _errors <- tryParseMany parseOpcError nodes
+    _errors <- parseMany parseOpcError nodes
     pure
       ReadResponse
         { _readResult,
@@ -484,7 +464,7 @@ parseReplyItemList = withSOAPElement
   ReplyItemListParseError
   \attributes nodes -> do
     let _reserved = lookupAttribute "Reserved" attributes
-    _items <- tryParseMany parseItemValue nodes
+    _items <- parseMany parseItemValue nodes
     pure
       ReplyItemList
         { _items,
@@ -518,8 +498,8 @@ parseItemValue =
           _resultId = error "TODO"
           timestamp = lookupAttribute "Timestamp" attributes
           quality = lookupElement "OpcQuality" nodes
-      _quality <- tryParse parseOpcQuality quality
-      _timestamp <- tryParse parseDateTime timestamp
+      _quality <- traverse parseOpcQuality quality
+      _timestamp <- traverse parseDateTime timestamp
       pure
         ItemValue
           { _diagnosticInfo,
@@ -641,7 +621,7 @@ parseArrayOfFloat = withSOAPElement
   ArrayOfFloatParseError
   \attributes nodes -> do
     _float <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Float
@@ -658,7 +638,7 @@ parseArrayOfInt = withSOAPElement
   ArrayOfIntParseError
   \attributes nodes -> do
     _int <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Int32
@@ -675,7 +655,7 @@ parseArrayOfUnsignedInt = withSOAPElement
   ArrayOfUnsignedIntParseError
   \attributes nodes -> do
     _unsignedInt <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Word32
@@ -692,7 +672,7 @@ parseArrayOfLong = withSOAPElement
   ArrayOfLongParseError
   \attributes nodes -> do
     _long <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Int64
@@ -709,7 +689,7 @@ parseArrayOfUnsignedLong = withSOAPElement
   ArrayOfUnsignedLongParseError
   \attributes nodes -> do
     _unsignedLong <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Word64
@@ -726,7 +706,7 @@ parseArrayOfDouble = withSOAPElement
   ArrayOfDoubleParseError
   \attributes nodes -> do
     _double <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Double
@@ -743,7 +723,7 @@ parseArrayOfDecimal = withSOAPElement
   ArrayOfDecimalParseError
   \attributes nodes -> do
     _decimal <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Scientific
@@ -760,7 +740,7 @@ parseArrayOfShort = withSOAPElement
   ArrayOfShortParseError
   \attributes nodes -> do
     _short <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Int16
@@ -777,7 +757,7 @@ parseArrayOfByte = withSOAPElement
   ArrayOfByteParseError
   \attributes nodes -> do
     _byte <-
-      tryParseManyValues
+      parseManyValues
         do
           Text.unpack
             >>> readMaybe @Int8
@@ -794,7 +774,7 @@ parseArrayOfString = withSOAPElement
   ArrayOfStringParseError
   \attributes nodes -> do
     _string <-
-      tryParseManyValues
+      parseManyValues
         (pure . pure) -- TODO?
         nodes
     pure ArrayOfString {_string}
@@ -805,7 +785,7 @@ parseArrayOfDateTime = withSOAPElement
   Nothing
   ArrayOfDateTimeParseError
   \attributes nodes -> do
-    _dateTime <- tryParseManyValues parseDateTime nodes
+    _dateTime <- parseManyValues parseDateTime nodes
     pure ArrayOfDateTime {_dateTime}
 
 parseArrayOfAnyType :: Parser ArrayOfAnyType
@@ -814,7 +794,7 @@ parseArrayOfAnyType = withSOAPElement
   Nothing
   ArrayOfAnyTypeParseError
   \attributes nodes -> do
-    _anyType <- tryParseMany (pure . pure) nodes -- TODO?
+    _anyType <- parseMany (pure . pure) nodes -- TODO?
     pure ArrayOfAnyType {_anyType}
 
 -- Write:
@@ -828,8 +808,8 @@ parseWrite = withSOAPElement
   Nothing
   WriteParseError
   \attributes nodes -> do
-    _options <- tryParse parseRequestOptions $ lookupElement "Options" nodes
-    _itemList <- tryParse parseWriteRequestItemList $ lookupElement "ItemList" nodes
+    _options <- traverse parseRequestOptions $ lookupElement "Options" nodes
+    _itemList <- traverse parseWriteRequestItemList $ lookupElement "ItemList" nodes
     _returnValuesOnReply <-
       lookupAttribute' "VendorField" attributes
         >>= maybe
@@ -854,7 +834,7 @@ parseWriteRequestItemList = withSOAPElement
   Nothing
   WriteRequestItemListParseError
   \attributes nodes -> do
-    _items <- tryParseMany parseItemValue nodes
+    _items <- parseMany parseItemValue nodes
     let _itemPath = lookupAttribute "ItemPath" attributes
     pure
       WriteRequestItemList
@@ -862,16 +842,54 @@ parseWriteRequestItemList = withSOAPElement
           _itemPath
         }
 
+-- WriteResponse:
+--   product:
+--     writeResult: Maybe ReplyBase
+--     rItemList: Maybe ReplyItemList
+--     errors: Vector OpcError
 parseWriteResponse :: Parser WriteResponse
 parseWriteResponse = withSOAPElement
   "WriteResponse"
   Nothing
   WriteResponseParseError
   \attributes nodes -> do
-    error "TODO"
+    _writeResult <- sequence do
+      Element {elementAttributes} <- lookupElement "WriteResult" nodes
+      pure do parseReplyBase elementAttributes
+    _rItemList <- traverse parseReplyItemList do lookupElement "RItemList" nodes
+    _errors <- parseMany parseOpcError nodes
+    pure
+      WriteResponse
+        { _writeResult,
+          _rItemList,
+          _errors
+        }
 
 parseSubscribe :: Parser Subscribe
-parseSubscribe = error "TODO"
+parseSubscribe = withSOAPElement
+  "Subscribe"
+  Nothing
+  SubscribeParseError
+  \attributes nodes -> do
+    _options <- traverse parseRequestOptions do lookupElement "Options" nodes
+    _itemList <- traverse parseSubscribeRequestItemList do lookupElement "ItemList" nodes
+    _returnValuesOnReply <-
+      lookupAttribute' "ReturnValuesOnReply" attributes
+        >>= maybe
+          do Left $ OtherParseError "Cannot parse \"ReturnValuesOnReply\" attribute value, not a `Bool`"
+          pure
+          . readMaybe @Bool
+          . Text.unpack
+    let _subscriptionPingRate =
+          lookupAttribute "SubscriptionPingRate" attributes
+            >>= readMaybe @Int32 . Text.unpack
+    pure
+      Subscribe
+        { _options,
+          _itemList,
+          _returnValuesOnReply,
+          _subscriptionPingRate
+        }
 
 parseSubscribeRequestItemList :: Parser SubscribeRequestItemList
 parseSubscribeRequestItemList = error "TODO"
@@ -894,7 +912,7 @@ parseSubscribeItemValue = withSOAPElement
           lookupAttribute "RevisedSamplingRate" attributes
             >>= readMaybe @Int . Text.unpack
     _itemValue <-
-      tryParse parseItemValue itemValueNode
+      traverse parseItemValue itemValueNode
         >>= maybe
           do Left $ OtherParseError "required element \"ItemValue\" is not found"
           pure
@@ -919,7 +937,7 @@ parseSubscribeReplyItemList =
       let _revisedSamplingRate =
             lookupAttribute "RevisedSamplingRate" attributes
               >>= readMaybe @Int32 . Text.unpack
-      _items <- tryParseMany parseSubscribeItemValue nodes
+      _items <- parseMany parseSubscribeItemValue nodes
       pure
         SubscribeReplyItemList
           { _items,
@@ -980,14 +998,14 @@ parseSubscriptionPolledRefreshResponse =
       let mbSubscriptionPolledRefreshResult = lookupElement "SubscriptionPolledRefreshResult" nodes
           _invalidServerSubHandles = error "TODO"
           dataBufferOverflow = lookupAttribute "DataBufferOverflow" attributes
-      _errors <- tryParseMany parseOpcError nodes
+      _errors <- parseMany parseOpcError nodes
       _dataBufferOverflow <- case dataBufferOverflow of
         Nothing -> Left do OtherParseError "Cannot find DataBufferOverflow attribute"
         Just (Text.unpack -> x : xs) -> case toUpper x : xs & readMaybe @Bool of
           Nothing -> Left do OtherParseError "Malformed value passed to DataBufferOverflow attribute"
           Just v -> pure v
       _rItemList <-
-        tryParseMany
+        parseMany
           ( withSOAPElement
               "SubscriptionPolledRefreshResult"
               Nothing
@@ -995,7 +1013,7 @@ parseSubscriptionPolledRefreshResponse =
               \attributes _ -> parseSubscribePolledRefreshReplyItemList attributes
           )
           nodes
-      -- _subscriptionPolledRefreshResult <- tryParse parseReplyBase mbSubscriptionPolledRefreshResult
+      -- _subscriptionPolledRefreshResult <- traverse parseReplyBase mbSubscriptionPolledRefreshResult
       _subscriptionPolledRefreshResult <- error "TODO"
       pure
         SubscriptionPolledRefreshResponse
@@ -1063,10 +1081,10 @@ parseGetPropertiesResponse = withSOAPElement
   Nothing
   GetPropertiesResponseParseError
   \attributes nodes -> do
-    -- _getPropertiesResult <- tryParse parseReplyBase do lookupElement "GetPropertiesResult" nodes
+    -- _getPropertiesResult <- traverse parseReplyBase do lookupElement "GetPropertiesResult" nodes
     _getPropertiesResult <- error "TODO"
-    _propertyLists <- tryParseMany parsePropertyReplyList nodes
-    _errors <- tryParseMany parseOpcError nodes
+    _propertyLists <- parseMany parsePropertyReplyList nodes
+    _errors <- parseMany parseOpcError nodes
     pure
       GetPropertiesResponse
         { _getPropertiesResult,
