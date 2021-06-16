@@ -5,9 +5,36 @@ import OpcXmlDaClient.Prelude hiding (Read, bool)
 import OpcXmlDaClient.Types
 import qualified Text.XML as Xml
 
+-- * Names
+
+unnamespacedName :: Text -> Xml.Name
+unnamespacedName name =
+  Xml.Name name Nothing Nothing
+
+soapEncodingName :: Text -> Xml.Name
+soapEncodingName name =
+  Xml.Name name (Just "http://schemas.xmlsoap.org/soap/encoding/") (Just "SOAP-ENC")
+
+soapEnvelopeName :: Text -> Xml.Name
+soapEnvelopeName name =
+  Xml.Name name (Just "http://schemas.xmlsoap.org/soap/envelope/") (Just "SOAP-ENV")
+
+xsdName :: Text -> Xml.Name
+xsdName name =
+  Xml.Name name (Just "http://www.w3.org/2001/XMLSchema") (Just "xsd")
+
+xsiName :: Text -> Xml.Name
+xsiName name =
+  Xml.Name name (Just "http://www.w3.org/2001/XMLSchema-instance") (Just "xsi")
+
+xmlDaName :: Text -> Xml.Name
+xmlDaName name =
+  Xml.Name name (Just "http://opcfoundation.org/webservices/XMLDA/1.0/") (Just "XMLDA")
+
+-- * Documents
+
 -- |
 -- Wraps the element in the following snippet.
--- Passing to it the name of the OPC namespace.
 --
 -- > <SOAP-ENV:Envelope
 -- >   xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
@@ -19,49 +46,30 @@ import qualified Text.XML as Xml
 -- >     ...
 -- >   </SOAP-ENV:Body>
 -- > </SOAP-ENV:Envelope>
-inSoapEnvelope :: (Text -> Xml.Node) -> Xml.Document
-inSoapEnvelope elementByNamespace =
+inSoapEnvelope :: Xml.Node -> Xml.Document
+inSoapEnvelope bodyChild =
   Xml.Document
     (Xml.Prologue [] Nothing [])
     ( Xml.Element
-        (Xml.Name "Envelope" Nothing (Just "SOAP-ENV"))
-        ( Map.fromList
-            [ ( Xml.Name "SOAP-ENC" Nothing (Just "xmlns"),
-                "http://schemas.xmlsoap.org/soap/encoding/"
-              ),
-              ( Xml.Name "SOAP-ENV" Nothing (Just "xmlns"),
-                "http://schemas.xmlsoap.org/soap/envelope/"
-              ),
-              ( Xml.Name "xsd" Nothing (Just "xmlns"),
-                "http://www.w3.org/2001/XMLSchema"
-              ),
-              ( Xml.Name "xsi" Nothing (Just "xmlns"),
-                "http://www.w3.org/2001/XMLSchema-instance"
-              )
-            ]
-        )
+        (soapEnvelopeName "Envelope")
+        Map.empty
         [ Xml.NodeElement
             ( Xml.Element
-                (Xml.Name "Header" Nothing (Just "SOAP-ENV"))
+                (soapEnvelopeName "Header")
                 Map.empty
                 []
             ),
           Xml.NodeElement
             ( Xml.Element
-                (Xml.Name "Body" Nothing (Just "SOAP-ENV"))
-                ( Map.fromList
-                    [ ( Xml.Name namespace Nothing (Just "xmlns"),
-                        "http://opcfoundation.org/webservices/XMLDA/1.0/"
-                      )
-                    ]
-                )
-                [elementByNamespace namespace]
+                (soapEnvelopeName "Body")
+                Map.empty
+                [bodyChild]
             )
         ]
     )
     []
-  where
-    namespace = "opc"
+
+-- * Elements
 
 -- |
 -- > <ns1:Subscribe ReturnValuesOnReply="true" SubscriptionPingRate="3000">
@@ -72,22 +80,22 @@ inSoapEnvelope elementByNamespace =
 -- >     <ns1:Items ClientItemHandle="SubscribeItem_2" ItemName="C"/>
 -- >   </ns1:ItemList>
 -- > </ns1:Subscribe>
-subscribe :: Maybe Text -> Text -> Subscribe -> Xml.Element
-subscribe ns name x =
+subscribe :: Text -> Subscribe -> Xml.Element
+subscribe name x =
   Xml.Element
-    (Xml.Name name Nothing ns)
+    (xmlDaName name)
     ( Map.fromList
-        [ ( Xml.Name "ReturnValuesOnReply" Nothing Nothing,
+        [ ( unnamespacedName "ReturnValuesOnReply",
             if #returnValuesOnReply x then "true" else "false"
           ),
-          ( Xml.Name "SubcriptionPingRate" Nothing Nothing,
+          ( unnamespacedName "SubcriptionPingRate",
             showText (#subscriptionPingRate x)
           )
         ]
     )
     ( catMaybes
-        [ fmap (Xml.NodeElement . requestOptions ns "Options") (#options x),
-          fmap (Xml.NodeElement . subscribeRequestItemList ns "ItemList") (#itemList x)
+        [ fmap (Xml.NodeElement . requestOptions "Options") (#options x),
+          fmap (Xml.NodeElement . subscribeRequestItemList "ItemList") (#itemList x)
         ]
     )
 
@@ -97,10 +105,10 @@ subscribe ns name x =
 -- >   ReturnErrorText="true"
 -- >   ReturnItemName="true"
 -- >   ReturnItemPath="true"/>
-requestOptions :: Maybe Text -> Text -> RequestOptions -> Xml.Element
-requestOptions ns name x =
+requestOptions :: Text -> RequestOptions -> Xml.Element
+requestOptions name x =
   Xml.Element
-    (Xml.Name name ns Nothing)
+    (xmlDaName name)
     ( Map.fromList
         ( catMaybes
             [ if #returnErrorText x then Nothing else Just ("ReturnErrorText", "true"),
@@ -121,10 +129,10 @@ requestOptions ns name x =
 -- >   <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
 -- >   <ns1:Items ClientItemHandle="SubscribeItem_1" ItemName="B"/>
 -- >   <ns1:Items ClientItemHandle="SubscribeItem_2" ItemName="C"/>
-subscribeRequestItemList :: Maybe Text -> Text -> SubscribeRequestItemList -> Xml.Element
-subscribeRequestItemList ns name x =
+subscribeRequestItemList :: Text -> SubscribeRequestItemList -> Xml.Element
+subscribeRequestItemList name x =
   Xml.Element
-    (Xml.Name name Nothing ns)
+    (xmlDaName name)
     ( Map.fromList
         ( catMaybes
             [ fmap ("ItemPath",) (#itemPath x),
@@ -135,14 +143,14 @@ subscribeRequestItemList ns name x =
             ]
         )
     )
-    (fmap (Xml.NodeElement . subscribeRequestItem ns "Items") (toList (#items x)))
+    (fmap (Xml.NodeElement . subscribeRequestItem "Items") (toList (#items x)))
 
 -- |
 -- > <ns1:Items ClientItemHandle="SubscribeItem_0" ItemName="A"/>
-subscribeRequestItem :: Maybe Text -> Text -> SubscribeRequestItem -> Xml.Element
-subscribeRequestItem ns name x =
+subscribeRequestItem :: Text -> SubscribeRequestItem -> Xml.Element
+subscribeRequestItem name x =
   Xml.Element
-    (Xml.Name name Nothing ns)
+    (xmlDaName name)
     ( Map.fromList
         ( catMaybes
             [ fmap ("ItemPath",) (#itemPath x),
