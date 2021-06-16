@@ -74,8 +74,8 @@ ReadRequestItem:
 
 ReadResponse:
   product:
-    readResult: ReplyBase
-    rItemList: ReplyItemList
+    readResult: Maybe ReplyBase
+    rItemList: Maybe ReplyItemList
     errors: Vector OpcError
 
 ReplyItemList:
