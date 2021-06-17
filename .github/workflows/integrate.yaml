@@ -7,17 +7,18 @@ jobs:
       - uses: mrkkrp/ormolu-action@v2
         with:
           extra-args: -o -XAllowAmbiguousTypes -o -XBlockArguments -o -XConstraintKinds -o -XDataKinds -o -XDefaultSignatures -o -XDeriveAnyClass -o -XDeriveFunctor -o -XDeriveGeneric -o -XDerivingStrategies -o -XDuplicateRecordFields -o -XEmptyCase -o -XExplicitNamespaces -o -XFlexibleContexts -o -XFlexibleInstances -o -XGeneralizedNewtypeDeriving -o -XInstanceSigs -o -XLambdaCase -o -XMultiParamTypeClasses -o -XMultiWayIf -o -XNamedFieldPuns -o -XNoImplicitPrelude -o -XNumericUnderscores -o -XOverloadedLabels -o -XOverloadedStrings -o -XPatternSynonyms -o -XRecordWildCards -o -XScopedTypeVariables -o -XStandaloneDeriving -o -XTemplateHaskell -o -XTupleSections -o -XTypeApplications -o -XTypeFamilies -o -XTypeOperators -o -XTypeSynonymInstances -o -XUndecidableInstances -o -XViewPatterns
+
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
 
-      - uses: actions/cache@v2.1.4
+      - uses: actions/cache@v2.1.6
         name: Cache Stack
         with:
           path: ~/.stack
           key: ${{ runner.os }}-stack-lint
-          restore-keys: ${{ runner.os }}-stack-
+          restore-keys: ${{ runner.os }}-stack-lint
 
       - run: stack install hlint
         name: Setup
