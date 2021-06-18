@@ -33,7 +33,7 @@ module OpcXmlDaClient.XmlConstruction
     getPropertiesElement,
     itemIdentifierElement,
 
-    -- * Parsers
+    -- * Texts
     limitBitsText,
     qualityBitsText,
     browseFilterText,
