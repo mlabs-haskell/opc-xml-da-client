@@ -24,7 +24,7 @@ module OpcXmlDaClient.Core
   )
 where
 
-import OpcXmlDaClient.Core.Prelude hiding (Read, read)
+import OpcXmlDaClient.Base.Prelude hiding (Read, read)
 import OpcXmlDaClient.Core.Types
 
 -- |

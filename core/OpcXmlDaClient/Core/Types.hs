@@ -2,7 +2,7 @@ module OpcXmlDaClient.Core.Types where
 
 import Data.Time.Clock
 import qualified Domain
-import OpcXmlDaClient.Core.Prelude hiding (Read)
+import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified Text.XML as Xml
 
 Domain.declare

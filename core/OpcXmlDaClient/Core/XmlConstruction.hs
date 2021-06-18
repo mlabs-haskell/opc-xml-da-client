@@ -16,7 +16,7 @@ where
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
 import Data.Time.Format.ISO8601 (iso8601Show)
-import OpcXmlDaClient.Core.Prelude hiding (Read, bool)
+import OpcXmlDaClient.Base.Prelude hiding (Read, bool)
 import OpcXmlDaClient.Core.Types
 import qualified Text.XML as Xml
 

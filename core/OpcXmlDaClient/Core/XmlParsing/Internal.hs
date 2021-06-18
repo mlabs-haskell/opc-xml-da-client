@@ -3,7 +3,7 @@ module OpcXmlDaClient.Core.XmlParsing.Internal where
 import Control.Lens hiding (element)
 import Data.Kind
 import Data.Text.Lazy.Lens (packed)
-import OpcXmlDaClient.Core.Prelude
+import OpcXmlDaClient.Base.Prelude
 import OpcXmlDaClient.Core.Types
 import qualified Text.XML as Xml
 import Text.XML.Cursor
