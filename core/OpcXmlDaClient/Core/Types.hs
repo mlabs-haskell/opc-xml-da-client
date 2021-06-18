@@ -1,8 +1,8 @@
-module OpcXmlDaClient.Types where
+module OpcXmlDaClient.Core.Types where
 
 import Data.Time.Clock
 import qualified Domain
-import OpcXmlDaClient.Prelude hiding (Read)
+import OpcXmlDaClient.Core.Prelude hiding (Read)
 import qualified Text.XML as Xml
 
 Domain.declare
@@ -21,4 +21,4 @@ Domain.declare
         Domain.accessorIsLabelDeriver
       ]
   )
-  =<< Domain.loadSchema "schemas/protocol.yaml"
+  =<< Domain.loadSchema "core/types.domain.yaml"

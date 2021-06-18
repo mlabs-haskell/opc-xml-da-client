@@ -1,7 +1,7 @@
-module OpcXmlDaClient.XmlParsing where
+module OpcXmlDaClient.Core.XmlParsing where
 
-import OpcXmlDaClient.Prelude hiding (Read)
-import OpcXmlDaClient.Types
+import OpcXmlDaClient.Core.Prelude hiding (Read)
+import OpcXmlDaClient.Core.Types
 import qualified Text.XML as Xml
 
 -- |

@@ -1,4 +1,4 @@
-module OpcXmlDaClient.Prelude
+module OpcXmlDaClient.Core.Prelude
   ( module Exports,
     showText,
   )
@@ -41,6 +41,7 @@ import Data.Functor.Identity as Exports
 import Data.Hashable as Exports (Hashable (hash, hashWithSalt))
 import Data.Hashable.Generic as Exports (genericHashWithSalt)
 import Data.Hashable.Lifted as Exports (liftHashWithSalt)
+import Data.Hashable.Time ()
 import Data.IORef as Exports
 import Data.Int as Exports
 import Data.Ix as Exports
@@ -53,6 +54,7 @@ import Data.Ord as Exports
 import Data.Proxy as Exports
 import Data.Ratio as Exports
 import Data.STRef as Exports
+import Data.Scientific as Exports (Scientific)
 import Data.Semigroup as Exports hiding (First (..), Last (..))
 import Data.String as Exports
 import Data.Text as Exports (Text)
