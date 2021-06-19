@@ -18,9 +18,11 @@ library
   exposed-modules:
     OpcXmlDaClient
   build-depends:
+    acc ^>=0.1.3,
     base >=4.14 && <5,
     bytestring >=0.10 && <0.12,
     containers ^>=0.6.2.1,
+    free >=5.1 && <6,
     hashable ^>=1.3.2.0,
     opc-xml-da-client-base,
     opc-xml-da-client-core,
