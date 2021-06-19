@@ -58,7 +58,7 @@ import Data.Scientific as Exports (Scientific)
 import Data.Semigroup as Exports hiding (First (..), Last (..))
 import Data.String as Exports
 import Data.Text as Exports (Text)
-import Data.Time as Exports (LocalTime, TimeZone, UTCTime)
+import Data.Time as Exports (DiffTime, LocalTime, NominalDiffTime, TimeZone, UTCTime)
 import Data.Traversable as Exports
 import Data.Tuple as Exports
 import Data.Unique as Exports
