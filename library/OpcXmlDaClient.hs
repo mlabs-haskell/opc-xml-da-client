@@ -2,12 +2,13 @@ module OpcXmlDaClient where
 
 import OpcXmlDaClient.Base.Prelude
 import qualified OpcXmlDaClient.Core as Core
+import qualified Text.XML as Xml
 
 -- * Types
 
 -- |
--- Validated server URI.
-newtype ServerUri = ServerUri ByteString
+-- Validated URI.
+newtype Uri = Uri ByteString
 
 -- |
 -- Request timeout in milliseconds.
@@ -55,7 +56,7 @@ instance Default SamplingRate where
 -- for the purpose of automatically setting options like \"deadline\" in server's time.
 data ServerInfo
   = ServerInfo
-      ServerUri
+      Uri
       -- ^ URI at which the server runs.
       DiffTime
       -- ^ Difference between server's and our time for synchronisation purposes.
@@ -69,10 +70,10 @@ data Subscription
   = Subscription
       Core.SubscribeRequestItem
       -- ^ Request parameters.
-      (ValueDecoder (IO Bool))
+      (Decoder (IO Bool))
       -- ^ Value decoder mapped with handler.
 
-data ValueDecoder value
+data Decoder value
 
 -- * Operations
 
@@ -145,11 +146,14 @@ subscription ::
   SamplingRate ->
   -- |
   -- Decoder of the value.
-  ValueDecoder value ->
+  --
+  -- If the value produced is of incompatible type,
+  -- error will be raised.
+  Decoder value ->
   -- |
   -- Handler called on each received value,
-  -- returning a boolean value,
-  -- where 'False' signals to terminate the subscription.
+  -- producing a boolean value,
+  -- where 'False' signals to close the channel of communication which this subscription is being executed on.
   (value -> IO Bool) ->
   Subscription
 subscription =
@@ -157,6 +161,20 @@ subscription =
 
 -- * Decoders
 
-float :: ValueDecoder Float
-float =
+floatDecoder :: Decoder Float
+floatDecoder =
+  error "TODO"
+
+customDecoder ::
+  -- |
+  -- Expected value type namespace.
+  Uri ->
+  -- |
+  -- Expected value type name.
+  Text ->
+  -- |
+  -- Parser of an XML element representing the value.
+  (Xml.Element -> Either Text value) ->
+  Decoder value
+customDecoder =
   error "TODO"
