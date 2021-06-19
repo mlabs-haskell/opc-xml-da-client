@@ -10,7 +10,7 @@ import qualified OpcXmlDaClient.Core as Core
 newtype ServerUri = ServerUri ByteString
 
 -- |
--- Request timeout.
+-- Request timeout in milliseconds.
 newtype RequestTimeout = RequestTimeout Int32
 
 -- |
@@ -30,6 +30,23 @@ instance Default Locale where
 -- Percentage of full engineering unit range of an item's value
 -- needed to trigger a subscription handler.
 newtype Deadband = Deadband Float
+
+-- |
+-- Deadband of 0.
+instance Default Deadband where
+  def = Deadband 0
+
+-- |
+-- Rate in milliseconds at which the server should check for value changes.
+--
+-- 0 sampling rate instructs the server to attempt to poll underlying device at fastest practical rate and
+-- return the most accurate data available.
+newtype SamplingRate = SamplingRate Int
+
+-- |
+-- SamplingRate of 0.
+instance Default SamplingRate where
+  def = SamplingRate 0
 
 -- |
 -- General information about the server to be acquired once and reused across operations.
@@ -66,6 +83,9 @@ subscribe ::
   -- Request timeout.
   -- You can use 'def' here.
   RequestTimeout ->
+  -- |
+  -- Locale.
+  -- You can use 'def' here.
   Locale ->
   -- |
   -- Subscription list.
@@ -113,7 +133,18 @@ subscribe (RequestTimeout requestTimeout) (Locale localeId) =
 -- |
 -- Declares a single subscription item.
 subscription ::
+  -- |
+  -- Deadband.
+  --
+  -- Specifies the percentage of full engineering unit range of the value that must change to trigger the handler.
+  -- Only applies to analog (integer or float) types and arrays of them.
+  -- In case of arrays the entire array is returned if any array element exceeds the deadband threshold.
   Deadband ->
+  -- |
+  -- Rate at which the server should check for value changes.
+  SamplingRate ->
+  -- |
+  -- Decoder of the value.
   ValueDecoder value ->
   -- |
   -- Handler called on each received value,
@@ -122,17 +153,6 @@ subscription ::
   (value -> IO Bool) ->
   Subscription
 subscription =
-  error "TODO"
-
-floatSubscription ::
-  Deadband ->
-  -- |
-  -- Handler called on each received value,
-  -- returning a boolean value,
-  -- where 'False' signals to terminate the subscription.
-  (Float -> IO Bool) ->
-  Subscription
-floatSubscription =
   error "TODO"
 
 -- * Decoders
