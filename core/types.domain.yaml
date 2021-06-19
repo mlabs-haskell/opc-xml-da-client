@@ -241,8 +241,18 @@ SubscribeRequestItem:
     reqType: Maybe Xml.Name
     itemName: Maybe Text
     clientItemHandle: Maybe Text
+    # Specifies the percentage of full engineering unit range of an item’s value that must change prior
+    # to being returned in a SubscriptionPolledRefresh response.
+    # The deadband value shall be in the range 0-100 percent and only applies to analog (integer or float) types.
+    # The deadband will also apply to array types. The entire array is returned if any array element exceeds the deadband threshold.
+    # Server default is 0.
     deadband: Maybe Float
+    # The client specifies the rate in milliseconds at which the server should check for value changes.
+    # If no item-specific sampling rate is specified, sampling will be based on the rate of the item list.
     requestedSamplingRate: Maybe Int32
+    # If True, the client is requesting that the server use the RequestedSamplingRate
+    # to check for value changes and save all changes in a buffer for return to the client
+    # at the next SubscriptionPolledRefresh request.
     enableBuffering: Maybe Bool
 
 SubscribeReplyItemList:
