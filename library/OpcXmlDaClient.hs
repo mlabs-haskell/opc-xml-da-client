@@ -48,28 +48,35 @@ data ServerInfo
 data Error customValueParsingError
   = CustomValueParsingError customValueParsingError
 
-data Subscription value
+-- |
+-- Subscription to a single value.
+data Subscription
   = Subscription
-      (Acc.Acc Core.SubscribeRequestItem)
-      (Ap ValueDecoder value)
+      Core.SubscribeRequestItem
+      -- ^ Request parameters.
+      (ValueDecoder (IO Bool))
+      -- ^ Value decoder mapped with handler.
 
 data ValueDecoder value
 
 -- * Operations
 
 -- |
+-- Establish a subscription communication channel.
 subscribe ::
   -- |
   -- Request timeout.
   -- You can use 'def' here.
   RequestTimeout ->
   Locale ->
-  Subscription value ->
   -- |
-  --  Handler called on each received value,
-  --  returning a boolean value,
-  --  where 'False' signals to terminate the subscription.
-  (value -> IO Bool) ->
+  -- Subscription list.
+  --
+  -- Allows to establish multiple subscriptions using just a single communication channel.
+  --
+  -- When you need to subscribe to multiple events,
+  -- prefer providing a list of subscriptions instead of executing this function multiple times.
+  [Subscription] ->
   IO (Maybe (Error customValueParsingError))
 subscribe (RequestTimeout requestTimeout) (Locale localeId) =
   error "TODO"
@@ -107,14 +114,26 @@ subscribe (RequestTimeout requestTimeout) (Locale localeId) =
 
 -- |
 -- Declares a single subscription item.
---
--- You can then compose it with other items into a single subscription
--- using the applicative interface of 'Subscription'.
-subscriptionItem :: ValueDecoder value -> Subscription value
-subscriptionItem =
+subscription ::
+  Deadband ->
+  ValueDecoder value ->
+  -- |
+  -- Handler called on each received value,
+  -- returning a boolean value,
+  -- where 'False' signals to terminate the subscription.
+  (value -> IO Bool) ->
+  Subscription
+subscription =
   error "TODO"
 
-floatSubscription :: Deadband -> Subscription Float
+floatSubscription ::
+  Deadband ->
+  -- |
+  -- Handler called on each received value,
+  -- returning a boolean value,
+  -- where 'False' signals to terminate the subscription.
+  (Float -> IO Bool) ->
+  Subscription
 floatSubscription =
   error "TODO"
 
