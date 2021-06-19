@@ -1,8 +1,6 @@
 module OpcXmlDaClient where
 
-import qualified Acc
-import Control.Applicative.Free
-import OpcXmlDaClient.Base.Prelude hiding (Ap)
+import OpcXmlDaClient.Base.Prelude
 import qualified OpcXmlDaClient.Core as Core
 
 -- * Types
