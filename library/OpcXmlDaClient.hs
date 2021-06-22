@@ -266,10 +266,6 @@ subscription ::
   -- You can use this boolean value to cancel the subscriptions gracefully.
   -- Do keep in mind though that all the subscriptions executed in the same 'subscribe' operation will be cancelled as well.
   (Core.OpcQuality -> Maybe value -> IO Bool) ->
-  -- |
-  -- Error handler.
-  -- An action called on error.
-  (Text -> IO Bool) ->
   Subscription
 subscription =
   error "TODO"
