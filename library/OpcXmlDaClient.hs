@@ -2,7 +2,7 @@
 -- High-level OPC XML-DA client library.
 --
 -- The API comes free from all kinds of exceptions.
--- All error-reporting is explicit and is presented using the Either type.
+-- All error-reporting is explicit and is presented using 'Either' and 'Maybe'.
 module OpcXmlDaClient
   ( -- * Operations
     subscribe,
