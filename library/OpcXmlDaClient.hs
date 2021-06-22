@@ -74,8 +74,6 @@ data Subscription
       (Decoder (IO Bool))
       -- ^ Value decoder mapped with handler.
 
-data Decoder value
-
 -- * Operations
 
 -- |
@@ -172,13 +170,71 @@ subscription =
 
 -- * Decoders
 
-floatDecoder :: Decoder Float
-floatDecoder =
-  error "TODO"
+-- |
+-- Value decoding error.
+data DecodingError
+  = ContentDecodingError
+      Text
+      -- ^ Matching type namespace.
+      Text
+      -- ^ Matching type name.
+      Text
+      -- ^ Content that we failed to parse.
+  | ElementDecodingError
+      Text
+      -- ^ Matching type namespace.
+      Text
+      -- ^ Matching type name.
+      Xml.Element
+      -- ^ Element that we failed to parse.
 
+-- |
+-- Decoder of a value produced by the server.
+--
+-- Used for subscriptions and reads.
+data Decoder value
+  = Decoder
+      Text
+      -- ^ Expected type namespace.
+      Text
+      -- ^ Expected type name.
+      (Xml.Element -> Either DecodingError value)
+      -- ^ Element parsing function.
+  deriving (Functor)
+
+-- | Decoder of the @int@ primitive XSD type.
+intDecoder :: Decoder Int
+intDecoder =
+  contentDecoder xsdNamespace "int" Atto.decimal
+
+-- | Decoder of the @float@ primitive XSD type.
+floatDecoder :: Decoder Double
+floatDecoder =
+  contentDecoder xsdNamespace "float" Atto.double
+
+opcQualityDecoder :: Decoder Core.OpcQuality
+opcQualityDecoder =
+  Decoder opcXmlDaNamespace "OPCQuality" (error "TODO")
+
+-- |
+-- Textual content decoder using attoparsec.
+contentDecoder :: Text -> Text -> Atto.Parser value -> Decoder value
+contentDecoder typeNamespace typeName contentParser =
+  Decoder typeNamespace typeNamespace $ \(Xml.Element _ _ nodes) -> case nodes of
+    [singleNode] -> case singleNode of
+      Xml.NodeContent content -> case Atto.parseOnly (contentParser <* Atto.endOfInput) content of
+        Right success -> Right success
+        Left _ -> Left (ContentDecodingError typeNamespace typeName content)
+      _ -> Left $ error "TODO"
+    _ -> error "TODO"
+
+-- |
+-- Decoder for vendor-specific values not covered by the OPC XML-DA standard.
+--
+-- As per the spec, all vendor types must be namespaced under vendor-specific URI.
 customDecoder ::
   -- |
-  -- Expected value type namespace.
+  -- Expected value type XML namespace.
   Uri ->
   -- |
   -- Expected value type name.
@@ -189,3 +245,11 @@ customDecoder ::
   Decoder value
 customDecoder =
   error "TODO"
+
+-- * Namespaces
+
+xsdNamespace = "http://www.w3.org/2001/XMLSchema"
+
+xsiNamespace = "http://www.w3.org/2001/XMLSchema-instance"
+
+opcXmlDaNamespace = "http://opcfoundation.org/webservices/XMLDA/1.0/"
