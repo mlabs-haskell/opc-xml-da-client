@@ -1,5 +1,6 @@
 module OpcXmlDaClient where
 
+import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Base.Prelude
 import qualified OpcXmlDaClient.Core as Core
 import qualified Text.XML as Xml
