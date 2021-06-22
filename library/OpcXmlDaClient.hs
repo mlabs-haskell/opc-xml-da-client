@@ -96,6 +96,11 @@ subscribe ::
   -- When you need to subscribe to multiple events,
   -- prefer providing a list of subscriptions instead of executing this function multiple times.
   [Subscription] ->
+  -- |
+  -- IO action, which blocks for as long as the whole communication channel is active.
+  --
+  -- When a subscription error happens, it returns it in 'Just'.
+  -- When the channel gets closed at the user's will, it produces 'Nothing'.
   IO (Maybe (Error customValueParsingError))
 subscribe (RequestTimeout requestTimeout) (Locale localeId) =
   error "TODO"
@@ -145,16 +150,21 @@ subscription ::
   -- Rate at which the server should check for value changes.
   SamplingRate ->
   -- |
-  -- Decoder of the value.
+  -- List of alternative decoders of the value.
   --
-  -- If the value produced is of incompatible type,
-  -- error will be raised.
-  Decoder value ->
+  -- If the value produced is of a type that is not expected by any of them,
+  -- an error will be raised and the whole running channel of communication will be closed.
+  [Decoder value] ->
   -- |
-  -- Handler called on each received value,
+  -- Value handler.
+  -- An action called on each received value and its metadata,
   -- producing a boolean value,
   -- where 'False' signals to close the channel of communication which this subscription is being executed on.
-  (value -> IO Bool) ->
+  (Core.OpcQuality -> Maybe value -> IO Bool) ->
+  -- |
+  -- Error handler.
+  -- An action called on error.
+  (Text -> IO Bool) ->
   Subscription
 subscription =
   error "TODO"
