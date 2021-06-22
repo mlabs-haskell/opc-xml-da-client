@@ -173,20 +173,10 @@ subscription =
 -- |
 -- Value decoding error.
 data DecodingError
-  = ContentDecodingError
-      Text
-      -- ^ Matching type namespace.
-      Text
-      -- ^ Matching type name.
-      Text
-      -- ^ Content that we failed to parse.
-  | ElementDecodingError
-      Text
-      -- ^ Matching type namespace.
-      Text
-      -- ^ Matching type name.
-      Xml.Element
-      -- ^ Element that we failed to parse.
+  = -- | Content that we've failed to parse.
+    ContentDecodingError Text
+  | -- | Element that we've failed to parse.
+    ElementDecodingError Xml.Element
 
 -- |
 -- Decoder of a value produced by the server.
@@ -224,7 +214,7 @@ contentDecoder typeNamespace typeName contentParser =
     [singleNode] -> case singleNode of
       Xml.NodeContent content -> case Atto.parseOnly (contentParser <* Atto.endOfInput) content of
         Right success -> Right success
-        Left _ -> Left (ContentDecodingError typeNamespace typeName content)
+        Left _ -> Left (ContentDecodingError content)
       _ -> Left $ error "TODO"
     _ -> error "TODO"
 
