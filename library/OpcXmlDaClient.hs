@@ -19,7 +19,7 @@ module OpcXmlDaClient
 
     -- * Configuration
 
-    -- | We use smart constructors to ensure their correctness.
+    -- | We use smart constructors to ensure correctness.
     Uri,
     textUri,
     RequestTimeout,
