@@ -9,7 +9,7 @@ import qualified Text.XML as Xml
 
 -- |
 -- Validated URI.
-newtype Uri = Uri ByteString
+newtype Uri = Uri Text
 
 -- |
 -- Request timeout in milliseconds.
@@ -22,7 +22,7 @@ instance Default RequestTimeout where
 
 -- |
 -- Locale to be used by the server in response.
-newtype Locale = Locale ByteString
+newtype Locale = Locale Text
 
 -- | \"en\" locale.
 instance Default Locale where
