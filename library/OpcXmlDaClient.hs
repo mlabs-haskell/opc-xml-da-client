@@ -15,6 +15,7 @@ module OpcXmlDaClient
     Decoder,
     intDecoder,
     floatDecoder,
+    customDecoder,
 
     -- * Configuration
 
