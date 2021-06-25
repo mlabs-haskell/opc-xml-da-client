@@ -372,3 +372,74 @@ GetPropertiesResponse:
 DateTime:
   product:
     utcTime: UTCTime
+
+ResultCode:
+  enum:
+    ## Success
+    # The value written was accepted but the output was clamped.
+    # S_CLAMP
+    - clamp
+    # Not every detected change has been returned since the server's buffer reached its limit and had to purge out the oldest data.
+    # S_DATAQUEUEOVERFLOW
+    - dataQueueOverflow
+    # The server does not support the requested rate but will use the closest available rate.
+    # S_UNSUPPORTEDRATE
+    - unsupportedRate
+    ## Failure
+    # The server denies access (read and/or write) to the specified item. This error is typically caused by Web Service security (e.g. globally disabled write capabilities).
+    # E_ACCESS_DENIED
+    - accessDenied
+    # The server is currenly processing another polled refresh for one or more of the subscriptions.
+    # E_BUSY
+    - busy
+    # Unspecified error.
+    # E_FAIL
+    - fail
+    # The continuation point is not valid.
+    # E_INVALIDCONTINUATIONPOINT
+    - invalidContinuationPoint
+    # The filter string is not valid.
+    # E_INVALIDFILTER
+    - invalidFilter
+    # The hold time is too long (determined by server).
+    # E_INVALIDHOLDTIME
+    - invalidHoldTime
+    # The item name does not conform the server’s syntax.
+    # E_INVALIDITEMNAME
+    - invalidItemName
+    # The item path does not conform the server’s syntax.
+    # E_INVALIDITEMPATH
+    - invalidItemPath
+    # The property id is not valid for the item.
+    # E_INVALIDPID
+    - invalidPid
+    # An invalid set of subscription handles was passed to the request.
+    # E_NOSUBSCRIPTION
+    - noSubscription
+    # The server does not support writing to the quality and/or timestamp.
+    # E_NOTSUPPORTED
+    - notSupported
+    # Ran out of memory.
+    # E_OUTOFMEMORY
+    - outOfMemory
+    # The value was out of range.
+    # E_RANGE
+    - range
+    # The value is read only and may not be written to.
+    # E_READONLY
+    - readOnly
+    # The operation could not complete due to an abnormal server state.
+    # E_SERVERSTATE
+    - serverState
+    # The operation took too long to complete (determined by server).
+    # E_TIMEDOUT
+    - timedOut
+    # The item name is no longer available in the server address space.
+    # E_UNKNOWNITEMNAME
+    - unknownItemName
+    # The item path is no longer available in the server address space.
+    # E_UNKNOWNITEMPATH
+    - unknownItemPath
+    # The value is write-only and may not be read from or returned as part of a write response.
+    # E_WRITEONLY
+    - writeOnly
