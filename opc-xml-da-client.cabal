@@ -23,6 +23,7 @@ library
     OpcXmlDaClient.XmlConstruction
     OpcXmlDaClient.XmlParsing
   build-depends:
+    attoparsec >=0.13.2.5 && <0.15,
     base >=4.14 && <5,
     bytestring >=0.10 && <0.12,
     data-default ^>=0.7.1.1,
