@@ -6,6 +6,5 @@ extra-deps:
   - domain-0.1.1
   - domain-core-0.1
   - domain-optics-0.1
-  - lens-5.0.1
   - th-lego-0.2.3
   - yaml-unscrambler-0.1.0.2
