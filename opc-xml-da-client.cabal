@@ -34,7 +34,7 @@ library
     hashable-time >=0.2 && <0.4,
     scientific ^>=0.3.6.2,
     text >=1 && <2,
-    time >=1.9.3 && <1.12,
+    time >=1.9.3 && <2,
     transformers ^>=0.5,
     vector ^>=0.12,
     vector-instances ^>=3.4,
