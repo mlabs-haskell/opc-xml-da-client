@@ -38,3 +38,4 @@ library
     vector ^>=0.12,
     vector-instances ^>=3.4,
     xml-conduit ^>=1.9.1.1,
+    xml-unscrambler ^>=0.1,

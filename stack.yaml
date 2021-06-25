@@ -8,3 +8,5 @@ extra-deps:
   - domain-optics-0.1
   - th-lego-0.2.3
   - yaml-unscrambler-0.1.0.2
+  - git: https://github.com/nikita-volkov/xml-unscrambler
+    commit: !!str 402ca30b4d98a8e4ab96fc46bc1127af6bcd1b8e
