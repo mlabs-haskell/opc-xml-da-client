@@ -10,4 +10,4 @@ extra-deps:
   - th-lego-0.2.3
   - yaml-unscrambler-0.1.0.3
   - git: https://github.com/nikita-volkov/xml-unscrambler
-    commit: !!str 06785ef8bb18d2669d0f076cdb18fea09e1b8c44
+    commit: !!str 4bd4c9bc860ce6dd772876b87fe64bdce6e0443f
