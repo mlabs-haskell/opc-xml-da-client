@@ -681,7 +681,5 @@ float = packed
 int :: Int32 -> Text
 int = packed
 
--- TODO: may be wrong
-qName :: Xml.Name -> Text
-qName Xml.Name {nameLocalName, namePrefix = Just prefix} = nameLocalName <> ":" <> prefix
-qName Xml.Name {nameLocalName} = nameLocalName
+qName :: QName -> Text
+qName = error "TODO"

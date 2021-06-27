@@ -61,13 +61,13 @@ ReadRequestItemList:
   product:
     items: Vector ReadRequestItem
     itemPath: Maybe Text
-    reqType: Maybe Xml.Name
+    reqType: Maybe QName
     maxAge: Maybe Int32
 
 ReadRequestItem:
   product:
     itemPath: Maybe Text
-    reqType: Maybe Xml.Name
+    reqType: Maybe QName
     itemName: Maybe Text
     clientItemHandle: Maybe Text
     maxAge: Maybe Int32
@@ -88,12 +88,12 @@ ItemValue:
     diagnosticInfo: Maybe Text
     value: Maybe Xml.Element
     quality: Maybe OpcQuality
-    valueTypeQualifier: Maybe Xml.Name
+    valueTypeQualifier: Maybe QName
     itemPath: Maybe Text
     itemName: Maybe Text
     clientItemHandle: Maybe Text
     timestamp: Maybe DateTime
-    resultId: Maybe Xml.Name
+    resultId: Maybe QName
 
 OpcQuality:
   product:
@@ -130,7 +130,7 @@ LimitBits:
 OpcError:
   product:
     text: Maybe Text
-    id: Xml.Name
+    id: QName
 
 # TODO: This would be better just as unboxed Vector Float.
 ArrayOfFloat:
@@ -230,7 +230,7 @@ SubscribeRequestItemList:
   product:
     items: Vector SubscribeRequestItem
     itemPath: Maybe Text
-    reqType: Maybe Xml.Name
+    reqType: Maybe QName
     deadband: Maybe Float
     requestedSamplingRate: Maybe Int32
     enableBuffering: Maybe Bool
@@ -238,7 +238,7 @@ SubscribeRequestItemList:
 SubscribeRequestItem:
   product:
     itemPath: Maybe Text
-    reqType: Maybe Xml.Name
+    reqType: Maybe QName
     itemName: Maybe Text
     clientItemHandle: Maybe Text
     deadband: Maybe Float
@@ -294,7 +294,7 @@ SubscriptionCancelResponse:
 
 Browse:
   product:
-    propertyNames: Vector Xml.Name
+    propertyNames: Vector QName
     localeId: Maybe Text
     clientRequestHandle: Maybe Text
     itemPath: Maybe Text
@@ -326,11 +326,11 @@ BrowseElement:
 ItemProperty:
   product:
     value: Maybe Xml.Element
-    name: Xml.Name
+    name: QName
     description: Maybe Text
     itemPath: Maybe Text
     itemName: Maybe Text
-    resultId: Maybe Xml.Name
+    resultId: Maybe QName
 
 BrowseResponse:
   product:
@@ -343,7 +343,7 @@ BrowseResponse:
 GetProperties:
   product:
     itemIds: Vector ItemIdentifier
-    propertyNames: Vector Xml.Name
+    propertyNames: Vector QName
     localeId: Maybe Text
     clientRequestHandle: Maybe Text
     itemPath: Maybe Text
@@ -361,7 +361,7 @@ PropertyReplyList:
     properties: Vector ItemProperty
     itemPath: Maybe Text
     itemName: Maybe Text
-    resultId: Maybe Xml.Name
+    resultId: Maybe QName
 
 GetPropertiesResponse:
   product:
@@ -444,3 +444,10 @@ ResultCode:
     # The value is write-only and may not be read from or returned as part of a write response.
     # E_WRITEONLY
     - writeOnly
+
+QName:
+  sum:
+    namespaced:
+      - Text
+      - Text
+    unnamespaced: Text
