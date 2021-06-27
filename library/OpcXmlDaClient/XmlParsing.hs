@@ -54,7 +54,13 @@ getPropertiesResponse = error "TODO"
 
 replyBase :: Element ReplyBase
 replyBase =
-  error "TODO"
+  attributesByName $ do
+    _rcvTime <- byName Nothing "RcvTime" dateTimeContent
+    _replyTime <- byName Nothing "ReplyTime" dateTimeContent
+    _clientRequestHandle <- optional $ byName Nothing "ClientRequestHandle" textContent
+    _revisedLocaleID <- optional $ byName Nothing "RevisedLocaleID" textContent
+    _serverState <- byName Nothing "ServerState" serverStateContent
+    return $ ReplyBase _rcvTime _replyTime _clientRequestHandle _revisedLocaleID _serverState
 
 subscribeReplyItemList :: Element SubscribeReplyItemList
 subscribeReplyItemList =
@@ -154,6 +160,17 @@ limitBitsContent =
 unsignedByteContent :: Content Word8
 unsignedByteContent =
   attoparsedContent AttoparsecData.lenientParser
+
+serverStateContent :: Content ServerState
+serverStateContent =
+  enumContent
+    [ ("running", #running),
+      ("failed", #failed),
+      ("noConfig", #noConfig),
+      ("suspended", #suspended),
+      ("test", #test),
+      ("commFault", #commFault)
+    ]
 
 -- * Attributes
 
