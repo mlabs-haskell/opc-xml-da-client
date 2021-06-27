@@ -1,5 +1,6 @@
 module OpcXmlDaClient.XmlParsing where
 
+import qualified Attoparsec.Time.Text as AttoparsecTime
 import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Prelude hiding (Read)
 import OpcXmlDaClient.Types
@@ -116,9 +117,9 @@ adaptedQNameContent =
     Just ns -> NamespacedQName ns name
     Nothing -> UnnamespacedQName name
 
-dateTimeContent :: Content DateTime
+dateTimeContent :: Content UTCTime
 dateTimeContent =
-  error "TODO"
+  attoparsedContent AttoparsecTime.utcTimeInISO8601
 
 qualityBitsContent :: Content QualityBits
 qualityBitsContent =

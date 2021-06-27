@@ -12,8 +12,8 @@ GetStatusResponse:
 
 ReplyBase:
   product:
-    rcvTime: DateTime
-    replyTime: DateTime
+    rcvTime: UTCTime
+    replyTime: UTCTime
     clientRequestHandle: Maybe Text
     revisedLocaleId: Maybe Text
     serverState: ServerState
@@ -33,7 +33,7 @@ ServerStatus:
     vendorInfo: Maybe Text
     supportedLocaleIds: Vector Text
     supportedInterfaceVersions: Vector InterfaceVersion
-    startTime: DateTime
+    startTime: UTCTime
     productVersion: Maybe Text
 
 InterfaceVersion:
@@ -53,7 +53,7 @@ RequestOptions:
     returnItemTime: Bool
     returnItemPath: Bool
     returnItemName: Bool
-    requestDeadline: Maybe DateTime
+    requestDeadline: Maybe UTCTime
     clientRequestHandle: Maybe Text
     localeId: Maybe Text
 
@@ -92,7 +92,7 @@ ItemValue:
     itemPath: Maybe Text
     itemName: Maybe Text
     clientItemHandle: Maybe Text
-    timestamp: Maybe DateTime
+    timestamp: Maybe UTCTime
     resultId: Maybe QName
 
 OpcQuality:
@@ -177,10 +177,10 @@ ArrayOfString:
   product:
     string: Vector (Maybe Text)
 
-# TODO: This would be better just as Vector DateTime.
+# TODO: This would be better just as Vector UTCTime.
 ArrayOfDateTime:
   product:
-    dateTime: Vector DateTime
+    dateTime: Vector UTCTime
 
 # TODO: This would be better just as Vector (Maybe Xml.Element).
 ArrayOfAnyType:
@@ -269,7 +269,7 @@ SubscriptionPolledRefresh:
   product:
     options: Maybe RequestOptions
     serverSubHandles: Vector Text
-    holdTime: Maybe DateTime
+    holdTime: Maybe UTCTime
     waitTime: Int32
     returnAllItems: Bool
 
@@ -371,10 +371,6 @@ GetPropertiesResponse:
     getPropertiesResult: Maybe ReplyBase
     propertyLists: Vector PropertyReplyList
     errors: Vector OpcError
-
-DateTime:
-  product:
-    utcTime: UTCTime
 
 # Standard OPC result code as per the definition in the 3.1.9 section of the spec.
 ResultCode:

@@ -137,7 +137,7 @@ subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
 -- >    returnItemTime: Bool
 -- >    returnItemPath: Bool
 -- >    returnItemName: Bool
--- >    requestDeadline: Maybe DateTime
+-- >    requestDeadline: Maybe UTCTime
 -- >    clientRequestHandle: Maybe Text
 -- >    localeId: Maybe Text
 --
@@ -245,7 +245,7 @@ getStatusDocument = inSoapEnvelope . Xml.NodeElement . getStatusElement
 -- >    itemPath: Maybe Text
 -- >    itemName: Maybe Text
 -- >    clientItemHandle: Maybe Text
--- >    timestamp: Maybe DateTime
+-- >    timestamp: Maybe UTCTime
 -- >    resultId: Maybe Xml.Name
 --
 -- > <Items
@@ -492,7 +492,7 @@ readDocument = inSoapEnvelope . Xml.NodeElement . readElement
 -- > product:
 -- >   options: Maybe RequestOptions
 -- >   serverSubHandles: Vector Text
--- >   holdTime: Maybe DateTime
+-- >   holdTime: Maybe UTCTime
 -- >   waitTime: Int32
 -- >   returnAllItems: Bool
 --
@@ -669,8 +669,8 @@ itemIdentifierElement ii =
 packed :: Show a => a -> Text
 packed = Text.pack . show
 
-dateTime :: DateTime -> Text
-dateTime = Text.pack . iso8601Show . _utcTime
+dateTime :: UTCTime -> Text
+dateTime = Text.pack . iso8601Show
 
 bool :: Bool -> Text
 bool = Text.toLower . packed
