@@ -1,6 +1,6 @@
 module OpcXmlDaClient.XmlParsing where
 
-import qualified Attoparsec.Time.Text as AttoparsecTime
+import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Prelude hiding (Read)
 import OpcXmlDaClient.Types
@@ -119,7 +119,7 @@ adaptedQNameContent =
 
 dateTimeContent :: Content UTCTime
 dateTimeContent =
-  attoparsedContent AttoparsecTime.utcTimeInISO8601
+  attoparsedContent AttoparsecData.utcTimeInISO8601
 
 qualityBitsContent :: Content QualityBits
 qualityBitsContent =
@@ -132,6 +132,12 @@ limitBitsContent =
 unsignedByteContent :: Content Word8
 unsignedByteContent =
   error "TODO"
+
+-- * Attributes
+
+isNil :: ByName Content Bool
+isNil =
+  byName (Just xsiNs) "nil" (attoparsedContent AttoparsecData.bool) <|> pure False
 
 -- * Namespaces
 
