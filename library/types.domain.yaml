@@ -252,6 +252,9 @@ SubscribeReplyItemList:
 
 SubscribeItemValue:
   product:
+    # We're avoiding a Maybe here, since the spec says that it has minOccurs set to 0
+    # only to satisfy the needs of some codegen tools.
+    # See Section 3.5.2 of the spec.
     itemValue: ItemValue
     revisedSamplingRate: Maybe Int
 
