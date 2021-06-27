@@ -123,11 +123,33 @@ dateTimeContent =
 
 qualityBitsContent :: Content QualityBits
 qualityBitsContent =
-  error "TODO"
+  enumContent
+    [ ("bad", #bad),
+      ("badConfigurationError", #badConfigurationError),
+      ("badNotConnected", #badNotConnected),
+      ("badDeviceFailure", #badDeviceFailure),
+      ("badSensorFailure", #badSensorFailure),
+      ("badLastKnownValue", #badLastKnownValue),
+      ("badCommFailure", #badCommFailure),
+      ("badOutOfService", #badOutOfService),
+      ("badWaitingForInitialData", #badWaitingForInitialData),
+      ("uncertain", #uncertain),
+      ("uncertainLastUsableValue", #uncertainLastUsableValue),
+      ("uncertainSensorNotAccurate", #uncertainSensorNotAccurate),
+      ("uncertainEUExceeded", #uncertainEUExceeded),
+      ("uncertainSubNormal", #uncertainSubNormal),
+      ("good", #good),
+      ("goodLocalOverride", #goodLocalOverride)
+    ]
 
 limitBitsContent :: Content LimitBits
 limitBitsContent =
-  error "TODO"
+  enumContent
+    [ ("none", #none),
+      ("low", #low),
+      ("high", #high),
+      ("constant", #constant)
+    ]
 
 unsignedByteContent :: Content Word8
 unsignedByteContent =
