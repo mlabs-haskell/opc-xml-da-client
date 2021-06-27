@@ -153,7 +153,7 @@ limitBitsContent =
 
 unsignedByteContent :: Content Word8
 unsignedByteContent =
-  error "TODO"
+  attoparsedContent AttoparsecData.lenientParser
 
 -- * Attributes
 
