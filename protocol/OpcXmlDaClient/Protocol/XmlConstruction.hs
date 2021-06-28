@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module OpcXmlDaClient.XmlConstruction
+module OpcXmlDaClient.Protocol.XmlConstruction
   ( -- * Documents
     subscribeDocument,
     getStatusDocument,
@@ -16,8 +16,8 @@ where
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
 import Data.Time.Format.ISO8601 (iso8601Show)
-import OpcXmlDaClient.Prelude hiding (Read, bool)
-import OpcXmlDaClient.Types
+import OpcXmlDaClient.Base.Prelude hiding (Read, bool)
+import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
 
 ----------------------------------------------------------------
@@ -122,9 +122,6 @@ subscribeElement x =
           fmap (Xml.NodeElement . subscribeRequestItemListElement "ItemList") (#itemList x)
         ]
     )
-  where
-    s = #subscriptionPingRate x
-    r = int <$> s
 
 subscribeDocument :: Subscribe -> Xml.Document
 subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
@@ -137,7 +134,7 @@ subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
 -- >    returnItemTime: Bool
 -- >    returnItemPath: Bool
 -- >    returnItemName: Bool
--- >    requestDeadline: Maybe DateTime
+-- >    requestDeadline: Maybe UTCTime
 -- >    clientRequestHandle: Maybe Text
 -- >    localeId: Maybe Text
 --
@@ -245,7 +242,7 @@ getStatusDocument = inSoapEnvelope . Xml.NodeElement . getStatusElement
 -- >    itemPath: Maybe Text
 -- >    itemName: Maybe Text
 -- >    clientItemHandle: Maybe Text
--- >    timestamp: Maybe DateTime
+-- >    timestamp: Maybe UTCTime
 -- >    resultId: Maybe Xml.Name
 --
 -- > <Items
@@ -273,10 +270,14 @@ itemValueElement iv =
         ]
     ( catMaybes
         [ Xml.NodeElement . diagnosticInfoElement <$> #diagnosticInfo iv,
-          Xml.NodeElement <$> #value iv,
+          Xml.NodeElement . valueElement <$> #value iv,
           Xml.NodeElement . opcQualityElement <$> #quality iv
         ]
     )
+
+valueElement :: Value -> Xml.Element
+valueElement =
+  error "TODO"
 
 -- |
 -- > <DiagnosticInfo>sss</DiagnosticInfo>
@@ -492,7 +493,7 @@ readDocument = inSoapEnvelope . Xml.NodeElement . readElement
 -- > product:
 -- >   options: Maybe RequestOptions
 -- >   serverSubHandles: Vector Text
--- >   holdTime: Maybe DateTime
+-- >   holdTime: Maybe UTCTime
 -- >   waitTime: Int32
 -- >   returnAllItems: Bool
 --
@@ -669,8 +670,8 @@ itemIdentifierElement ii =
 packed :: Show a => a -> Text
 packed = Text.pack . show
 
-dateTime :: DateTime -> Text
-dateTime = Text.pack . iso8601Show . _utcTime
+dateTime :: UTCTime -> Text
+dateTime = Text.pack . iso8601Show
 
 bool :: Bool -> Text
 bool = Text.toLower . packed
@@ -681,7 +682,5 @@ float = packed
 int :: Int32 -> Text
 int = packed
 
--- TODO: may be wrong
-qName :: Xml.Name -> Text
-qName Xml.Name {nameLocalName, namePrefix = Just prefix} = nameLocalName <> ":" <> prefix
-qName Xml.Name {nameLocalName} = nameLocalName
+qName :: QName -> Text
+qName = error "TODO"

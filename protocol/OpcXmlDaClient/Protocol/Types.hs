@@ -1,8 +1,8 @@
-module OpcXmlDaClient.Types where
+module OpcXmlDaClient.Protocol.Types where
 
 import Data.Time.Clock
 import qualified Domain
-import OpcXmlDaClient.Prelude hiding (Read)
+import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified Text.XML as Xml
 
 Domain.declare
