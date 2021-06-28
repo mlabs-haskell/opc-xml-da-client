@@ -28,7 +28,7 @@ library
     transformers ^>=0.5,
     vector ^>=0.12,
     xml-conduit ^>=1.9.1.1,
-    xml-unscrambler ^>=0.1,
+    xml-parser ^>=0.1,
 
 library opc-xml-da-client-protocol
   hs-source-dirs: protocol
@@ -53,7 +53,7 @@ library opc-xml-da-client-protocol
     vector ^>=0.12,
     vector-builder ^>=0.3.8.1,
     xml-conduit ^>=1.9.1.1,
-    xml-unscrambler ^>=0.1,
+    xml-parser ^>=0.1,
 
 library opc-xml-da-client-base
   hs-source-dirs: base
@@ -92,4 +92,4 @@ test-suite test
     tasty-hunit >=0.9 && <0.11,
     tasty-quickcheck >=0.9 && <0.11,
     xml-conduit,
-    xml-unscrambler,
+    xml-parser,

@@ -9,5 +9,5 @@ extra-deps:
   - template-haskell-compat-v0208-0.1.6
   - th-lego-0.2.3
   - yaml-unscrambler-0.1.0.3
-  - git: https://github.com/nikita-volkov/xml-unscrambler
-    commit: !!str 7b4f13285caf921b83b3ec56155a821598c35246
+  - git: https://github.com/nikita-volkov/xml-parser
+    commit: !!str fb4c0c5014fcabefe0769ab364fa69fef661bc96

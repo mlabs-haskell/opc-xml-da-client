@@ -11,14 +11,14 @@ import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
 import Test.Tasty.Runners
 import qualified Text.XML as Xml
-import qualified XmlUnscrambler as Xu
+import qualified XmlParser as Xp
 import Prelude
 
 main =
   defaultMain $
     let Right response =
           unsafePerformIO $
-            Xu.parseFile XmlParsing.subscribeResponse "samples/680.response.xml"
+            Xp.parseFile XmlParsing.subscribeResponse "samples/680.response.xml"
      in testGroup
           "Subscribe Response"
           [ testCase "Top level properties" $ do

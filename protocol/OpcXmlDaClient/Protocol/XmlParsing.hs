@@ -6,7 +6,7 @@ import OpcXmlDaClient.Base.Prelude hiding (Read)
 import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
 import qualified VectorBuilder.Alternative as Vb
-import XmlUnscrambler
+import XmlParser
 
 -- * Responses
 
