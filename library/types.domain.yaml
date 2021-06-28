@@ -32,14 +32,9 @@ ServerStatus:
     statusInfo: Maybe Text
     vendorInfo: Maybe Text
     supportedLocaleIds: Vector Text
-    supportedInterfaceVersions: Vector InterfaceVersion
+    supportedInterfaceVersions: Vector Text
     startTime: UTCTime
     productVersion: Maybe Text
-
-InterfaceVersion:
-  product:
-    major: Int
-    minor: Int
 
 Read:
   product:

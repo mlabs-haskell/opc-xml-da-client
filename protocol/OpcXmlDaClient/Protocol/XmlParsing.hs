@@ -5,7 +5,7 @@ import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Base.Prelude hiding (Read)
 import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
-import qualified VectorBuilder.Alternative as Vb
+import qualified VectorBuilder.Alternative as Vba
 import XmlParser
 
 -- * Responses
@@ -18,7 +18,12 @@ response ns name parser = do
   childrenByName $ byName (Just soapEnvNs) "Body" $ childrenByName $ byName ns name $ parser
 
 getStatusResponse :: Element GetStatusResponse
-getStatusResponse = error "TODO"
+getStatusResponse =
+  response (Just opcNs) "GetStatusResponse" $
+    childrenByName $ do
+      _getStatusResult <- optional $ byName (Just opcNs) "GetStatusResult" $ replyBase
+      _status <- optional $ byName (Just opcNs) "Status" $ serverStatus
+      return $ GetStatusResponse _getStatusResult _status
 
 readResponse :: Element ReadResponse
 readResponse = error "TODO"
@@ -36,7 +41,7 @@ subscribeResponse =
           childrenByName $ do
             _subscribeResult <- optional $ byName (Just opcNs) "SubscribeResult" $ replyBase
             _rItemList <- optional $ byName (Just opcNs) "RItemList" $ subscribeReplyItemList
-            _errors <- Vb.many $ byName (Just opcNs) "OPCError" $ opcError
+            _errors <- Vba.many $ byName (Just opcNs) "OPCError" $ opcError
             return $ SubscribeResponse _subscribeResult _rItemList _errors _subHandle
 
 subscriptionPolledRefreshResponse :: Element SubscriptionPolledRefreshResponse
@@ -69,7 +74,7 @@ subscribeReplyItemList =
     attributesByName $ do
       _revisedSamplingRate <- optional $ byName Nothing "RevisedSamplingRate" $ attoparsedContent Atto.decimal
       return $ do
-        _items <- childrenByName $ Vb.many $ byName (Just opcNs) "Items" $ subscribeItemValue
+        _items <- childrenByName $ Vba.many $ byName (Just opcNs) "Items" $ subscribeItemValue
         return (SubscribeReplyItemList _items _revisedSamplingRate)
 
 subscribeItemValue :: Element SubscribeItemValue
@@ -124,6 +129,20 @@ opcQuality =
     _limitField <- byName Nothing "LimitField" limitBitsContent <|> pure #none
     _vendorField <- byName Nothing "VendorField" unsignedByteContent <|> pure 0
     return (OpcQuality _qualityField _limitField _vendorField)
+
+serverStatus :: Element ServerStatus
+serverStatus =
+  join $
+    childrenByName $ do
+      _statusInfo <- optional $ byName (Just opcNs) "StatusInfo" $ children $ contentNode $ textContent
+      _vendorInfo <- optional $ byName (Just opcNs) "VendorInfo" $ children $ contentNode $ textContent
+      _supportedLocaleIds <- Vba.many $ byName (Just opcNs) "SupportedLocaleIDs" $ children $ contentNode $ textContent
+      _supportedInterfaceVersions <- Vba.many $ byName (Just opcNs) "SupportedInterfaceVersions" $ children $ contentNode $ textContent
+      return $
+        attributesByName $ do
+          _startTime <- byName Nothing "StartTime" $ dateTimeContent
+          _productVersion <- optional $ byName Nothing "ProductVersion" $ textContent
+          return $ ServerStatus _statusInfo _vendorInfo _supportedLocaleIds _supportedInterfaceVersions _startTime _productVersion
 
 -- * Content
 
