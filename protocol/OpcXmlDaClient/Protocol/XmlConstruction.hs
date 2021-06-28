@@ -122,9 +122,6 @@ subscribeElement x =
           fmap (Xml.NodeElement . subscribeRequestItemListElement "ItemList") (#itemList x)
         ]
     )
-  where
-    s = #subscriptionPingRate x
-    r = int <$> s
 
 subscribeDocument :: Subscribe -> Xml.Document
 subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
