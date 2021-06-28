@@ -273,10 +273,14 @@ itemValueElement iv =
         ]
     ( catMaybes
         [ Xml.NodeElement . diagnosticInfoElement <$> #diagnosticInfo iv,
-          Xml.NodeElement <$> #value iv,
+          Xml.NodeElement . valueElement <$> #value iv,
           Xml.NodeElement . opcQualityElement <$> #quality iv
         ]
     )
+
+valueElement :: Value -> Xml.Element
+valueElement =
+  error "TODO"
 
 -- |
 -- > <DiagnosticInfo>sss</DiagnosticInfo>

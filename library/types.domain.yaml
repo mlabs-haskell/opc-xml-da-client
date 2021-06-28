@@ -86,7 +86,7 @@ ReplyItemList:
 ItemValue:
   product:
     diagnosticInfo: Maybe Text
-    value: Maybe Xml.Element
+    value: Maybe Value
     quality: Maybe OpcQuality
     valueTypeQualifier: Maybe QName
     itemPath: Maybe Text
@@ -94,6 +94,11 @@ ItemValue:
     clientItemHandle: Maybe Text
     timestamp: Maybe UTCTime
     resultId: Maybe QName
+
+Value:
+  product:
+    type: QName
+    xml: "[Xml.Node]"
 
 OpcQuality:
   product:

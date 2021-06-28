@@ -4,6 +4,7 @@ import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Prelude hiding (Read)
 import OpcXmlDaClient.Types
+import qualified Text.XML as Xml
 import qualified VectorBuilder.Alternative as Vb
 import XmlUnscrambler
 
@@ -103,9 +104,18 @@ itemValue =
       return $ do
         childrenByName $ do
           _diagnosticInfo <- optional $ byName (Just opcNs) "DiagnosticInfo" $ children $ contentNode $ textContent
-          _value <- optional $ byName (Just opcNs) "Value" $ astElement
+          _value <- optional $ byName (Just opcNs) "Value" $ value
           _opcQuality <- optional $ byName (Just opcNs) "Quality" $ opcQuality
           return (ItemValue _diagnosticInfo _value _opcQuality _valueTypeQualifier _itemPath _itemName _clientItemHandle _timestamp _resultId)
+
+value :: Element Value
+value =
+  join $
+    attributesByName $ do
+      _type <- byName (Just xsiNs) "type" adaptedQNameContent
+      return $ do
+        Xml.Element _ _ _nodes <- astElement
+        return $ Value _type _nodes
 
 opcQuality :: Element OpcQuality
 opcQuality =
