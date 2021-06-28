@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module OpcXmlDaClient.XmlConstruction
+module OpcXmlDaClient.Protocol.XmlConstruction
   ( -- * Documents
     subscribeDocument,
     getStatusDocument,
@@ -16,8 +16,8 @@ where
 import qualified Data.Map.Strict as Map
 import qualified Data.Text as Text
 import Data.Time.Format.ISO8601 (iso8601Show)
-import OpcXmlDaClient.Prelude hiding (Read, bool)
-import OpcXmlDaClient.Types
+import OpcXmlDaClient.Base.Prelude hiding (Read, bool)
+import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
 
 ----------------------------------------------------------------

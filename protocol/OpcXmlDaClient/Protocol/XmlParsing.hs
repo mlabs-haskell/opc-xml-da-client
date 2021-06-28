@@ -1,9 +1,9 @@
-module OpcXmlDaClient.XmlParsing where
+module OpcXmlDaClient.Protocol.XmlParsing where
 
 import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
-import OpcXmlDaClient.Prelude hiding (Read)
-import OpcXmlDaClient.Types
+import OpcXmlDaClient.Base.Prelude hiding (Read)
+import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
 import qualified VectorBuilder.Alternative as Vb
 import XmlUnscrambler

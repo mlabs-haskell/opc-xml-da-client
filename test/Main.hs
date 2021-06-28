@@ -2,8 +2,8 @@ module Main where
 
 import qualified Data.ByteString.Lazy as LazyByteString
 import qualified Data.Vector as Vector
-import OpcXmlDaClient.Types
-import qualified OpcXmlDaClient.XmlParsing as XmlParsing
+import OpcXmlDaClient.Protocol.Types
+import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
 import qualified Test.QuickCheck as QuickCheck
 import Test.QuickCheck.Instances
 import Test.Tasty

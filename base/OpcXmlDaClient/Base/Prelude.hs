@@ -1,4 +1,4 @@
-module OpcXmlDaClient.Prelude
+module OpcXmlDaClient.Base.Prelude
   ( module Exports,
     showText,
   )
