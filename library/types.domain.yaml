@@ -182,10 +182,10 @@ ArrayOfDateTime:
   product:
     dateTime: Vector UTCTime
 
-# TODO: This would be better just as Vector (Maybe Xml.Element).
+# TODO: This would be better just as Vector (Maybe Value).
 ArrayOfAnyType:
   product:
-    anyType: Vector (Maybe Xml.Element)
+    anyType: Vector (Maybe Value)
 
 # TODO: This would be better as Vector Scientific.
 ArrayOfDecimal:
