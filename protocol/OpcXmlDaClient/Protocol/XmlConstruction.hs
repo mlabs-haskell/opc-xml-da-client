@@ -20,11 +20,7 @@ import OpcXmlDaClient.Base.Prelude hiding (Read, bool)
 import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
 
-----------------------------------------------------------------
-
 -- * Names
-
-----------------------------------------------------------------
 
 soapEncodingName :: Text -> Xml.Name
 soapEncodingName name =
@@ -47,6 +43,30 @@ xmlDaName name =
   Xml.Name name (Just "http://opcfoundation.org/webservices/XMLDA/1.0/") (Just "XMLDA")
 
 -- * Documents
+
+subscribeDocument :: Subscribe -> Xml.Document
+subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
+
+getStatusDocument :: GetStatus -> Xml.Document
+getStatusDocument = inSoapEnvelope . Xml.NodeElement . getStatusElement
+
+writeDocument :: Write -> Xml.Document
+writeDocument = inSoapEnvelope . Xml.NodeElement . writeElement
+
+readDocument :: Read -> Xml.Document
+readDocument = inSoapEnvelope . Xml.NodeElement . readElement
+
+subscriptionPolledRefreshDocument :: SubscriptionPolledRefresh -> Xml.Document
+subscriptionPolledRefreshDocument = inSoapEnvelope . Xml.NodeElement . subscriptionPolledRefreshElement
+
+subscriptionCancelDocument :: SubscriptionCancel -> Xml.Document
+subscriptionCancelDocument = inSoapEnvelope . Xml.NodeElement . subscriptionCancelElement
+
+browseDocument :: Browse -> Xml.Document
+browseDocument = inSoapEnvelope . Xml.NodeElement . browseElement
+
+getPropertiesDocument :: GetProperties -> Xml.Document
+getPropertiesDocument = inSoapEnvelope . Xml.NodeElement . getPropertiesElement
 
 -- |
 -- Wraps the element in the following snippet.
@@ -84,20 +104,12 @@ inSoapEnvelope bodyChild =
     )
     []
 
-----------------------------------------------------------------
-
 -- * Helpers
-
-----------------------------------------------------------------
 
 constructElement :: Text -> [(Xml.Name, Text)] -> [Xml.Node] -> Xml.Element
 constructElement name attributes = Xml.Element (xmlDaName name) (Map.fromList attributes)
 
-----------------------------------------------------------------
-
 -- * Elements
-
-----------------------------------------------------------------
 
 -- |
 -- > <ns1:Subscribe ReturnValuesOnReply="true" SubscriptionPingRate="3000">
@@ -122,9 +134,6 @@ subscribeElement x =
           fmap (Xml.NodeElement . subscribeRequestItemListElement "ItemList") (#itemList x)
         ]
     )
-
-subscribeDocument :: Subscribe -> Xml.Document
-subscribeDocument = inSoapEnvelope . Xml.NodeElement . subscribeElement
 
 -- |
 -- > RequestOptions:
@@ -228,9 +237,6 @@ getStatusElement gs =
         ]
     )
     []
-
-getStatusDocument :: GetStatus -> Xml.Document
-getStatusDocument = inSoapEnvelope . Xml.NodeElement . getStatusElement
 
 -- |
 -- > ItemValue:
@@ -404,9 +410,6 @@ writeElement w =
         ]
     )
 
-writeDocument :: Write -> Xml.Document
-writeDocument = inSoapEnvelope . Xml.NodeElement . writeElement
-
 -- |
 -- > ReadRequestItem:
 -- >  product:
@@ -485,9 +488,6 @@ readElement r =
         ]
     )
 
-readDocument :: Read -> Xml.Document
-readDocument = inSoapEnvelope . Xml.NodeElement . readElement
-
 -- |
 -- > SubscriptionPolledRefresh:
 -- > product:
@@ -524,9 +524,6 @@ serverSubHandlesElement name =
     []
     [Xml.NodeContent name]
 
-subscriptionPolledRefreshDocument :: SubscriptionPolledRefresh -> Xml.Document
-subscriptionPolledRefreshDocument = inSoapEnvelope . Xml.NodeElement . subscriptionPolledRefreshElement
-
 -- |
 -- > SubscriptionCancel:
 -- >   product:
@@ -544,9 +541,6 @@ subscriptionCancelElement sc =
         ]
     )
     []
-
-subscriptionCancelDocument :: SubscriptionCancel -> Xml.Document
-subscriptionCancelDocument = inSoapEnvelope . Xml.NodeElement . subscriptionCancelElement
 
 browseFilterText :: BrowseFilter -> Text
 browseFilterText = \case
@@ -596,9 +590,6 @@ browseElement b =
     )
     (Xml.NodeElement . propertyNamesElement . qName <$> toList (#propertyNames b))
 
-browseDocument :: Browse -> Xml.Document
-browseDocument = inSoapEnvelope . Xml.NodeElement . browseElement
-
 -- |
 -- > <PropertyNames>ss</PropertyNames>
 propertyNamesElement :: Text -> Xml.Element
@@ -644,9 +635,6 @@ getPropertiesElement gp =
           Xml.NodeElement . itemIdentifierElement <$> toList (#itemIds gp)
         ]
     )
-
-getPropertiesDocument :: GetProperties -> Xml.Document
-getPropertiesDocument = inSoapEnvelope . Xml.NodeElement . getPropertiesElement
 
 -- |
 -- > ItemIdentifier:
