@@ -132,72 +132,58 @@ OpcError:
     text: Maybe Text
     id: QName
 
-# TODO: This would be better just as unboxed Vector Float.
 ArrayOfFloat:
   product:
     float: Vector Float
 
-# TODO: This would be better just as unboxed Vector Int32.
 ArrayOfInt:
   product:
     int: Vector Int32
 
-# TODO: This would be better just as unboxed Vector Word32.
 ArrayOfUnsignedInt:
   product:
     unsignedInt: Vector Word32
 
-# TODO: This would be better just as unboxed Vector Int64
 ArrayOfLong:
   product:
     long: Vector Int64
 
-# TODO: This would be better just as unboxed Vector Word64
 ArrayOfUnsignedLong:
   product:
     unsignedLong: Vector Word64
 
-# TODO: This would be better just as unboxed Vector Double.
 ArrayOfDouble:
   product:
     double: Vector Double
 
-# TODO: This would be better just as unboxed Vector Word16.
 ArrayOfUnsignedShort:
   product:
     unsignedShort: Vector Word16
 
-# TODO: This would be better just as unboxed Vector Bool.
 ArrayOfBoolean:
   product:
     boolean: Vector Bool
 
-# TODO: This would be better just as Vector (Maybe Text).
 ArrayOfString:
   product:
     string: Vector (Maybe Text)
 
-# TODO: This would be better just as Vector UTCTime.
 ArrayOfDateTime:
   product:
     dateTime: Vector UTCTime
 
-# TODO: This would be better just as Vector (Maybe Value).
 ArrayOfAnyType:
   product:
     anyType: Vector (Maybe Value)
 
-# TODO: This would be better as Vector Scientific.
 ArrayOfDecimal:
   product:
     decimal: Vector Scientific
 
-# TODO: This would be better just as unboxed Vector Int8.
 ArrayOfByte:
   product:
     byte: Vector Int8
 
-# TODO: This would be better just as unboxed Vector Int16.
 ArrayOfShort:
   product:
     short: Vector Int16
