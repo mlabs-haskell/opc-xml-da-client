@@ -112,11 +112,11 @@ subscribeElement :: Subscribe -> Xml.Element
 subscribeElement x =
   constructElement
     "Subscribe"
-    do
-      catMaybes
-        [ pure ("ReturnValuesOnReply", bool do #returnValuesOnReply x),
+    ( catMaybes
+        [ Just ("ReturnValuesOnReply", bool (#returnValuesOnReply x)),
           ("SubcriptionPingRate",) . int <$> #subscriptionPingRate x
         ]
+    )
     ( catMaybes
         [ fmap (Xml.NodeElement . requestOptionsElement) (#options x),
           fmap (Xml.NodeElement . subscribeRequestItemListElement "ItemList") (#itemList x)
@@ -147,8 +147,7 @@ requestOptionsElement :: RequestOptions -> Xml.Element
 requestOptionsElement x =
   constructElement
     "Options"
-    do
-      catMaybes
+    ( catMaybes
         [ if #returnErrorText x then Nothing else Just ("ReturnErrorText", "true"),
           if #returnDiagnosticInfo x then Just ("ReturnDiagnosticInfo", "true") else Nothing,
           if #returnItemTime x then Just ("ReturnItemTime", "true") else Nothing,
@@ -158,6 +157,7 @@ requestOptionsElement x =
           fmap ("ClientRequestHandle",) (#clientRequestHandle x),
           fmap ("LocaleID",) (#localeId x)
         ]
+    )
     []
 
 -- |
@@ -222,11 +222,11 @@ getStatusElement :: GetStatus -> Xml.Element
 getStatusElement gs =
   constructElement
     "GetStatus"
-    do
-      catMaybes
+    ( catMaybes
         [ ("LocaleID",) <$> #localeId gs,
           ("ClientRequestHandle",) <$> #clientRequestHandle gs
         ]
+    )
     []
 
 getStatusDocument :: GetStatus -> Xml.Document
@@ -259,8 +259,7 @@ itemValueElement :: ItemValue -> Xml.Element
 itemValueElement iv =
   constructElement
     "Items"
-    do
-      catMaybes
+    ( catMaybes
         [ ("ValueTypeQualifier",) . qName <$> #valueTypeQualifier iv,
           ("ItemPath",) <$> #itemPath iv,
           ("ItemName",) <$> #itemName iv,
@@ -268,6 +267,7 @@ itemValueElement iv =
           ("Timestamp",) . dateTime <$> #timestamp iv,
           ("ResultID",) . qName <$> #resultId iv
         ]
+    )
     ( catMaybes
         [ Xml.NodeElement . diagnosticInfoElement <$> #diagnosticInfo iv,
           Xml.NodeElement . valueElement <$> #value iv,
@@ -300,9 +300,9 @@ opcQualityElement :: OpcQuality -> Xml.Element
 opcQualityElement opcq =
   constructElement
     "Quality"
-    [ ("QualityField", qualityBitsText do #qualityField opcq),
-      ("LimitField", limitBitsText do #limitField opcq),
-      ("VendorField", packed do #vendorField opcq)
+    [ ("QualityField", qualityBitsText (#qualityField opcq)),
+      ("LimitField", limitBitsText (#limitField opcq)),
+      ("VendorField", packed (#vendorField opcq))
     ]
     []
 
@@ -373,10 +373,10 @@ writeRequestItemListElement :: WriteRequestItemList -> Xml.Element
 writeRequestItemListElement wril =
   constructElement
     "WriteRequestItemList"
-    do
-      catMaybes
+    ( catMaybes
         [("ItemPath",) <$> #itemPath wril]
-    (Xml.NodeElement . itemValueElement <$> toList do #items wril)
+    )
+    (Xml.NodeElement . itemValueElement <$> toList (#items wril))
 
 -- |
 -- > Write:
@@ -397,7 +397,7 @@ writeElement :: Write -> Xml.Element
 writeElement w =
   constructElement
     "Write"
-    [("ReturnValuesOnReply", bool do #returnValuesOnReply w)]
+    [("ReturnValuesOnReply", bool (#returnValuesOnReply w))]
     ( catMaybes
         [ Xml.NodeElement . writeRequestItemListElement <$> #itemList w,
           Xml.NodeElement . requestOptionsElement <$> #options w
@@ -426,14 +426,14 @@ readRequestItemElement :: ReadRequestItem -> Xml.Element
 readRequestItemElement rri =
   constructElement
     "Items"
-    do
-      catMaybes
+    ( catMaybes
         [ ("ItemPath",) <$> #itemPath rri,
           ("ReqType",) . qName <$> #reqType rri,
           ("ItemName",) <$> #itemName rri,
           ("ClientItemHandle",) <$> #clientItemHandle rri,
           ("MaxAge",) . int <$> #maxAge rri
         ]
+    )
     []
 
 -- |
@@ -454,13 +454,13 @@ readRequestItemListElement :: ReadRequestItemList -> Xml.Element
 readRequestItemListElement rril =
   constructElement
     "ItemList"
-    do
-      catMaybes
+    ( catMaybes
         [ ("ItemPath",) <$> #itemPath rril,
           ("ReqType",) . qName <$> #reqType rril,
           ("MaxAge",) . int <$> #maxAge rril
         ]
-    (Xml.NodeElement . readRequestItemElement <$> toList do #items rril)
+    )
+    (Xml.NodeElement . readRequestItemElement <$> toList (#items rril))
 
 -- |
 -- > Read:
@@ -507,12 +507,12 @@ subscriptionPolledRefreshElement :: SubscriptionPolledRefresh -> Xml.Element
 subscriptionPolledRefreshElement spr =
   constructElement
     "SubscriptionPolledRefresh"
-    do
-      catMaybes
+    ( catMaybes
         [ ("HoldTime",) . dateTime <$> #holdTime spr,
-          pure ("WaitTime", int do #waitTime spr),
-          pure ("ReturnAllItems", bool do #returnAllItems spr)
+          pure ("WaitTime", int (#waitTime spr)),
+          pure ("ReturnAllItems", bool (#returnAllItems spr))
         ]
+    )
     ( catMaybes [Xml.NodeElement . requestOptionsElement <$> #options spr]
         ++ fmap (Xml.NodeElement . serverSubHandlesElement) (toList (#serverSubHandles spr))
     )
@@ -538,11 +538,11 @@ subscriptionCancelElement :: SubscriptionCancel -> Xml.Element
 subscriptionCancelElement sc =
   constructElement
     "SubscriptionCancel"
-    do
-      catMaybes
+    ( catMaybes
         [ ("ClientRequestHandle",) <$> #clientRequestHandle sc,
           ("ServerSubHandle",) <$> #serverSubHandle sc
         ]
+    )
     []
 
 subscriptionCancelDocument :: SubscriptionCancel -> Xml.Document
@@ -579,23 +579,22 @@ browseElement :: Browse -> Xml.Element
 browseElement b =
   constructElement
     "Browse"
-    do
-      catMaybes
+    ( catMaybes
         [ ("LocaleID",) <$> #localeId b,
           ("ClientRequestHandle",) <$> #clientRequestHandle b,
           ("ItemPath",) <$> #itemPath b,
           ("ItemName",) <$> #itemName b,
           ("ContinuationPoint",) <$> #continuationPoint b,
-          pure ("MaxElementsReturned", int do #maxElementsReturned b),
-          pure ("BrowseFilter", browseFilterText do #browseFilter b),
+          pure ("MaxElementsReturned", int (#maxElementsReturned b)),
+          pure ("BrowseFilter", browseFilterText (#browseFilter b)),
           ("ElementNameFilter",) <$> #elementNameFilter b,
           ("VendorFilter",) <$> #vendorFilter b,
-          pure ("ReturnAllProperties", bool do #returnAllProperties b),
-          pure ("ReturnAllPropertyValues", bool do #returnAllPropertyValues b),
-          pure ("ReturnErrorText", bool do #returnErrorText b)
+          pure ("ReturnAllProperties", bool (#returnAllProperties b)),
+          pure ("ReturnAllPropertyValues", bool (#returnAllPropertyValues b)),
+          pure ("ReturnErrorText", bool (#returnErrorText b))
         ]
-    do
-      Xml.NodeElement . propertyNamesElement . qName <$> toList do #propertyNames b
+    )
+    (Xml.NodeElement . propertyNamesElement . qName <$> toList (#propertyNames b))
 
 browseDocument :: Browse -> Xml.Document
 browseDocument = inSoapEnvelope . Xml.NodeElement . browseElement
@@ -631,20 +630,20 @@ getPropertiesElement :: GetProperties -> Xml.Element
 getPropertiesElement gp =
   constructElement
     "GetProperties"
-    do
-      catMaybes
+    ( catMaybes
         [ ("LocaleID",) <$> #localeId gp,
           ("ClientRequestHandle",) <$> #clientRequestHandle gp,
           ("ItemPath",) <$> #itemPath gp,
-          pure ("ReturnAllProperties", bool do #returnAllProperties gp),
-          pure ("ReturnPropertyValues", bool do #returnPropertyValues gp),
-          pure ("ReturnErrorText", bool do #returnErrorText gp)
+          pure ("ReturnAllProperties", bool (#returnAllProperties gp)),
+          pure ("ReturnPropertyValues", bool (#returnPropertyValues gp)),
+          pure ("ReturnErrorText", bool (#returnErrorText gp))
         ]
-    do
-      mconcat
-        [ Xml.NodeElement . propertyNamesElement . qName <$> toList do #propertyNames gp,
-          Xml.NodeElement . itemIdentifierElement <$> toList do #itemIds gp
+    )
+    ( mconcat
+        [ Xml.NodeElement . propertyNamesElement . qName <$> toList (#propertyNames gp),
+          Xml.NodeElement . itemIdentifierElement <$> toList (#itemIds gp)
         ]
+    )
 
 getPropertiesDocument :: GetProperties -> Xml.Document
 getPropertiesDocument = inSoapEnvelope . Xml.NodeElement . getPropertiesElement
@@ -660,11 +659,11 @@ itemIdentifierElement :: ItemIdentifier -> Xml.Element
 itemIdentifierElement ii =
   constructElement
     "ItemIdentifier"
-    do
-      catMaybes
+    ( catMaybes
         [ ("ItemPath",) <$> #itemPath ii,
           ("ItemName",) <$> #itemName ii
         ]
+    )
     []
 
 packed :: Show a => a -> Text
