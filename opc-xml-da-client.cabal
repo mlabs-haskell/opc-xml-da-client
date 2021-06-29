@@ -39,6 +39,8 @@ library opc-xml-da-client-protocol
     OpcXmlDaClient.Protocol.Types
     OpcXmlDaClient.Protocol.XmlConstruction
     OpcXmlDaClient.Protocol.XmlParsing
+  other-modules:
+    OpcXmlDaClient.Protocol.Namespaces
   build-depends:
     attoparsec >=0.13.2.5 && <0.15,
     attoparsec-data ^>=1.0.5.2,

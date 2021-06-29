@@ -3,6 +3,7 @@ module OpcXmlDaClient.Protocol.XmlParsing where
 import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Base.Prelude hiding (Read)
+import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
 import qualified VectorBuilder.Alternative as Vba
@@ -14,36 +15,36 @@ import XmlParser
 -- General response SOAP envelope parser.
 inSoapEnvelope :: Maybe Text -> Text -> Element a -> Element a
 inSoapEnvelope ns name parser = do
-  elementNameIs (Just soapEnvNs) "Envelope"
-  childrenByName $ byName (Just soapEnvNs) "Body" $ childrenByName $ byName ns name $ parser
+  elementNameIs (Just Ns.soapEnv) "Envelope"
+  childrenByName $ byName (Just Ns.soapEnv) "Body" $ childrenByName $ byName ns name $ parser
 
 opcResponse :: Text -> Element a -> Element a
-opcResponse = inSoapEnvelope (Just opcNs)
+opcResponse = inSoapEnvelope (Just Ns.opc)
 
 getStatusResponse :: Element GetStatusResponse
 getStatusResponse =
   opcResponse "GetStatusResponse" $
     childrenByName $ do
-      _getStatusResult <- optional $ byName (Just opcNs) "GetStatusResult" $ replyBase
-      _status <- optional $ byName (Just opcNs) "Status" $ serverStatus
+      _getStatusResult <- optional $ byName (Just Ns.opc) "GetStatusResult" $ replyBase
+      _status <- optional $ byName (Just Ns.opc) "Status" $ serverStatus
       return $ GetStatusResponse _getStatusResult _status
 
 readResponse :: Element ReadResponse
 readResponse =
   opcResponse "ReadResponse" $
     childrenByName $ do
-      _readResult <- optional $ byName (Just opcNs) "ReadResult" $ replyBase
-      _rItemList <- optional $ byName (Just opcNs) "RItemList" $ replyItemList
-      _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+      _readResult <- optional $ byName (Just Ns.opc) "ReadResult" $ replyBase
+      _rItemList <- optional $ byName (Just Ns.opc) "RItemList" $ replyItemList
+      _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ ReadResponse _readResult _rItemList _errors
 
 writeResponse :: Element WriteResponse
 writeResponse =
   opcResponse "WriteResponse" $
     childrenByName $ do
-      _writeResult <- optional $ byName (Just opcNs) "WriteResult" $ replyBase
-      _rItemList <- optional $ byName (Just opcNs) "RItemList" $ replyItemList
-      _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+      _writeResult <- optional $ byName (Just Ns.opc) "WriteResult" $ replyBase
+      _rItemList <- optional $ byName (Just Ns.opc) "RItemList" $ replyItemList
+      _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ WriteResponse _writeResult _rItemList _errors
 
 subscribeResponse :: Element SubscribeResponse
@@ -54,9 +55,9 @@ subscribeResponse =
         _subHandle <- optional $ byName Nothing "ServerSubHandle" $ textContent
         return $
           childrenByName $ do
-            _subscribeResult <- optional $ byName (Just opcNs) "SubscribeResult" $ replyBase
-            _rItemList <- optional $ byName (Just opcNs) "RItemList" $ subscribeReplyItemList
-            _errors <- Vba.many $ byName (Just opcNs) "OPCError" $ opcError
+            _subscribeResult <- optional $ byName (Just Ns.opc) "SubscribeResult" $ replyBase
+            _rItemList <- optional $ byName (Just Ns.opc) "RItemList" $ subscribeReplyItemList
+            _errors <- Vba.many $ byName (Just Ns.opc) "OPCError" $ opcError
             return $ SubscribeResponse _subscribeResult _rItemList _errors _subHandle
 
 subscriptionPolledRefreshResponse :: Element SubscriptionPolledRefreshResponse
@@ -64,10 +65,10 @@ subscriptionPolledRefreshResponse =
   opcResponse "SubscriptionPolledRefreshResponse" $
     join $
       childrenByName $ do
-        _subscriptionPolledRefreshResult <- optional $ byName (Just opcNs) "SubscriptionPolledRefreshResult" $ replyBase
-        _invalidServerSubHandles <- Vba.many $ byName (Just opcNs) "InvalidServerSubHandles" $ children $ contentNode $ textContent
-        _rItemList <- Vba.many $ byName (Just opcNs) "RItemList" $ subscribePolledRefreshReplyItemList
-        _errors <- Vba.many $ byName (Just opcNs) "OPCError" $ opcError
+        _subscriptionPolledRefreshResult <- optional $ byName (Just Ns.opc) "SubscriptionPolledRefreshResult" $ replyBase
+        _invalidServerSubHandles <- Vba.many $ byName (Just Ns.opc) "InvalidServerSubHandles" $ children $ contentNode $ textContent
+        _rItemList <- Vba.many $ byName (Just Ns.opc) "RItemList" $ subscribePolledRefreshReplyItemList
+        _errors <- Vba.many $ byName (Just Ns.opc) "OPCError" $ opcError
         return $
           attributesByName $ do
             _dataBufferOverflow <- byName Nothing "DataBufferOverflow" booleanContent <|> pure False
@@ -77,7 +78,7 @@ subscriptionCancelResponse :: Element SubscriptionCancelResponse
 subscriptionCancelResponse =
   opcResponse "SubscriptionCancelResponse" $
     childrenByName $ do
-      _clientRequestHandle <- optional $ byName (Just opcNs) "ClientRequestHandle" $ children $ contentNode $ textContent
+      _clientRequestHandle <- optional $ byName (Just Ns.opc) "ClientRequestHandle" $ children $ contentNode $ textContent
       return $ SubscriptionCancelResponse _clientRequestHandle
 
 browseResponse :: Element BrowseResponse
@@ -85,9 +86,9 @@ browseResponse =
   opcResponse "BrowseResponse" $
     join $
       childrenByName $ do
-        _browseResult <- optional $ byName (Just opcNs) "BrowseResult" $ replyBase
-        _elements <- Vba.many $ byName (Just opcNs) "Elements" $ browseElement
-        _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+        _browseResult <- optional $ byName (Just Ns.opc) "BrowseResult" $ replyBase
+        _elements <- Vba.many $ byName (Just Ns.opc) "Elements" $ browseElement
+        _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
         return $
           attributesByName $ do
             _continuationPoint <- optional $ byName Nothing "ContinuationPoint" $ textContent
@@ -98,9 +99,9 @@ getPropertiesResponse :: Element GetPropertiesResponse
 getPropertiesResponse =
   opcResponse "GetPropertiesResponse" $
     childrenByName $ do
-      _getPropertiesResult <- optional $ byName (Just opcNs) "GetPropertiesResult" $ replyBase
-      _propertiesList <- Vba.many $ byName (Just opcNs) "PropertyLists" $ propertyReplyList
-      _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+      _getPropertiesResult <- optional $ byName (Just Ns.opc) "GetPropertiesResult" $ replyBase
+      _propertiesList <- Vba.many $ byName (Just Ns.opc) "PropertyLists" $ propertyReplyList
+      _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ GetPropertiesResponse _getPropertiesResult _propertiesList _errors
 
 -- * Details
@@ -121,7 +122,7 @@ subscribeReplyItemList =
     attributesByName $ do
       _revisedSamplingRate <- optional $ byName Nothing "RevisedSamplingRate" $ attoparsedContent Atto.decimal
       return $ do
-        _items <- childrenByName $ Vba.many $ byName (Just opcNs) "Items" $ subscribeItemValue
+        _items <- childrenByName $ Vba.many $ byName (Just Ns.opc) "Items" $ subscribeItemValue
         return (SubscribeReplyItemList _items _revisedSamplingRate)
 
 subscribeItemValue :: Element SubscribeItemValue
@@ -130,7 +131,7 @@ subscribeItemValue =
     attributesByName $ do
       _revisedSamplingRate <- optional $ byName Nothing "RevisedSamplingRate" $ attoparsedContent Atto.decimal
       return $ do
-        _itemValue <- childrenByName $ byName (Just opcNs) "ItemValue" $ itemValue
+        _itemValue <- childrenByName $ byName (Just Ns.opc) "ItemValue" $ itemValue
         return (SubscribeItemValue _itemValue _revisedSamplingRate)
 
 opcError :: Element OpcError
@@ -140,7 +141,7 @@ opcError =
       _id <- byName Nothing "ID" $ adaptedQNameContent
       return $
         childrenByName $ do
-          _text <- optional $ byName (Just opcNs) "Text" $ children $ contentNode $ textContent
+          _text <- optional $ byName (Just Ns.opc) "Text" $ children $ contentNode $ textContent
           return $ OpcError _text _id
 
 itemValue :: Element ItemValue
@@ -155,16 +156,16 @@ itemValue =
       _resultId <- optional $ byName Nothing "ResultID" $ adaptedQNameContent
       return $ do
         childrenByName $ do
-          _diagnosticInfo <- optional $ byName (Just opcNs) "DiagnosticInfo" $ children $ contentNode $ textContent
-          _value <- optional $ byName (Just opcNs) "Value" $ value
-          _opcQuality <- optional $ byName (Just opcNs) "Quality" $ opcQuality
+          _diagnosticInfo <- optional $ byName (Just Ns.opc) "DiagnosticInfo" $ children $ contentNode $ textContent
+          _value <- optional $ byName (Just Ns.opc) "Value" $ value
+          _opcQuality <- optional $ byName (Just Ns.opc) "Quality" $ opcQuality
           return (ItemValue _diagnosticInfo _value _opcQuality _valueTypeQualifier _itemPath _itemName _clientItemHandle _timestamp _resultId)
 
 value :: Element Value
 value =
   join $
     attributesByName $ do
-      _type <- byName (Just xsiNs) "type" adaptedQNameContent
+      _type <- byName (Just Ns.xsi) "type" adaptedQNameContent
       return $ do
         Xml.Element _ _ _nodes <- astElement
         return $ Value _type _nodes
@@ -181,10 +182,10 @@ serverStatus :: Element ServerStatus
 serverStatus =
   join $
     childrenByName $ do
-      _statusInfo <- optional $ byName (Just opcNs) "StatusInfo" $ children $ contentNode $ textContent
-      _vendorInfo <- optional $ byName (Just opcNs) "VendorInfo" $ children $ contentNode $ textContent
-      _supportedLocaleIds <- Vba.many $ byName (Just opcNs) "SupportedLocaleIDs" $ children $ contentNode $ textContent
-      _supportedInterfaceVersions <- Vba.many $ byName (Just opcNs) "SupportedInterfaceVersions" $ children $ contentNode $ textContent
+      _statusInfo <- optional $ byName (Just Ns.opc) "StatusInfo" $ children $ contentNode $ textContent
+      _vendorInfo <- optional $ byName (Just Ns.opc) "VendorInfo" $ children $ contentNode $ textContent
+      _supportedLocaleIds <- Vba.many $ byName (Just Ns.opc) "SupportedLocaleIDs" $ children $ contentNode $ textContent
+      _supportedInterfaceVersions <- Vba.many $ byName (Just Ns.opc) "SupportedInterfaceVersions" $ children $ contentNode $ textContent
       return $
         attributesByName $ do
           _startTime <- byName Nothing "StartTime" $ dateTimeContent
@@ -195,7 +196,7 @@ replyItemList :: Element ReplyItemList
 replyItemList =
   join $
     childrenByName $ do
-      _items <- Vba.many $ byName (Just opcNs) "Items" $ itemValue
+      _items <- Vba.many $ byName (Just Ns.opc) "Items" $ itemValue
       return $
         attributesByName $ do
           _reserved <- optional $ byName Nothing "Reserved" $ textContent
@@ -205,7 +206,7 @@ subscribePolledRefreshReplyItemList :: Element SubscribePolledRefreshReplyItemLi
 subscribePolledRefreshReplyItemList =
   join $
     childrenByName $ do
-      _items <- Vba.many $ byName (Just opcNs) "Items" $ itemValue
+      _items <- Vba.many $ byName (Just Ns.opc) "Items" $ itemValue
       return $
         attributesByName $ do
           _subscriptionHandle <- optional $ byName Nothing "SubscriptionHandle" $ textContent
@@ -215,7 +216,7 @@ browseElement :: Element BrowseElement
 browseElement =
   join $
     childrenByName $ do
-      _properties <- Vba.many $ byName (Just opcNs) "Properties" $ itemProperty
+      _properties <- Vba.many $ byName (Just Ns.opc) "Properties" $ itemProperty
       return $
         attributesByName $ do
           _name <- optional $ byName Nothing "Name" textContent
@@ -229,7 +230,7 @@ itemProperty :: Element ItemProperty
 itemProperty =
   join $
     childrenByName $ do
-      _value <- optional $ byName (Just opcNs) "Value" $ value
+      _value <- optional $ byName (Just Ns.opc) "Value" $ value
       return $
         attributesByName $ do
           _name <- byName Nothing "Name" adaptedQNameContent
@@ -243,7 +244,7 @@ propertyReplyList :: Element PropertyReplyList
 propertyReplyList = do
   join $
     childrenByName $ do
-      _properties <- Vba.many $ byName (Just opcNs) "Properties" $ itemProperty
+      _properties <- Vba.many $ byName (Just Ns.opc) "Properties" $ itemProperty
       return $
         attributesByName $ do
           _itemPath <- optional $ byName Nothing "ItemPath" $ textContent
@@ -315,21 +316,4 @@ booleanContent = attoparsedContent AttoparsecData.bool
 
 isNil :: ByName Content Bool
 isNil =
-  byName (Just xsiNs) "nil" booleanContent <|> pure False
-
--- * Namespaces
-
-soapEnvNs :: Text =
-  "http://schemas.xmlsoap.org/soap/envelope/"
-
-soapEncNs :: Text =
-  "http://schemas.xmlsoap.org/soap/encoding/"
-
-xsiNs :: Text =
-  "http://www.w3.org/2001/XMLSchema-instance"
-
-xsdNs :: Text =
-  "http://www.w3.org/2001/XMLSchema"
-
-opcNs :: Text =
-  "http://opcfoundation.org/webservices/XMLDA/1.0/"
+  byName (Just Ns.xsi) "nil" booleanContent <|> pure False
