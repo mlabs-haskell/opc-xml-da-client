@@ -95,7 +95,13 @@ browseResponse =
             return $ BrowseResponse _browseResult _elements _errors _continuationPoint _moreElements
 
 getPropertiesResponse :: Element GetPropertiesResponse
-getPropertiesResponse = error "TODO"
+getPropertiesResponse =
+  opcResponse "GetPropertiesResponse" $
+    childrenByName $ do
+      _getPropertiesResult <- optional $ byName (Just opcNs) "GetPropertiesResult" $ replyBase
+      _propertiesList <- Vba.many $ byName (Just opcNs) "PropertyLists" $ propertyReplyList
+      _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+      return $ GetPropertiesResponse _getPropertiesResult _propertiesList _errors
 
 -- * Details
 
@@ -232,6 +238,18 @@ itemProperty =
           _itemName <- optional $ byName Nothing "ItemName" textContent
           _resultId <- optional $ byName Nothing "ResultID" adaptedQNameContent
           return $ ItemProperty _value _name _description _itemPath _itemName _resultId
+
+propertyReplyList :: Element PropertyReplyList
+propertyReplyList = do
+  join $
+    childrenByName $ do
+      _properties <- Vba.many $ byName (Just opcNs) "Properties" $ itemProperty
+      return $
+        attributesByName $ do
+          _itemPath <- optional $ byName Nothing "ItemPath" $ textContent
+          _itemName <- optional $ byName Nothing "ItemName" $ textContent
+          _resultId <- optional $ byName Nothing "ResultID" $ adaptedQNameContent
+          return $ PropertyReplyList _properties _itemPath _itemName _resultId
 
 -- * Content
 
