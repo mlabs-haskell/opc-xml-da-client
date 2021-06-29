@@ -26,7 +26,13 @@ getStatusResponse =
       return $ GetStatusResponse _getStatusResult _status
 
 readResponse :: Element ReadResponse
-readResponse = error "TODO"
+readResponse =
+  response (Just opcNs) "ReadResponse" $
+    childrenByName $ do
+      _readResult <- optional $ byName (Just opcNs) "ReadResult" $ replyBase
+      _rItemList <- optional $ byName (Just opcNs) "RItemList" $ replyItemList
+      _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+      return $ ReadResponse _readResult _rItemList _errors
 
 writeResponse :: Element WriteResponse
 writeResponse = error "TODO"
@@ -143,6 +149,16 @@ serverStatus =
           _startTime <- byName Nothing "StartTime" $ dateTimeContent
           _productVersion <- optional $ byName Nothing "ProductVersion" $ textContent
           return $ ServerStatus _statusInfo _vendorInfo _supportedLocaleIds _supportedInterfaceVersions _startTime _productVersion
+
+replyItemList :: Element ReplyItemList
+replyItemList =
+  join $
+    childrenByName $ do
+      _items <- Vba.many $ byName (Just opcNs) "Items" $ itemValue
+      return $
+        attributesByName $ do
+          _reserved <- optional $ byName (Just opcNs) "Reserved" $ textContent
+          return $ ReplyItemList _items _reserved
 
 -- * Content
 
