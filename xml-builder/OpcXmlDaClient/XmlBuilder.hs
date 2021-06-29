@@ -10,14 +10,18 @@ module OpcXmlDaClient.XmlBuilder
     element,
 
     -- * Node
+    Node,
     elementNode,
     contentNode,
+    astNode,
 
     -- * Content
+    Content,
     textContent,
     qNameContent,
 
     -- * QName
+    QName,
     namespacedQName,
     unnamespacedQName,
   )
@@ -72,9 +76,15 @@ elementNode (Element a) = Node (fmap Xml.NodeElement a)
 contentNode :: Content -> Node
 contentNode (Content a) = Node (fmap Xml.NodeContent a)
 
+astNode :: Xml.Node -> Node
+astNode = Node . pure
+
 -- *
 
 newtype Content = Content (Namespaced Text)
+
+instance IsString Content where
+  fromString = textContent . fromString
 
 textContent :: Text -> Content
 textContent text =
@@ -90,6 +100,9 @@ qNameContent (QName qName) =
 -- *
 
 newtype QName = QName (Namespaced Xml.Name)
+
+instance IsString QName where
+  fromString = unnamespacedQName . fromString
 
 -- |
 -- Namespaced QName.
