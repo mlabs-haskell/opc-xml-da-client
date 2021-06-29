@@ -74,7 +74,11 @@ subscriptionPolledRefreshResponse =
             return $ SubscriptionPolledRefreshResponse _subscriptionPolledRefreshResult _invalidServerSubHandles _rItemList _errors _dataBufferOverflow
 
 subscriptionCancelResponse :: Element SubscriptionCancelResponse
-subscriptionCancelResponse = error "TODO"
+subscriptionCancelResponse =
+  opcResponse "SubscriptionCancelResponse" $
+    childrenByName $ do
+      _clientRequestHandle <- optional $ byName (Just opcNs) "ClientRequestHandle" $ children $ contentNode $ textContent
+      return $ SubscriptionCancelResponse _clientRequestHandle
 
 browseResponse :: Element BrowseResponse
 browseResponse = error "TODO"
