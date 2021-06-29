@@ -60,7 +60,18 @@ subscribeResponse =
             return $ SubscribeResponse _subscribeResult _rItemList _errors _subHandle
 
 subscriptionPolledRefreshResponse :: Element SubscriptionPolledRefreshResponse
-subscriptionPolledRefreshResponse = error "TODO"
+subscriptionPolledRefreshResponse =
+  opcResponse "SubscriptionPolledRefreshResponse" $
+    join $
+      childrenByName $ do
+        _subscriptionPolledRefreshResult <- optional $ byName (Just opcNs) "SubscriptionPolledRefreshResult" $ replyBase
+        _invalidServerSubHandles <- Vba.many $ byName (Just opcNs) "InvalidServerSubHandles" $ children $ contentNode $ textContent
+        _rItemList <- Vba.many $ byName (Just opcNs) "RItemList" $ subscribePolledRefreshReplyItemList
+        _errors <- Vba.many $ byName (Just opcNs) "OPCError" $ opcError
+        return $
+          attributesByName $ do
+            _dataBufferOverflow <- byName Nothing "DataBufferOverflow" booleanContent <|> pure False
+            return $ SubscriptionPolledRefreshResponse _subscriptionPolledRefreshResult _invalidServerSubHandles _rItemList _errors _dataBufferOverflow
 
 subscriptionCancelResponse :: Element SubscriptionCancelResponse
 subscriptionCancelResponse = error "TODO"
@@ -169,6 +180,16 @@ replyItemList =
           _reserved <- optional $ byName Nothing "Reserved" $ textContent
           return $ ReplyItemList _items _reserved
 
+subscribePolledRefreshReplyItemList :: Element SubscribePolledRefreshReplyItemList
+subscribePolledRefreshReplyItemList =
+  join $
+    childrenByName $ do
+      _items <- Vba.many $ byName (Just opcNs) "Items" $ itemValue
+      return $
+        attributesByName $ do
+          _subscriptionHandle <- optional $ byName Nothing "SubscriptionHandle" $ textContent
+          return $ SubscribePolledRefreshReplyItemList _items _subscriptionHandle
+
 -- * Content
 
 adaptedQNameContent :: Content QName
@@ -226,11 +247,14 @@ serverStateContent =
       ("commFault", #commFault)
     ]
 
+booleanContent :: Content Bool
+booleanContent = attoparsedContent AttoparsecData.bool
+
 -- * Attributes
 
 isNil :: ByName Content Bool
 isNil =
-  byName (Just xsiNs) "nil" (attoparsedContent AttoparsecData.bool) <|> pure False
+  byName (Just xsiNs) "nil" booleanContent <|> pure False
 
 -- * Namespaces
 
