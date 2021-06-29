@@ -12,14 +12,17 @@ import XmlParser
 
 -- |
 -- General response SOAP envelope parser.
-response :: Maybe Text -> Text -> Element a -> Element a
-response ns name parser = do
+inSoapEnvelope :: Maybe Text -> Text -> Element a -> Element a
+inSoapEnvelope ns name parser = do
   elementNameIs (Just soapEnvNs) "Envelope"
   childrenByName $ byName (Just soapEnvNs) "Body" $ childrenByName $ byName ns name $ parser
 
+opcResponse :: Text -> Element a -> Element a
+opcResponse = inSoapEnvelope (Just opcNs)
+
 getStatusResponse :: Element GetStatusResponse
 getStatusResponse =
-  response (Just opcNs) "GetStatusResponse" $
+  opcResponse "GetStatusResponse" $
     childrenByName $ do
       _getStatusResult <- optional $ byName (Just opcNs) "GetStatusResult" $ replyBase
       _status <- optional $ byName (Just opcNs) "Status" $ serverStatus
@@ -27,7 +30,7 @@ getStatusResponse =
 
 readResponse :: Element ReadResponse
 readResponse =
-  response (Just opcNs) "ReadResponse" $
+  opcResponse "ReadResponse" $
     childrenByName $ do
       _readResult <- optional $ byName (Just opcNs) "ReadResult" $ replyBase
       _rItemList <- optional $ byName (Just opcNs) "RItemList" $ replyItemList
@@ -35,11 +38,17 @@ readResponse =
       return $ ReadResponse _readResult _rItemList _errors
 
 writeResponse :: Element WriteResponse
-writeResponse = error "TODO"
+writeResponse =
+  opcResponse "WriteResponse" $
+    childrenByName $ do
+      _writeResult <- optional $ byName (Just opcNs) "WriteResult" $ replyBase
+      _rItemList <- optional $ byName (Just opcNs) "RItemList" $ replyItemList
+      _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+      return $ WriteResponse _writeResult _rItemList _errors
 
 subscribeResponse :: Element SubscribeResponse
 subscribeResponse =
-  response (Just opcNs) "SubscribeResponse" $
+  opcResponse "SubscribeResponse" $
     join $
       attributesByName $ do
         _subHandle <- optional $ byName Nothing "ServerSubHandle" $ textContent
