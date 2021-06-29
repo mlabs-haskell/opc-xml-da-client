@@ -166,7 +166,7 @@ replyItemList =
       _items <- Vba.many $ byName (Just opcNs) "Items" $ itemValue
       return $
         attributesByName $ do
-          _reserved <- optional $ byName (Just opcNs) "Reserved" $ textContent
+          _reserved <- optional $ byName Nothing "Reserved" $ textContent
           return $ ReplyItemList _items _reserved
 
 -- * Content
