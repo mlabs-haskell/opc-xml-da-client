@@ -328,7 +328,7 @@ BrowseElement:
 
 ItemProperty:
   product:
-    value: Maybe Xml.Element
+    value: Maybe Value
     name: QName
     description: Maybe Text
     itemPath: Maybe Text

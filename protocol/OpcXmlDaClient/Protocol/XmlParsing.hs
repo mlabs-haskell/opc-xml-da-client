@@ -81,7 +81,18 @@ subscriptionCancelResponse =
       return $ SubscriptionCancelResponse _clientRequestHandle
 
 browseResponse :: Element BrowseResponse
-browseResponse = error "TODO"
+browseResponse =
+  opcResponse "BrowseResponse" $
+    join $
+      childrenByName $ do
+        _browseResult <- optional $ byName (Just opcNs) "BrowseResult" $ replyBase
+        _elements <- Vba.many $ byName (Just opcNs) "Elements" $ browseElement
+        _errors <- Vba.many $ byName (Just opcNs) "Errors" $ opcError
+        return $
+          attributesByName $ do
+            _continuationPoint <- optional $ byName Nothing "ContinuationPoint" $ textContent
+            _moreElements <- byName Nothing "MoreElements" booleanContent <|> pure False
+            return $ BrowseResponse _browseResult _elements _errors _continuationPoint _moreElements
 
 getPropertiesResponse :: Element GetPropertiesResponse
 getPropertiesResponse = error "TODO"
@@ -193,6 +204,34 @@ subscribePolledRefreshReplyItemList =
         attributesByName $ do
           _subscriptionHandle <- optional $ byName Nothing "SubscriptionHandle" $ textContent
           return $ SubscribePolledRefreshReplyItemList _items _subscriptionHandle
+
+browseElement :: Element BrowseElement
+browseElement =
+  join $
+    childrenByName $ do
+      _properties <- Vba.many $ byName (Just opcNs) "Properties" $ itemProperty
+      return $
+        attributesByName $ do
+          _name <- optional $ byName Nothing "Name" textContent
+          _itemPath <- optional $ byName Nothing "ItemPath" textContent
+          _itemName <- optional $ byName Nothing "ItemName" textContent
+          _isItem <- byName Nothing "IsItem" booleanContent
+          _hasChildren <- byName Nothing "HasChildren" booleanContent
+          return $ BrowseElement _properties _name _itemPath _itemName _isItem _hasChildren
+
+itemProperty :: Element ItemProperty
+itemProperty =
+  join $
+    childrenByName $ do
+      _value <- optional $ byName (Just opcNs) "Value" $ value
+      return $
+        attributesByName $ do
+          _name <- byName Nothing "Name" adaptedQNameContent
+          _description <- optional $ byName Nothing "Description" textContent
+          _itemPath <- optional $ byName Nothing "ItemPath" textContent
+          _itemName <- optional $ byName Nothing "ItemName" textContent
+          _resultId <- optional $ byName Nothing "ResultID" adaptedQNameContent
+          return $ ItemProperty _value _name _description _itemPath _itemName _resultId
 
 -- * Content
 
