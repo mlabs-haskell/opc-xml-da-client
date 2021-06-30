@@ -165,7 +165,7 @@ value :: Element Value
 value =
   join $
     attributesByName $ do
-      _type <- byName (Just Ns.xsi) "type" adaptedQNameContent
+      _type <- xsiType
       return $ do
         Xml.Element _ _ _nodes <- astElement
         return $ Value _type _nodes
@@ -317,3 +317,7 @@ booleanContent = attoparsedContent AttoparsecData.bool
 isNil :: ByName Content Bool
 isNil =
   byName (Just Ns.xsi) "nil" booleanContent <|> pure False
+
+xsiType :: ByName Content QName
+xsiType =
+  byName (Just Ns.xsi) "type" adaptedQNameContent
