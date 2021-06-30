@@ -1,14 +1,5 @@
 module OpcXmlDaClient
-  ( -- * Connection
-    Connection,
-    ConnectionParams,
-    ConnectionError,
-    OperationError,
-    connect,
-    operate,
-    disconnect,
-
-    -- * Operations
+  ( -- * Operations
     Op,
     getStatus,
     read,
@@ -19,81 +10,116 @@ module OpcXmlDaClient
     browse,
     getProperties,
 
-    -- * Data types
+    -- ** Operation parameter types
+    Uri,
+    textUri,
+    RequestTimeout,
+    millisecondsRequestTimeout,
+
+    -- ** Operation errors
+    Error (..),
+
+    -- * Value types
     module OpcXmlDaClient.Protocol.Types,
   )
 where
 
+import qualified Data.Text as Text
+import qualified Network.HTTP.Client as Hc
 import OpcXmlDaClient.Base.Prelude hiding (Read, read)
 import OpcXmlDaClient.Protocol.Types
+import qualified OpcXmlDaClient.Protocol.XmlConstruction as XmlConstruction
+import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
+import qualified XmlParser
+
+-- * Operations
 
 -- |
--- Connection to the server.
-data Connection
-
--- |
--- Connection parameters.
+-- Alias to an HTTP request operation in the scope of
+-- HTTP connection manager, timeout for the operation, URI of the server.
 --
--- TODO: Blank until implemented.
-data ConnectionParams
+-- All errors are explicit and are wrapped by the 'Error' type.
+type Op i o = Hc.Manager -> RequestTimeout -> Uri -> i -> IO (Either Error o)
+
+getStatus :: Op GetStatus GetStatusResponse
+getStatus = encDecOp XmlConstruction.getStatus XmlParsing.getStatusResponse
+
+read :: Op Read ReadResponse
+read = encDecOp XmlConstruction.read XmlParsing.readResponse
+
+write :: Op Write WriteResponse
+write = encDecOp XmlConstruction.write XmlParsing.writeResponse
+
+subscribe :: Op Subscribe SubscribeResponse
+subscribe = encDecOp XmlConstruction.subscribe XmlParsing.subscribeResponse
+
+subscriptionPolledRefresh :: Op SubscriptionPolledRefresh SubscriptionPolledRefreshResponse
+subscriptionPolledRefresh = encDecOp XmlConstruction.subscriptionPolledRefresh XmlParsing.subscriptionPolledRefreshResponse
+
+subscriptionCancel :: Op SubscriptionCancel SubscriptionCancelResponse
+subscriptionCancel = encDecOp XmlConstruction.subscriptionCancel XmlParsing.subscriptionCancelResponse
+
+browse :: Op Browse BrowseResponse
+browse = encDecOp XmlConstruction.browse XmlParsing.browseResponse
+
+getProperties :: Op GetProperties GetPropertiesResponse
+getProperties = encDecOp XmlConstruction.getProperties XmlParsing.getPropertiesResponse
+
+encDecOp :: (i -> ByteString) -> XmlParser.Element o -> Op i o
+encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
+  let request =
+        request
+          { Hc.method = "POST",
+            Hc.requestBody = Hc.RequestBodyBS (encode input),
+            Hc.responseTimeout = Hc.responseTimeoutMicro (timeout * 1000)
+          }
+   in do
+        response <- try $ Hc.httpLbs request manager
+        case response of
+          Left exc
+            | Just exc <- fromException @Hc.HttpException exc -> case exc of
+              Hc.HttpExceptionRequest _ reason -> return $ Left $ HttpError reason
+              Hc.InvalidUrlException uri reason -> error $ "Invalid URI: " <> uri <> ". " <> reason
+            | Just exc <- fromException @IOException exc ->
+              return $ Left $ IoError exc
+            | otherwise -> throwIO exc
+          Right response ->
+            return $ case XmlParser.parseLazyByteString decode (Hc.responseBody response) of
+              Right res -> Right res
+              Left err -> Left $ ParsingError err
+
+-- * Helper types
 
 -- |
--- Error during the establishment of connection.
---
--- TODO: Blank until implemented.
-data ConnectionError
+-- URI of the server.
+newtype Uri = Uri Hc.Request
+
+-- |
+-- Construct a correct URI by validating a textual value.
+textUri :: Text -> Maybe Uri
+textUri = fmap Uri . Hc.parseRequest . Text.unpack
+
+newtype RequestTimeout = RequestTimeout Int
+
+-- |
+-- RequestTimeout of 30 seconds.
+instance Default RequestTimeout where
+  def = RequestTimeout 30000
+
+-- |
+-- Construct a request timeout value,
+-- ensuring that it's in the proper range.
+millisecondsRequestTimeout :: Int -> Maybe RequestTimeout
+millisecondsRequestTimeout x =
+  if x >= 0
+    then Just $ RequestTimeout x
+    else Nothing
+
+-- * Errors
 
 -- |
 -- Error during the execution of an operation.
---
--- TODO: Blank until implemented.
-data OperationError
-
--- |
--- Establish a connection given the params.
-connect :: ConnectionParams -> IO (Either ConnectionError Connection)
-connect =
-  error "TODO"
-
--- |
--- Execute series of operations on a connection.
-operate :: Connection -> Op a -> IO (Either OperationError a)
-operate =
-  error "TODO"
-
--- |
--- Close a connection releasing all resources.
-disconnect :: Connection -> IO ()
-disconnect =
-  error "TODO"
-
--- |
--- Composable series of interactions with the server.
-newtype Op a = Op (Connection -> IO (Either OperationError a))
-  deriving
-    (Functor, Applicative, Monad)
-    via (ReaderT Connection (ExceptT OperationError IO))
-
-getStatus :: GetStatus -> Op GetStatusResponse
-getStatus = error "TODO"
-
-read :: Read -> Op ReadResponse
-read = error "TODO"
-
-write :: Write -> Op WriteResponse
-write = error "TODO"
-
-subscribe :: Subscribe -> Op SubscribeResponse
-subscribe = error "TODO"
-
-subscriptionPolledRefresh :: SubscriptionPolledRefresh -> Op SubscriptionPolledRefreshResponse
-subscriptionPolledRefresh = error "TODO"
-
-subscriptionCancel :: SubscriptionCancel -> Op SubscriptionCancelResponse
-subscriptionCancel = error "TODO"
-
-browse :: Browse -> Op BrowseResponse
-browse = error "TODO"
-
-getProperties :: GetProperties -> Op GetPropertiesResponse
-getProperties = error "TODO"
+data Error
+  = HttpError Hc.HttpExceptionContent
+  | IoError IOException
+  | ParsingError Text
