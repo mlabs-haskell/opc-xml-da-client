@@ -312,6 +312,9 @@ serverStateContent =
 booleanContent :: Content Bool
 booleanContent = attoparsedContent AttoparsecData.bool
 
+decimalContent :: Content Scientific
+decimalContent = attoparsedContent AttoparsecData.lenientParser
+
 -- * Attributes
 
 isNil :: ByName Content Bool
