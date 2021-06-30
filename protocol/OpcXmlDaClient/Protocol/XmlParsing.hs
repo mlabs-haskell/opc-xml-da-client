@@ -321,3 +321,21 @@ isNil =
 xsiType :: ByName Content QName
 xsiType =
   byName (Just Ns.xsi) "type" adaptedQNameContent
+
+-- * Value parsers
+
+-- |
+-- Parse array of any type by passing in a parser for elements
+-- in the context of a QName of the element type.
+arrayOfAnyType :: (QName -> ByName Element element) -> ByName Element (Vector (Maybe element))
+arrayOfAnyType elementParser =
+  Vba.many $
+    byName (Just Ns.opc) "anyType" $
+      join $
+        attributesByName $ do
+          _isNil <- isNil
+          if _isNil
+            then return (return Nothing)
+            else do
+              _type <- xsiType
+              return $ childrenByName $ fmap Just $ elementParser _type
