@@ -21,4 +21,4 @@ Domain.declare
         Domain.accessorIsLabelDeriver
       ]
   )
-  =<< Domain.loadSchema "library/types.domain.yaml"
+  =<< Domain.loadSchema "protocol/types.domain.yaml"
