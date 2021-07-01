@@ -40,6 +40,7 @@ library opc-xml-da-client-protocol
     OpcXmlDaClient.Protocol.Types
     OpcXmlDaClient.Protocol.XmlConstruction
     OpcXmlDaClient.Protocol.XmlParsing
+    OpcXmlDaClient.Protocol.ValueParsing
   other-modules:
     OpcXmlDaClient.Protocol.Namespaces
   build-depends:
