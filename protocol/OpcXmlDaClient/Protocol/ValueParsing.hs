@@ -1,4 +1,27 @@
-module OpcXmlDaClient.Protocol.ValueParsing where
+-- |
+-- Constructor of value parsers.
+module OpcXmlDaClient.Protocol.ValueParsing
+  ( -- * Execution
+    parseValue,
+
+    -- * Values
+    Value,
+    primitive,
+    arrayOfPrimitive,
+    arrayOfAnyType,
+    vendor,
+
+    -- * Primitives
+    Primitive,
+    decimal,
+    byte,
+    short,
+
+    -- * Errors
+    Error (..),
+    ValueError (..),
+  )
+where
 
 import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Vector.Generic as GenericVector
@@ -10,105 +33,63 @@ import qualified OpcXmlDaClient.Protocol.XmlParsing as ProtocolXp
 import qualified Text.XML as Xml
 import qualified XmlParser as Xp
 
+-- * Errors
+
 data Error
-  = UnexpectedTypeNamespaceError
+  = ValueError ValueError
+  | XmlError Text
+
+data ValueError
+  = UnexpectedTypeNamespaceValueError
       Text
       -- ^ Expected.
       Text
       -- ^ Actual.
-  | UnexpectedTypeNameError
+  | UnexpectedTypeNameValueError
       Text
       -- ^ Expected.
       Text
       -- ^ Actual.
-  | UnnamespacedTypeNameError
+  | UnnamespacedTypeNameValueError
       Text
       -- ^ Expected namespace.
       Text
       -- ^ Expected name.
       Text
       -- ^ Actual type name.
-  | ArrayElementError
+  | ArrayElementValueError
       Int
       -- ^ Offset in the array.
-      Error
+      ValueError
       -- ^ Reason.
+
+-- * Execution
+
+parseValue ::
+  -- | Alternative value parsers to try before failing.
+  NonEmpty (Value a) ->
+  -- | XML element AST to parse.
+  Xml.Element ->
+  -- | Either a parsing error or a result.
+  Either Error a
+parseValue =
+  error "TODO"
+
+-- *
 
 data Value a
   = Value
+      (Maybe Text)
+      -- ^ Type namespace.
       Text
-      -- ^ Type name for the containing array.
-      Text
-      -- ^ Tag name for elements of the containing array.
-      (Xp.Element (Either Error a))
-      -- ^ Element parser extended with value parsing error capability.
+      -- ^ Type name.
+      (Xp.Element (Either ValueError a))
+      -- ^ Element parser.
   deriving (Functor)
-
-elementBase :: Text -> Text -> Text -> Text -> Xp.Element (Either Error a) -> Value a
-elementBase typeNs typeName arrayTypeName arrayElementTagName contParser =
-  Value arrayTypeName arrayElementTagName $
-    join $
-      Xp.attributesByName $ do
-        _type <- ProtocolXp.xsiType
-        case _type of
-          ProtocolTypes.NamespacedQName _ns _name ->
-            if _ns == typeNs
-              then
-                if _name == typeName
-                  then return $ contParser
-                  else return $ return $ Left $ UnexpectedTypeNameError typeName _name
-              else return $ return $ Left $ UnexpectedTypeNamespaceError typeNs _ns
-          ProtocolTypes.UnnamespacedQName _name ->
-            return $ return $ Left $ UnnamespacedTypeNameError typeNs typeName _name
-
-contentBase :: Text -> Text -> Text -> Text -> Xp.Content a -> Value a
-contentBase typeNs typeName arrayTypeName arrayElementTagName contentParser =
-  elementBase typeNs typeName arrayTypeName arrayElementTagName $
-    fmap Right $ Xp.children $ Xp.contentNode $ contentParser
-
-primitiveBase :: Text -> Text -> Xp.Content a -> Value a
-primitiveBase typeName arrayTypeName =
-  contentBase Ns.xsd typeName arrayTypeName typeName
-
--- |
--- Homogenous array.
-array :: GenericVector.Vector v a => Value a -> Value (v a)
-array (Value arrayTypeName arrayElementTagName elementParser) =
-  elementBase Ns.opc arrayTypeName "ArrayOfAnyType" "anyType" $
-    Xp.childrenByName $
-      let build !list !offset =
-            join $
-              asum
-                [ Xp.byName (Just Ns.opc) arrayElementTagName $ do
-                    res <- elementParser
-                    case res of
-                      Right element -> return $ build (element : list) (succ offset)
-                      Left err -> return $ return $ Left $ ArrayElementError offset err,
-                  return $ return $ Right $ VectorUtil.fromReverseListN offset list
-                ]
-       in build [] 0
-
-nilable :: Value a -> Value (Maybe a)
-nilable (Value arrayTypeName arrayElementTagName elementParser) =
-  Value arrayTypeName arrayElementTagName $ do
-    _isNil <- Xp.attributesByName $ ProtocolXp.isNil
-    if _isNil
-      then return (Right Nothing)
-      else fmap (fmap Just) elementParser
-
--- |
--- Parser of a vendor-specific non-standard value element node.
---
--- Expects a function on a resolved QName of the type and the content nodes.
-vendor :: (ProtocolTypes.QName -> Xml.Element -> Either Text a) -> Value a
-vendor =
-  error "TODO"
 
 primitive :: Primitive a -> Value a
 primitive (Primitive arrayTypeName typeName parser) =
-  contentBase Ns.xsd typeName arrayTypeName typeName parser
-
--- *
+  error "TODO"
 
 arrayOfPrimitive :: GenericVector.Vector vector a => Primitive a -> Value (vector a)
 arrayOfPrimitive =
@@ -116,19 +97,24 @@ arrayOfPrimitive =
 
 arrayOfAnyType ::
   GenericVector.Vector vector a =>
-  -- | Non-empty list of alternative value parsers for each element of the vector.
-  NonEmpty (AnyType a) ->
+  -- | Alternative value parsers tried on each element of the array.
+  NonEmpty (Value a) ->
   Value (vector (Maybe a))
 arrayOfAnyType =
   error "TODO"
 
--- *
-
-data AnyType a
-  = AnyType
-      (Maybe Text)
-      Text
-      (Xp.Element a)
+-- |
+-- Parser of a vendor-specific non-standard value element node.
+vendor ::
+  -- | Type namespace.
+  Maybe Text ->
+  -- | Type name.
+  Text ->
+  -- | Custom value element parser.
+  Xp.Element a ->
+  Value a
+vendor =
+  error "TODO"
 
 -- *
 
