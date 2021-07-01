@@ -87,6 +87,8 @@ library opc-xml-da-client-base
   ghc-options: -funbox-strict-fields
   exposed-modules:
     OpcXmlDaClient.Base.Prelude
+    OpcXmlDaClient.Base.MVector
+    OpcXmlDaClient.Base.Vector
   build-depends:
     base >=4.14 && <5,
     bytestring >=0.10 && <0.12,
