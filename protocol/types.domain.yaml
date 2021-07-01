@@ -90,11 +90,6 @@ ItemValue:
     timestamp: Maybe UTCTime
     resultId: Maybe QName
 
-Value:
-  product:
-    type: QName
-    xml: "[Xml.Node]"
-
 OpcQuality:
   product:
     qualityField: QualityBits
@@ -436,3 +431,8 @@ QName:
       - Text
       - Text
     unnamespaced: Text
+
+Value:
+  product:
+    type: QName
+    xml: "[Xml.Node]"
