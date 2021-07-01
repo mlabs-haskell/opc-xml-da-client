@@ -15,6 +15,7 @@ module OpcXmlDaClient.Protocol.ValueParsing
     decimal,
     long,
     int,
+    short,
     byte,
     unsignedLong,
     unsignedInt,
@@ -23,6 +24,7 @@ module OpcXmlDaClient.Protocol.ValueParsing
     base64Binary,
     dateTime,
     time,
+    date,
     duration,
     qName,
 
