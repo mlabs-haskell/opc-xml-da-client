@@ -40,28 +40,16 @@ data Error
   | XmlError Text
 
 data ValueError
-  = UnexpectedTypeNamespaceValueError
-      Text
-      -- ^ Expected.
-      Text
-      -- ^ Actual.
-  | UnexpectedTypeNameValueError
-      Text
-      -- ^ Expected.
-      Text
-      -- ^ Actual.
-  | UnnamespacedTypeNameValueError
-      Text
-      -- ^ Expected namespace.
-      Text
-      -- ^ Expected name.
-      Text
-      -- ^ Actual type name.
-  | ArrayElementValueError
+  = ArrayElementValueError
       Int
       -- ^ Offset in the array.
       ValueError
       -- ^ Reason.
+  | NoneOfTypesMatchValueError
+      (NonEmpty ProtocolTypes.QName)
+      -- ^ Expected type names.
+      ProtocolTypes.QName
+      -- ^ Actual type name.
 
 -- * Execution
 
@@ -77,23 +65,34 @@ parseValue =
 
 -- *
 
+-- |
+-- Parser of any value.
 data Value a
   = Value
       (Maybe Text)
-      -- ^ Type namespace.
+      -- ^ Expected type namespace.
       Text
-      -- ^ Type name.
+      -- ^ Expected type name.
       (Xp.Element (Either ValueError a))
       -- ^ Element parser.
   deriving (Functor)
 
+-- |
+-- Lift a standard primitive parser into parser of any value.
 primitive :: Primitive a -> Value a
-primitive (Primitive arrayTypeName typeName parser) =
-  error "TODO"
+primitive (Primitive _ typeName contentParser) =
+  Value (Just Ns.opc) typeName $ fmap Right $ Xp.children $ Xp.contentNode contentParser
 
+-- |
+-- Array over a primitive type.
+--
+-- Works with all the @ArrayOf...@ types, excluding @ArrayOfAnyType@,
+-- for which we provide 'arrayOfAnyType'.
 arrayOfPrimitive :: GenericVector.Vector vector a => Primitive a -> Value (vector a)
-arrayOfPrimitive =
-  error "TODO"
+arrayOfPrimitive (Primitive arrayTypeName typeName contentParser) =
+  Value (Just Ns.opc) arrayTypeName $
+    Xp.childrenByName $
+      error "TODO"
 
 arrayOfAnyType ::
   GenericVector.Vector vector a =>
@@ -118,6 +117,8 @@ vendor =
 
 -- *
 
+-- |
+-- Parser of standard primitives listed in the spec of OPC XML DA.
 data Primitive a
   = Primitive
       Text
