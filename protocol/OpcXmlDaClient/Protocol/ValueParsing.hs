@@ -24,6 +24,7 @@ module OpcXmlDaClient.Protocol.ValueParsing
 where
 
 import qualified Attoparsec.Data as AttoparsecData
+import qualified Data.Map.Strict as Map
 import qualified Data.Vector.Generic as GenericVector
 import OpcXmlDaClient.Base.Prelude
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
@@ -45,8 +46,13 @@ data ValueError
       -- ^ Offset in the array.
       ValueError
       -- ^ Reason.
+  | ByTypeNameValueError
+      ProtocolTypes.QName
+      -- ^ Matching parsed type name.
+      ValueError
+      -- ^ Reason.
   | NoneOfTypesMatchValueError
-      (NonEmpty ProtocolTypes.QName)
+      [ProtocolTypes.QName]
       -- ^ Expected type names.
       ProtocolTypes.QName
       -- ^ Actual type name.
@@ -62,6 +68,33 @@ parseValue ::
   Either Error a
 parseValue =
   error "TODO"
+
+-- |
+-- Squash the value parser into element, bundling in the checks for the expected type.
+applyTypeExpectations :: [Value a] -> Xp.Element (Either ValueError a)
+applyTypeExpectations parsers =
+  join $
+    Xp.attributesByName $ do
+      _type <- ProtocolXp.xsiType
+      case Map.lookup _type parserByNameMap of
+        Just parser ->
+          return $ fmap (first (ByTypeNameValueError _type)) parser
+        Nothing ->
+          return $ return $ Left $ NoneOfTypesMatchValueError expectedNameList _type
+  where
+    (expectedNameList, parserByNameMap) =
+      parsers
+        & fmap
+          ( \(Value expectedTypeNamespace expectedTypeName elementParser) ->
+              ( case expectedTypeNamespace of
+                  Just expectedTypeNamespace ->
+                    ProtocolTypes.NamespacedQName expectedTypeNamespace expectedTypeName
+                  Nothing ->
+                    ProtocolTypes.UnnamespacedQName expectedTypeName,
+                elementParser
+              )
+          )
+        & \list -> (fmap fst list, Map.fromList list)
 
 -- *
 
@@ -96,12 +129,20 @@ arrayOfPrimitive (Primitive arrayTypeName typeName contentParser) =
         VectorUtil.many $ Xp.byName (Just Ns.opc) typeName $ Xp.children $ Xp.contentNode contentParser
 
 arrayOfAnyType ::
-  GenericVector.Vector vector a =>
+  GenericVector.Vector vector (Maybe a) =>
   -- | Alternative value parsers tried on each element of the array.
   NonEmpty (Value a) ->
   Value (vector (Maybe a))
-arrayOfAnyType =
-  error "TODO"
+arrayOfAnyType valueParsers =
+  Value (Just Ns.opc) "ArrayOfAnyType" $
+    Xp.childrenByName $
+      VectorUtil.manyWithIndexTerminating $ \i ->
+        Xp.byName (Just Ns.opc) "anyType" $
+          fmap (first (ArrayElementValueError i)) $ do
+            _isNil <- Xp.attributesByName $ ProtocolXp.isNil
+            if _isNil
+              then return (Right Nothing)
+              else fmap (fmap Just) (applyTypeExpectations (toList valueParsers))
 
 -- |
 -- Parser of a vendor-specific non-standard value element node.
