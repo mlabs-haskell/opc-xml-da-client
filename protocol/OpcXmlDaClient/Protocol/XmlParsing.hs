@@ -2,6 +2,8 @@ module OpcXmlDaClient.Protocol.XmlParsing where
 
 import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
+import qualified Data.ByteString.Base64 as Base64
+import qualified Data.Text.Encoding as TextEncoding
 import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
@@ -314,6 +316,9 @@ booleanContent = attoparsedContent AttoparsecData.bool
 
 decimalContent :: Content Scientific
 decimalContent = attoparsedContent AttoparsecData.lenientParser
+
+base64BinaryContent :: Content ByteString
+base64BinaryContent = refinedContent $ Base64.decodeBase64 . TextEncoding.encodeUtf8
 
 -- * Attributes
 

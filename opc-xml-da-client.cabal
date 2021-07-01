@@ -40,12 +40,14 @@ library opc-xml-da-client-protocol
     OpcXmlDaClient.Protocol.Types
     OpcXmlDaClient.Protocol.XmlConstruction
     OpcXmlDaClient.Protocol.XmlParsing
+    OpcXmlDaClient.Protocol.ValueParsing
   other-modules:
     OpcXmlDaClient.Protocol.Namespaces
   build-depends:
     attoparsec >=0.13.2.5 && <0.15,
     attoparsec-data ^>=1.0.5.2,
     base >=4.14 && <5,
+    base64 ^>=0.4.2.3,
     bytestring >=0.10 && <0.12,
     containers ^>=0.6.2.1,
     domain ^>=0.1.1,
@@ -99,6 +101,7 @@ library opc-xml-da-client-base
     text >=1 && <2,
     time >=1.9.3 && <2,
     transformers ^>=0.5,
+    unordered-containers ^>=0.2.14,
     vector ^>=0.12,
     vector-instances ^>=3.4,
 

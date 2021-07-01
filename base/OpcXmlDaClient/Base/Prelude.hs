@@ -38,6 +38,7 @@ import Data.Function as Exports hiding (id, (.))
 import Data.Functor as Exports
 import Data.Functor.Compose as Exports
 import Data.Functor.Identity as Exports
+import Data.HashMap.Strict as Exports (HashMap)
 import Data.Hashable as Exports (Hashable (hash, hashWithSalt))
 import Data.Hashable.Generic as Exports (genericHashWithSalt)
 import Data.Hashable.Lifted as Exports (liftHashWithSalt)
@@ -58,7 +59,7 @@ import Data.Scientific as Exports (Scientific)
 import Data.Semigroup as Exports hiding (First (..), Last (..))
 import Data.String as Exports
 import Data.Text as Exports (Text)
-import Data.Time as Exports (LocalTime, TimeZone, UTCTime)
+import Data.Time as Exports (Day, DiffTime, LocalTime, TimeZone, UTCTime)
 import Data.Traversable as Exports
 import Data.Tuple as Exports
 import Data.Unique as Exports
