@@ -21,3 +21,17 @@ initialized size initialize = runST $ do
   mv <- M.unsafeNew size
   initialize mv
   unsafeFreeze mv
+
+-- |
+-- Efficiently build a vector with the @many@ pattern.
+many :: (MonadPlus m, Vector v a) => m a -> m (v a)
+many produce =
+  build [] 0
+  where
+    build list !size =
+      step <|> finish
+      where
+        step =
+          produce >>= \a -> build (a : list) (succ size)
+        finish =
+          pure (fromReverseListN size list)
