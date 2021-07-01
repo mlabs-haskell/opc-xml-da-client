@@ -31,7 +31,7 @@ jobs:
         run: stack build --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
 
       - name: Build
-        run: stack build --test --bench --no-run-tests --no-run-benchmarks
+        run: stack build --test --bench --no-run-tests --no-run-benchmarks --ghc-options="-Werror -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-unused-do-bind -Wno-unused-top-binds"
 
       - name: Test
         run: stack test
