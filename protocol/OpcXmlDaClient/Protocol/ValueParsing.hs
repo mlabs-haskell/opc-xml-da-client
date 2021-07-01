@@ -173,11 +173,41 @@ data Primitive a
 
 deriving instance Functor Primitive
 
-decimal :: Primitive Scientific
-decimal = Primitive "ArrayOfDecimal" "decimal" $ Xp.attoparsedContent AttoparsecData.lenientParser
-
-byte :: Primitive Word8
+byte :: Primitive Int8
 byte = Primitive "ArrayOfByte" "byte" $ Xp.attoparsedContent AttoparsecData.lenientParser
 
 short :: Primitive Int16
 short = Primitive "ArrayOfShort" "short" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+unsignedShort :: Primitive Word16
+unsignedShort = Primitive "ArrayOfUnsignedShort" "unsignedShort" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+int :: Primitive Int32
+int = Primitive "ArrayOfInt" "int" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+unsignedInt :: Primitive Word32
+unsignedInt = Primitive "ArrayOfUnsignedInt" "unsignedInt" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+long :: Primitive Int64
+long = Primitive "ArrayOfLong" "long" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+unsignedLong :: Primitive Word64
+unsignedLong = Primitive "ArrayOfUnsignedLong" "unsignedLong" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+float :: Primitive Float
+float = Primitive "ArrayOfFloat" "float" $ Xp.attoparsedContent $ fmap realToFrac $ AttoparsecData.lenientParser @Double
+
+decimal :: Primitive Scientific
+decimal = Primitive "ArrayOfDecimal" "decimal" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+double :: Primitive Double
+double = Primitive "ArrayOfDouble" "double" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+boolean :: Primitive Bool
+boolean = Primitive "ArrayOfBoolean" "boolean" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+string :: Primitive Text
+string = Primitive "ArrayOfString" "string" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+dateTime :: Primitive UTCTime
+dateTime = Primitive "ArrayOfDateTime" "dateTime" $ Xp.attoparsedContent AttoparsecData.lenientParser
