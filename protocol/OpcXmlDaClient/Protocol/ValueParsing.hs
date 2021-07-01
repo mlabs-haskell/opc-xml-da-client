@@ -52,7 +52,7 @@ data ValueError
       ValueError
       -- ^ Reason.
   | NoneOfTypesMatchValueError
-      [ProtocolTypes.QName]
+      (NonEmpty ProtocolTypes.QName)
       -- ^ Expected type names.
       ProtocolTypes.QName
       -- ^ Actual type name.
@@ -71,7 +71,7 @@ parseValue =
 
 -- |
 -- Squash the value parser into element, bundling in the checks for the expected type.
-applyTypeExpectations :: [Value a] -> Xp.Element (Either ValueError a)
+applyTypeExpectations :: NonEmpty (Value a) -> Xp.Element (Either ValueError a)
 applyTypeExpectations parsers =
   join $
     Xp.attributesByName $ do
@@ -94,7 +94,7 @@ applyTypeExpectations parsers =
                 elementParser
               )
           )
-        & \list -> (fmap fst list, Map.fromList list)
+        & \list -> (fmap fst list, Map.fromList (toList list))
 
 -- *
 
@@ -142,7 +142,7 @@ arrayOfAnyType valueParsers =
             _isNil <- Xp.attributesByName $ ProtocolXp.isNil
             if _isNil
               then return (Right Nothing)
-              else fmap (fmap Just) (applyTypeExpectations (toList valueParsers))
+              else fmap (fmap Just) (applyTypeExpectations valueParsers)
 
 -- |
 -- Parser of a vendor-specific non-standard value element node.
