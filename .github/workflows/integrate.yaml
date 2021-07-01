@@ -8,25 +8,6 @@ jobs:
         with:
           extra-args: -o -XAllowAmbiguousTypes -o -XApplicativeDo -o -XBangPatterns -o -XBinaryLiterals -o -XBlockArguments -o -XConstraintKinds -o -XDataKinds -o -XDefaultSignatures -o -XDeriveAnyClass -o -XDeriveDataTypeable -o -XDeriveFoldable -o -XDeriveFunctor -o -XDeriveGeneric -o -XDeriveLift -o -XDeriveTraversable -o -XDerivingStrategies -o -XDerivingVia -o -XDuplicateRecordFields -o -XEmptyCase -o -XEmptyDataDecls -o -XExplicitNamespaces -o -XFlexibleContexts -o -XFlexibleInstances -o -XFunctionalDependencies -o -XGADTs -o -XGeneralizedNewtypeDeriving -o -XHexFloatLiterals -o -XInstanceSigs -o -XLambdaCase -o -XLiberalTypeSynonyms -o -XMagicHash -o -XMultiParamTypeClasses -o -XMultiWayIf -o -XNamedFieldPuns -o -XNoImplicitPrelude -o -XNoMonomorphismRestriction -o -XNumericUnderscores -o -XOverloadedLabels -o -XOverloadedStrings -o -XParallelListComp -o -XPatternGuards -o -XPatternSynonyms -o -XQuasiQuotes -o -XRankNTypes -o -XRecordWildCards -o -XScopedTypeVariables -o -XStandaloneDeriving -o -XStrictData -o -XTemplateHaskell -o -XTupleSections -o -XTypeApplications -o -XTypeFamilies -o -XTypeOperators -o -XTypeSynonymInstances -o -XUndecidableInstances -o -XViewPatterns
 
-  lint:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v2.3.4
-
-      - uses: actions/cache@v2.1.6
-        name: Cache Stack
-        with:
-          path: ~/.stack
-          key: ${{ runner.os }}-stack-lint
-          restore-keys: ${{ runner.os }}-stack-lint
-
-      - run: stack install hlint
-        name: Setup
-
-      - run: ~/.local/bin/hlint .
-        name: Lint
-
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +31,7 @@ jobs:
         run: stack build --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
 
       - name: Build
-        run: stack build --test --bench --no-run-tests --no-run-benchmarks
+        run: stack build --test --bench --no-run-tests --no-run-benchmarks --ghc-options="-Werror -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-unused-do-bind -Wno-unused-top-binds"
 
       - name: Test
         run: stack test

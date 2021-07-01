@@ -3,10 +3,10 @@ module OpcXmlDaClient.Protocol.XmlParsing where
 import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
 import OpcXmlDaClient.Base.Prelude hiding (Read)
+import qualified OpcXmlDaClient.Base.Vector as VectorUtil
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
 import qualified Text.XML as Xml
-import qualified VectorBuilder.Alternative as Vba
 import XmlParser
 
 -- * Responses
@@ -35,7 +35,7 @@ readResponse =
     childrenByName $ do
       _readResult <- optional $ byName (Just Ns.opc) "ReadResult" $ replyBase
       _rItemList <- optional $ byName (Just Ns.opc) "RItemList" $ replyItemList
-      _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
+      _errors <- VectorUtil.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ ReadResponse _readResult _rItemList _errors
 
 writeResponse :: Element WriteResponse
@@ -44,7 +44,7 @@ writeResponse =
     childrenByName $ do
       _writeResult <- optional $ byName (Just Ns.opc) "WriteResult" $ replyBase
       _rItemList <- optional $ byName (Just Ns.opc) "RItemList" $ replyItemList
-      _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
+      _errors <- VectorUtil.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ WriteResponse _writeResult _rItemList _errors
 
 subscribeResponse :: Element SubscribeResponse
@@ -57,7 +57,7 @@ subscribeResponse =
           childrenByName $ do
             _subscribeResult <- optional $ byName (Just Ns.opc) "SubscribeResult" $ replyBase
             _rItemList <- optional $ byName (Just Ns.opc) "RItemList" $ subscribeReplyItemList
-            _errors <- Vba.many $ byName (Just Ns.opc) "OPCError" $ opcError
+            _errors <- VectorUtil.many $ byName (Just Ns.opc) "OPCError" $ opcError
             return $ SubscribeResponse _subscribeResult _rItemList _errors _subHandle
 
 subscriptionPolledRefreshResponse :: Element SubscriptionPolledRefreshResponse
@@ -66,9 +66,9 @@ subscriptionPolledRefreshResponse =
     join $
       childrenByName $ do
         _subscriptionPolledRefreshResult <- optional $ byName (Just Ns.opc) "SubscriptionPolledRefreshResult" $ replyBase
-        _invalidServerSubHandles <- Vba.many $ byName (Just Ns.opc) "InvalidServerSubHandles" $ children $ contentNode $ textContent
-        _rItemList <- Vba.many $ byName (Just Ns.opc) "RItemList" $ subscribePolledRefreshReplyItemList
-        _errors <- Vba.many $ byName (Just Ns.opc) "OPCError" $ opcError
+        _invalidServerSubHandles <- VectorUtil.many $ byName (Just Ns.opc) "InvalidServerSubHandles" $ children $ contentNode $ textContent
+        _rItemList <- VectorUtil.many $ byName (Just Ns.opc) "RItemList" $ subscribePolledRefreshReplyItemList
+        _errors <- VectorUtil.many $ byName (Just Ns.opc) "OPCError" $ opcError
         return $
           attributesByName $ do
             _dataBufferOverflow <- byName Nothing "DataBufferOverflow" booleanContent <|> pure False
@@ -87,8 +87,8 @@ browseResponse =
     join $
       childrenByName $ do
         _browseResult <- optional $ byName (Just Ns.opc) "BrowseResult" $ replyBase
-        _elements <- Vba.many $ byName (Just Ns.opc) "Elements" $ browseElement
-        _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
+        _elements <- VectorUtil.many $ byName (Just Ns.opc) "Elements" $ browseElement
+        _errors <- VectorUtil.many $ byName (Just Ns.opc) "Errors" $ opcError
         return $
           attributesByName $ do
             _continuationPoint <- optional $ byName Nothing "ContinuationPoint" $ textContent
@@ -100,8 +100,8 @@ getPropertiesResponse =
   opcResponse "GetPropertiesResponse" $
     childrenByName $ do
       _getPropertiesResult <- optional $ byName (Just Ns.opc) "GetPropertiesResult" $ replyBase
-      _propertiesList <- Vba.many $ byName (Just Ns.opc) "PropertyLists" $ propertyReplyList
-      _errors <- Vba.many $ byName (Just Ns.opc) "Errors" $ opcError
+      _propertiesList <- VectorUtil.many $ byName (Just Ns.opc) "PropertyLists" $ propertyReplyList
+      _errors <- VectorUtil.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ GetPropertiesResponse _getPropertiesResult _propertiesList _errors
 
 -- * Details
@@ -122,7 +122,7 @@ subscribeReplyItemList =
     attributesByName $ do
       _revisedSamplingRate <- optional $ byName Nothing "RevisedSamplingRate" $ attoparsedContent Atto.decimal
       return $ do
-        _items <- childrenByName $ Vba.many $ byName (Just Ns.opc) "Items" $ subscribeItemValue
+        _items <- childrenByName $ VectorUtil.many $ byName (Just Ns.opc) "Items" $ subscribeItemValue
         return (SubscribeReplyItemList _items _revisedSamplingRate)
 
 subscribeItemValue :: Element SubscribeItemValue
@@ -184,8 +184,8 @@ serverStatus =
     childrenByName $ do
       _statusInfo <- optional $ byName (Just Ns.opc) "StatusInfo" $ children $ contentNode $ textContent
       _vendorInfo <- optional $ byName (Just Ns.opc) "VendorInfo" $ children $ contentNode $ textContent
-      _supportedLocaleIds <- Vba.many $ byName (Just Ns.opc) "SupportedLocaleIDs" $ children $ contentNode $ textContent
-      _supportedInterfaceVersions <- Vba.many $ byName (Just Ns.opc) "SupportedInterfaceVersions" $ children $ contentNode $ textContent
+      _supportedLocaleIds <- VectorUtil.many $ byName (Just Ns.opc) "SupportedLocaleIDs" $ children $ contentNode $ textContent
+      _supportedInterfaceVersions <- VectorUtil.many $ byName (Just Ns.opc) "SupportedInterfaceVersions" $ children $ contentNode $ textContent
       return $
         attributesByName $ do
           _startTime <- byName Nothing "StartTime" $ dateTimeContent
@@ -196,7 +196,7 @@ replyItemList :: Element ReplyItemList
 replyItemList =
   join $
     childrenByName $ do
-      _items <- Vba.many $ byName (Just Ns.opc) "Items" $ itemValue
+      _items <- VectorUtil.many $ byName (Just Ns.opc) "Items" $ itemValue
       return $
         attributesByName $ do
           _reserved <- optional $ byName Nothing "Reserved" $ textContent
@@ -206,7 +206,7 @@ subscribePolledRefreshReplyItemList :: Element SubscribePolledRefreshReplyItemLi
 subscribePolledRefreshReplyItemList =
   join $
     childrenByName $ do
-      _items <- Vba.many $ byName (Just Ns.opc) "Items" $ itemValue
+      _items <- VectorUtil.many $ byName (Just Ns.opc) "Items" $ itemValue
       return $
         attributesByName $ do
           _subscriptionHandle <- optional $ byName Nothing "SubscriptionHandle" $ textContent
@@ -216,7 +216,7 @@ browseElement :: Element BrowseElement
 browseElement =
   join $
     childrenByName $ do
-      _properties <- Vba.many $ byName (Just Ns.opc) "Properties" $ itemProperty
+      _properties <- VectorUtil.many $ byName (Just Ns.opc) "Properties" $ itemProperty
       return $
         attributesByName $ do
           _name <- optional $ byName Nothing "Name" textContent
@@ -244,7 +244,7 @@ propertyReplyList :: Element PropertyReplyList
 propertyReplyList = do
   join $
     childrenByName $ do
-      _properties <- Vba.many $ byName (Just Ns.opc) "Properties" $ itemProperty
+      _properties <- VectorUtil.many $ byName (Just Ns.opc) "Properties" $ itemProperty
       return $
         attributesByName $ do
           _itemPath <- optional $ byName Nothing "ItemPath" $ textContent
@@ -332,7 +332,7 @@ xsiType =
 -- in the context of a QName of the element type.
 arrayOfAnyType :: (QName -> ByName Element element) -> ByName Element (Vector (Maybe element))
 arrayOfAnyType elementParser =
-  Vba.many $
+  VectorUtil.many $
     byName (Just Ns.opc) "anyType" $
       join $
         attributesByName $ do

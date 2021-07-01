@@ -56,7 +56,6 @@ library opc-xml-da-client-protocol
     text >=1 && <2,
     time >=1.9.3 && <2,
     vector ^>=0.12,
-    vector-builder ^>=0.3.8.1,
     xml-conduit ^>=1.9.1.1,
     xml-parser ^>=0.1,
 
