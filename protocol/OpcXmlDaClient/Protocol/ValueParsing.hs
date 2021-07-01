@@ -91,8 +91,9 @@ primitive (Primitive _ typeName contentParser) =
 arrayOfPrimitive :: GenericVector.Vector vector a => Primitive a -> Value (vector a)
 arrayOfPrimitive (Primitive arrayTypeName typeName contentParser) =
   Value (Just Ns.opc) arrayTypeName $
-    Xp.childrenByName $
-      error "TODO"
+    fmap Right $
+      Xp.childrenByName $
+        VectorUtil.many $ Xp.byName (Just Ns.opc) typeName $ Xp.children $ Xp.contentNode contentParser
 
 arrayOfAnyType ::
   GenericVector.Vector vector a =>
