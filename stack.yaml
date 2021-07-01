@@ -10,4 +10,4 @@ extra-deps:
   - th-lego-0.2.3
   - yaml-unscrambler-0.1.0.3
   - git: https://github.com/nikita-volkov/xml-parser
-    commit: !!str 5534809828de468ec20b698a22e372eead795210
+    commit: !!str 4a10ede27033321b662c51c47861dbec619d76a2

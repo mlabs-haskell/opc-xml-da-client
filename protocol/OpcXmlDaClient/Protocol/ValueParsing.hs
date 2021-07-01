@@ -66,8 +66,9 @@ parseValue ::
   Xml.Element ->
   -- | Either a parsing error or a result.
   Either Error a
-parseValue =
-  error "TODO"
+parseValue parsers xml =
+  Xp.parseElementAst (applyTypeExpectations parsers) xml
+    & either (Left . XmlError) (first ValueError)
 
 -- |
 -- Squash the value parser into element, bundling in the checks for the expected type.
