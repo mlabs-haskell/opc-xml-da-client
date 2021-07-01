@@ -433,6 +433,42 @@ QName:
     unnamespaced: Text
 
 Value:
-  product:
-    type: QName
-    xml: "[Xml.Node]"
+  sum:
+    string: Text
+    boolean: Bool
+    float: Float
+    double: Double
+    decimal: Scientific
+    long: Int64
+    int: Int32
+    short: Int16
+    byte: Int8
+    unsignedLong: Word64
+    unsignedInt: Word32
+    unsignedShort: Word16
+    unsignedByte: Word8
+    base64Binary: ByteString
+    dateTime: UTCTime
+    time: LocalTime
+    date: Day
+    duration: DiffTime
+    qName: QName
+    arrayOfByte: Uv.Vector Int8
+    arrayOfShort: Uv.Vector Int16
+    arrayOfUnsignedShort: Uv.Vector Word16
+    arrayOfInt: Uv.Vector Int32
+    arrayOfUnsignedInt: Uv.Vector Word32
+    arrayOfLong: Uv.Vector Int64
+    arrayOfUnsignedLong: Uv.Vector Word64
+    arrayOfFloat: Uv.Vector Float
+    arrayOfDecimal: Vector Scientific
+    arrayOfDouble: Uv.Vector Double
+    arrayOfBoolean: Uv.Vector Bool
+    arrayOfString: Vector Text
+    arrayOfDateTime: Vector UTCTime
+    arrayOfAnyType: Vector (Maybe Value)
+    nonStandard:
+      product:
+        # Needed for ability to resolve QName values in the element
+        namespaces: HashMap Text Text
+        xml: Xml.Element

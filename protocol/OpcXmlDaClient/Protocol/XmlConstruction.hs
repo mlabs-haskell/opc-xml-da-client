@@ -174,11 +174,7 @@ itemValueElement elementName x =
 
 valueElement :: Text -> Value -> X.Element
 valueElement elementName x =
-  X.element
-    (opcQName elementName)
-    [ (xsiQName "type", qNameContent (#type x))
-    ]
-    (fmap X.astNode (#xml x))
+  error "TODO"
 
 diagnosticInfoElement :: Text -> Text -> X.Element
 diagnosticInfoElement elementName x =
