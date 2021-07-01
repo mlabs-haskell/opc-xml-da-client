@@ -29,7 +29,6 @@ module OpcXmlDaClient.Protocol.ValueParsing
     qName,
 
     -- ** Array
-    arrayOfPrimitive,
     arrayOfByte,
     arrayOfShort,
     arrayOfUnsignedShort,
