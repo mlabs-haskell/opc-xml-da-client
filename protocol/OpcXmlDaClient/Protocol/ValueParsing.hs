@@ -1,5 +1,6 @@
 module OpcXmlDaClient.Protocol.ValueParsing where
 
+import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Vector.Generic as GenericVector
 import OpcXmlDaClient.Base.Prelude
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
@@ -65,8 +66,8 @@ contentBase typeNs typeName arrayTypeName arrayElementTagName contentParser =
   elementBase typeNs typeName arrayTypeName arrayElementTagName $
     fmap Right $ Xp.children $ Xp.contentNode $ contentParser
 
-primitive :: Text -> Text -> Xp.Content a -> Value a
-primitive typeName arrayTypeName =
+primitiveBase :: Text -> Text -> Xp.Content a -> Value a
+primitiveBase typeName arrayTypeName =
   contentBase Ns.xsd typeName arrayTypeName typeName
 
 -- |
@@ -103,5 +104,50 @@ vendor :: (ProtocolTypes.QName -> Xml.Element -> Either Text a) -> Value a
 vendor =
   error "TODO"
 
-decimal :: Value Scientific
-decimal = primitive "decimal" "ArrayOfDecimal" ProtocolXp.decimalContent
+primitive :: Primitive a -> Value a
+primitive (Primitive arrayTypeName typeName parser) =
+  contentBase Ns.xsd typeName arrayTypeName typeName parser
+
+-- *
+
+arrayOfPrimitive :: GenericVector.Vector vector a => Primitive a -> Value (vector a)
+arrayOfPrimitive =
+  error "TODO"
+
+arrayOfAnyType ::
+  GenericVector.Vector vector a =>
+  -- | Non-empty list of alternative value parsers for each element of the vector.
+  NonEmpty (AnyType a) ->
+  Value (vector (Maybe a))
+arrayOfAnyType =
+  error "TODO"
+
+-- *
+
+data AnyType a
+  = AnyType
+      (Maybe Text)
+      Text
+      (Xp.Element a)
+
+-- *
+
+data Primitive a
+  = Primitive
+      Text
+      -- ^ Type name for the containing array.
+      Text
+      -- ^ Primitive name and name of the primitive array element tag at the same time.
+      (Xp.Content a)
+      -- ^ Element content parser.
+
+deriving instance Functor Primitive
+
+decimal :: Primitive Scientific
+decimal = Primitive "ArrayOfDecimal" "decimal" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+byte :: Primitive Word8
+byte = Primitive "ArrayOfByte" "byte" $ Xp.attoparsedContent AttoparsecData.lenientParser
+
+short :: Primitive Int16
+short = Primitive "ArrayOfShort" "short" $ Xp.attoparsedContent AttoparsecData.lenientParser
