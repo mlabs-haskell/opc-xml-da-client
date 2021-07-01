@@ -35,7 +35,7 @@ module OpcXmlDaClient.Protocol.ValueParsing
     arrayOfInt,
     arrayOfUnsignedInt,
     arrayOfLong,
-    arrayOfWord64,
+    arrayOfUnsignedLong,
     arrayOfFloat,
     arrayOfDecimal,
     arrayOfDouble,
@@ -281,8 +281,8 @@ arrayOfUnsignedInt = arrayOfPrimitive "ArrayOfUnsignedInt" "unsignedInt" $ Xp.at
 arrayOfLong :: Value (Uv.Vector Int64)
 arrayOfLong = arrayOfPrimitive "ArrayOfLong" "long" $ Xp.attoparsedContent AttoparsecData.lenientParser
 
-arrayOfWord64 :: Value (Uv.Vector Word64)
-arrayOfWord64 = arrayOfPrimitive "ArrayOfWord64" "unsignedLong" $ Xp.attoparsedContent AttoparsecData.lenientParser
+arrayOfUnsignedLong :: Value (Uv.Vector Word64)
+arrayOfUnsignedLong = arrayOfPrimitive "ArrayOfUnsignedLong" "unsignedLong" $ Xp.attoparsedContent AttoparsecData.lenientParser
 
 arrayOfFloat :: Value (Uv.Vector Float)
 arrayOfFloat = arrayOfPrimitive "ArrayOfFloat" "float" $ Xp.attoparsedContent $ fmap realToFrac $ AttoparsecData.lenientParser @Double
