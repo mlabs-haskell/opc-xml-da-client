@@ -219,7 +219,7 @@ unsignedByte = primitive "unsignedByte" $ Xp.attoparsedContent $ AttoparsecData.
 -- |
 -- A sequence of 8-bit values represented in XML with Base-64 Encoding.
 base64Binary :: Value ByteString
-base64Binary = primitive "base64Binary" $ Xp.attoparsedContent $ error "TODO"
+base64Binary = primitive "base64Binary" ProtocolXp.base64BinaryContent
 
 -- |
 -- A specific instance in time.
