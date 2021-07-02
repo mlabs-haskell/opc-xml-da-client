@@ -1,6 +1,7 @@
 module OpcXmlDaClient.Protocol.Types where
 
 import Data.Time.Clock
+import qualified Data.Vector.Unboxed as Uv
 import qualified Domain
 import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified Text.XML as Xml

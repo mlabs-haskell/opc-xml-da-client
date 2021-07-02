@@ -163,7 +163,66 @@ itemValue =
           return (ItemValue _diagnosticInfo _value _opcQuality _valueTypeQualifier _itemPath _itemName _clientItemHandle _timestamp _resultId)
 
 value :: Element Value
-value = error "TODO"
+value = do
+  (_typeNs, _typeName) <- attributesByName $ byName (Just Ns.xsi) "type" qNameContent
+  case _typeNs of
+    Just _typeNs ->
+      if _typeNs == Ns.xsd
+        then case _typeName of
+          "string" -> primitive #string stringContent
+          "boolean" -> primitive #boolean booleanContent
+          "float" -> primitive #float floatContent
+          "double" -> primitive #double doubleContent
+          "decimal" -> primitive #decimal decimalContent
+          "long" -> primitive #long longContent
+          "int" -> primitive #int intContent
+          "short" -> primitive #short shortContent
+          "byte" -> primitive #byte byteContent
+          "unsignedLong" -> primitive #unsignedLong unsignedLongContent
+          "unsignedInt" -> primitive #unsignedInt unsignedIntContent
+          "unsignedShort" -> primitive #unsignedShort unsignedShortContent
+          "unsignedByte" -> primitive #unsignedByte unsignedByteContent
+          "base64Binary" -> primitive #base64Binary base64BinaryContent
+          "dateTime" -> primitive #dateTime dateTimeContent
+          "time" -> primitive #time timeContent
+          "date" -> primitive #date dateContent
+          "duration" -> primitive #duration durationContent
+          "QName" -> primitive #qName adaptedQNameContent
+          _ -> error "TODO"
+        else
+          if _typeNs == Ns.opc
+            then case _typeName of
+              "arrayOfByte" -> arrayOfPrimitive "byte" #arrayOfByte byteContent
+              "arrayOfShort" -> arrayOfPrimitive "short" #arrayOfShort shortContent
+              "arrayOfUnsignedShort" -> arrayOfPrimitive "unsignedShort" #arrayOfUnsignedShort unsignedShortContent
+              "arrayOfInt" -> arrayOfPrimitive "int" #arrayOfInt intContent
+              "arrayOfUnsignedInt" -> arrayOfPrimitive "unsignedInt" #arrayOfUnsignedInt unsignedIntContent
+              "arrayOfLong" -> arrayOfPrimitive "long" #arrayOfLong longContent
+              "arrayOfUnsignedLong" -> arrayOfPrimitive "unsignedLong" #arrayOfUnsignedLong unsignedLongContent
+              "arrayOfFloat" -> arrayOfPrimitive "float" #arrayOfFloat floatContent
+              "arrayOfDecimal" -> arrayOfPrimitive "decimal" #arrayOfDecimal decimalContent
+              "arrayOfDouble" -> arrayOfPrimitive "double" #arrayOfDouble doubleContent
+              "arrayOfBoolean" -> arrayOfPrimitive "boolean" #arrayOfBoolean booleanContent
+              "arrayOfString" -> arrayOfPrimitive "string" #arrayOfString stringContent
+              "arrayOfDateTime" -> arrayOfPrimitive "dateTime" #arrayOfDateTime dateTimeContent
+              "arrayOfAnyType" ->
+                fmap #arrayOfAnyType $
+                  childrenByName $
+                    VectorUtil.many $
+                      byName (Just Ns.opc) "anyType" $ do
+                        _isNil <- attributesByName isNil
+                        if _isNil
+                          then return Nothing
+                          else fmap Just $ value
+              _ -> error "TODO"
+            else error "TODO"
+    Nothing ->
+      error "TODO"
+  where
+    primitive constructor contentParser =
+      fmap constructor $ children $ contentNode contentParser
+    arrayOfPrimitive elementName constructor contentParser =
+      fmap constructor $ childrenByName $ VectorUtil.many $ byName (Just Ns.opc) elementName $ children $ contentNode contentParser
 
 opcQuality :: Element OpcQuality
 opcQuality =
@@ -249,16 +308,6 @@ propertyReplyList = do
 
 -- * Content
 
-adaptedQNameContent :: Content QName
-adaptedQNameContent =
-  qNameContent <&> \(ns, name) -> case ns of
-    Just ns -> NamespacedQName ns name
-    Nothing -> UnnamespacedQName name
-
-dateTimeContent :: Content UTCTime
-dateTimeContent =
-  attoparsedContent AttoparsecData.utcTimeInISO8601
-
 qualityBitsContent :: Content QualityBits
 qualityBitsContent =
   enumContent
@@ -289,10 +338,6 @@ limitBitsContent =
       ("constant", #constant)
     ]
 
-unsignedByteContent :: Content Word8
-unsignedByteContent =
-  attoparsedContent AttoparsecData.lenientParser
-
 serverStateContent :: Content ServerState
 serverStateContent =
   enumContent
@@ -304,14 +349,107 @@ serverStateContent =
       ("commFault", #commFault)
     ]
 
+-- |
+-- A sequence of UNICODE characters.
+stringContent :: Content Text
+stringContent = textContent
+
+-- |
+-- A binary logic value (true or false).
 booleanContent :: Content Bool
-booleanContent = attoparsedContent AttoparsecData.bool
+booleanContent = attoparsedContent $ AttoparsecData.lenientParser
 
+-- |
+-- An IEEE single-precision 32-bit floating point value.
+floatContent :: Content Float
+floatContent = attoparsedContent $ fmap realToFrac $ AttoparsecData.lenientParser @Double
+
+-- |
+-- An IEEE double-precision 64-bit floating point value.
+doubleContent :: Content Double
+doubleContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A fixed-point decimal value with arbitrary precision.
+-- Application development environments impose practical limitations on the precision supported by this type. XML-DA compliant applications must support at least the range supported by the VT_CY type.
 decimalContent :: Content Scientific
-decimalContent = attoparsedContent AttoparsecData.lenientParser
+decimalContent = attoparsedContent $ AttoparsecData.lenientParser
 
+-- |
+-- A 64-bit signed integer value.
+longContent :: Content Int64
+longContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A 32-bit signed integer value.
+intContent :: Content Int32
+intContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A 16-bit signed integer value.
+shortContent :: Content Int16
+shortContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- An 8-bit signed integer value.
+-- Note this differs from the definition of ‘byte’ used in most programming laguages.
+byteContent :: Content Int8
+byteContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A 64-bit unsigned integer value.
+unsignedLongContent :: Content Word64
+unsignedLongContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A 32-bit unsigned integer value.
+unsignedIntContent :: Content Word32
+unsignedIntContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A 16-bit unsigned integer value.
+unsignedShortContent :: Content Word16
+unsignedShortContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- An 8-bit unsigned integer value.
+unsignedByteContent :: Content Word8
+unsignedByteContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A sequence of 8-bit values represented in XML with Base-64 Encoding.
 base64BinaryContent :: Content ByteString
 base64BinaryContent = refinedContent $ Base64.decodeBase64 . TextEncoding.encodeUtf8
+
+-- |
+-- A specific instance in time.
+dateTimeContent :: Content UTCTime
+dateTimeContent = attoparsedContent AttoparsecData.utcTimeInISO8601
+
+-- |
+-- An instant of time that recurs every day.
+timeContent :: Content LocalTime
+timeContent = error "TODO"
+
+-- |
+-- A Gregorian calendar date.
+dateContent :: Content Day
+dateContent = attoparsedContent $ AttoparsecData.lenientParser
+
+-- |
+-- A duration of time as specified by Gregorian year, month, day, hour, minute, and second components.
+durationContent :: Content DiffTime
+durationContent = attoparsedContent $ error "TODO"
+
+-- |
+-- An XML qualified name comprising of a name and a namespace.
+-- The name must be a valid XML element name and the namespace must be a valid URI.
+-- QNames are equal only if the name and the namespace are equal.
+adaptedQNameContent :: Content QName
+adaptedQNameContent =
+  qNameContent <&> \(ns, name) -> case ns of
+    Just ns -> NamespacedQName ns name
+    Nothing -> UnnamespacedQName name
 
 -- * Attributes
 

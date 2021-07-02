@@ -1,7 +1,9 @@
+{-# LANGUAGE OverloadedLists #-}
+
 module Main where
 
 import qualified Data.Vector as Vector
-import OpcXmlDaClient.Protocol.Types ()
+import OpcXmlDaClient.Protocol.Types
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
 import Test.QuickCheck.Instances ()
 import Test.Tasty
@@ -23,16 +25,16 @@ main =
             testCase "Item value at offset 0" $ do
               assertEqual
                 ""
-                (Just (error "TODO"))
+                (Just (FloatValue 4.5))
                 ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 0) . fmap #items . #rItemList) response),
             testCase "Item value at offset 1" $ do
               assertEqual
                 ""
-                (Just (error "TODO"))
+                (Just (IntValue 1234))
                 ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 1) . fmap #items . #rItemList) response),
             testCase "Item value at offset 2" $ do
               assertEqual
                 ""
-                (Just (error "TODO"))
+                (Just (ArrayOfUnsignedShortValue [0, 0, 3, 11, 0, 0]))
                 ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 2) . fmap #items . #rItemList) response)
           ]
