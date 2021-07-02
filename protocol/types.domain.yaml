@@ -469,6 +469,5 @@ Value:
     arrayOfAnyType: Vector (Maybe Value)
     nonStandard:
       product:
-        # Needed for ability to resolve QName values in the element
-        namespaces: HashMap Text Text
-        xml: Xml.Element
+        type: QName
+        xml: "[Xml.Node]"
