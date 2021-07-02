@@ -30,8 +30,12 @@ jobs:
       - name: Install dependencies
         run: stack build --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
 
-      - name: Build
+      - name: Build pedantically
         run: stack build --test --bench --no-run-tests --no-run-benchmarks --ghc-options="-Werror -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-unused-do-bind -Wno-unused-top-binds"
+        continue-on-error: true
+
+      - name: Build
+        run: stack build --test --bench --no-run-tests --no-run-benchmarks
 
       - name: Test
         run: stack test
