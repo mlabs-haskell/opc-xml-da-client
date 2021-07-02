@@ -8,7 +8,6 @@ import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
-import qualified Text.XML as Xml
 import XmlParser
 
 -- * Responses
@@ -164,13 +163,7 @@ itemValue =
           return (ItemValue _diagnosticInfo _value _opcQuality _valueTypeQualifier _itemPath _itemName _clientItemHandle _timestamp _resultId)
 
 value :: Element Value
-value =
-  join $
-    attributesByName $ do
-      _type <- xsiType
-      return $ do
-        Xml.Element _ _ _nodes <- astElement
-        return $ Value _type _nodes
+value = error "TODO"
 
 opcQuality :: Element OpcQuality
 opcQuality =

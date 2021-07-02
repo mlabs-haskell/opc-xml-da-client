@@ -434,5 +434,11 @@ QName:
 
 Value:
   product:
-    type: QName
-    xml: "[Xml.Node]"
+    # Map of namespaces of the context of this element.
+    # Needed for ability to resolve QName values in the element.
+    namaspaceMap: HashMap Text Text
+    # URI of the default namespace of the context of this element.
+    # Needed for ability to resolve QName values in the element.
+    defaultNamespace: Maybe Text
+    # Serialised value element.
+    xml: Xml.Element

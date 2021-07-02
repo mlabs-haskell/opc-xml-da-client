@@ -1,12 +1,11 @@
 module Main where
 
 import qualified Data.Vector as Vector
-import OpcXmlDaClient.Protocol.Types
+import OpcXmlDaClient.Protocol.Types ()
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
 import Test.QuickCheck.Instances ()
 import Test.Tasty
 import Test.Tasty.HUnit
-import qualified Text.XML as Xml
 import qualified XmlParser as Xp
 import Prelude
 
@@ -24,24 +23,16 @@ main =
             testCase "Item value at offset 0" $ do
               assertEqual
                 ""
-                (Just (Value (NamespacedQName "http://www.w3.org/2001/XMLSchema" "float") [Xml.NodeContent "4.5"]))
+                (Just (error "TODO"))
                 ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 0) . fmap #items . #rItemList) response),
             testCase "Item value at offset 1" $ do
               assertEqual
                 ""
-                (Just (Value (NamespacedQName "http://www.w3.org/2001/XMLSchema" "int") [Xml.NodeContent "1234"]))
+                (Just (error "TODO"))
                 ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 1) . fmap #items . #rItemList) response),
             testCase "Item value at offset 2" $ do
               assertEqual
                 ""
-                ( Just
-                    ( Value
-                        (NamespacedQName "http://opcfoundation.org/webservices/XMLDA/1.0/" "ArrayOfUnsignedShort")
-                        ( fmap
-                            (Xml.NodeElement . Xml.Element (Xml.Name "unsignedShort" (Just "http://opcfoundation.org/webservices/XMLDA/1.0/") Nothing) mempty . pure . Xml.NodeContent)
-                            ["0", "0", "3", "11", "0", "0"]
-                        )
-                    )
-                )
+                (Just (error "TODO"))
                 ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 2) . fmap #items . #rItemList) response)
           ]
