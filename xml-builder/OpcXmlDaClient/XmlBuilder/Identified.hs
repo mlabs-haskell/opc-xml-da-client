@@ -2,8 +2,8 @@ module OpcXmlDaClient.XmlBuilder.Identified where
 
 import qualified Acc
 import qualified Data.HashMap.Strict as HashMap
+import qualified OpcXmlDaClient.Base.HashMap as HashMap
 import OpcXmlDaClient.Base.Prelude
-import qualified OpcXmlDaClient.XmlBuilder.HashMap as HashMap
 
 -- |
 -- Comonad automating incremental indexed value generation.

@@ -1,4 +1,4 @@
-module OpcXmlDaClient.XmlBuilder.HashMap where
+module OpcXmlDaClient.Base.HashMap where
 
 import qualified Data.HashMap.Strict as HashMap
 import OpcXmlDaClient.Base.Prelude
