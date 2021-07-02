@@ -1,3 +1,5 @@
+-- |
+-- Utilities for HashMap.
 module OpcXmlDaClient.Base.HashMap where
 
 import qualified Data.HashMap.Strict as HashMap
