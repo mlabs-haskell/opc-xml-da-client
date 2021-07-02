@@ -29,7 +29,6 @@ where
 
 import qualified Data.ByteString.Lazy as Lbs
 import qualified Data.Map.Strict as Map
-import qualified Data.Text as Text
 import OpcXmlDaClient.Base.Prelude
 import qualified OpcXmlDaClient.XmlBuilder.Identified as Identified
 import qualified Text.XML as Xml

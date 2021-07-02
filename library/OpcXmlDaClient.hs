@@ -67,26 +67,25 @@ getProperties = encDecOp XmlConstruction.getProperties XmlParsing.getPropertiesR
 
 encDecOp :: (i -> ByteString) -> XmlParser.Element o -> Op i o
 encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
-  let request =
-        request
-          { Hc.method = "POST",
-            Hc.requestBody = Hc.RequestBodyBS (encode input),
-            Hc.responseTimeout = Hc.responseTimeoutMicro (timeout * 1000)
-          }
-   in do
-        response <- try $ Hc.httpLbs request manager
-        case response of
-          Left exc
-            | Just exc <- fromException @Hc.HttpException exc -> case exc of
-              Hc.HttpExceptionRequest _ reason -> return $ Left $ HttpError reason
-              Hc.InvalidUrlException uri reason -> error $ "Invalid URI: " <> uri <> ". " <> reason
-            | Just exc <- fromException @IOException exc ->
-              return $ Left $ IoError exc
-            | otherwise -> throwIO exc
-          Right response ->
-            return $ case XmlParser.parseLazyByteString decode (Hc.responseBody response) of
-              Right res -> Right res
-              Left err -> Left $ ParsingError err
+  request
+    { Hc.method = "POST",
+      Hc.requestBody = Hc.RequestBodyBS (encode input),
+      Hc.responseTimeout = Hc.responseTimeoutMicro (timeout * 1000)
+    }
+    & \request -> do
+      response <- try $ Hc.httpLbs request manager
+      case response of
+        Left exc
+          | Just exc <- fromException @Hc.HttpException exc -> case exc of
+            Hc.HttpExceptionRequest _ reason -> return $ Left $ HttpError reason
+            Hc.InvalidUrlException uri reason -> error $ "Invalid URI: " <> uri <> ". " <> reason
+          | Just exc <- fromException @IOException exc ->
+            return $ Left $ IoError exc
+          | otherwise -> throwIO exc
+        Right response ->
+          return $ case XmlParser.parseLazyByteString decode (Hc.responseBody response) of
+            Right res -> Right res
+            Left err -> Left $ ParsingError err
 
 -- * Helper types
 

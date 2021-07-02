@@ -10,7 +10,6 @@ module OpcXmlDaClient.Protocol.XmlConstruction
   )
 where
 
-import qualified Data.Text as Text
 import qualified Data.Time.Format.ISO8601 as Time
 import OpcXmlDaClient.Base.Prelude hiding (Read, read)
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns

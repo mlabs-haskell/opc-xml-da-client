@@ -3,11 +3,9 @@ module Main where
 import qualified Data.Vector as Vector
 import OpcXmlDaClient.Protocol.Types
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
-import qualified Test.QuickCheck as QuickCheck
 import Test.QuickCheck.Instances ()
 import Test.Tasty
 import Test.Tasty.HUnit
-import Test.Tasty.QuickCheck
 import qualified Text.XML as Xml
 import qualified XmlParser as Xp
 import Prelude

@@ -20,7 +20,7 @@ autoincrementedFoldable foldable projValue =
           map
           & \(newCounter, newMap) -> next newMap newCounter
     )
-    (\map counter -> map)
+    (\map _ -> map)
     foldable
     HashMap.empty
     0
