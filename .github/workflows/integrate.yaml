@@ -30,12 +30,11 @@ jobs:
       - name: Install dependencies
         run: stack build --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
 
-      - name: Build pedantically
+      - name: Collect pedantic warnings
         run: stack build --test --bench --no-run-tests --no-run-benchmarks --ghc-options="-Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-unused-do-bind -Wno-unused-top-binds"
-        continue-on-error: true
 
       - name: Build
-        run: stack build --test --bench --no-run-tests --no-run-benchmarks
+        run: stack build --test --bench --no-run-tests --no-run-benchmarks --ghc-options="-Werror -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-unused-do-bind -Wno-unused-top-binds"
 
       - name: Test
         run: stack test
