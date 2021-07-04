@@ -84,7 +84,7 @@ subscribeElement elementName x =
     (opcQName elementName)
     ( catMaybes
         [ Just ("ReturnValuesOnReply", booleanContent (#returnValuesOnReply x)),
-          ("SubcriptionPingRate",) . int32Content <$> #subscriptionPingRate x
+          ("SubcriptionPingRate",) . intContent <$> #subscriptionPingRate x
         ]
     )
     ( catMaybes
@@ -118,7 +118,7 @@ subscribeRequestItemListElement elementName x =
         [ fmap (("ItemPath",) . X.textContent) (#itemPath x),
           fmap (("ReqType",) . qNameContent) (#reqType x),
           fmap (("Deadband",) . floatContent) (#deadband x),
-          fmap (("RequestedSamplingRate",) . int32Content) (#requestedSamplingRate x),
+          fmap (("RequestedSamplingRate",) . intContent) (#requestedSamplingRate x),
           fmap (("EnableBuffering",) . booleanContent) (#enableBuffering x)
         ]
     )
@@ -134,7 +134,7 @@ subscribeRequestItemElement elementName x =
           fmap (("ItemName",) . X.textContent) (#itemName x),
           fmap (("ClientItemHandle",) . X.textContent) (#clientItemHandle x),
           fmap (("Deadband",) . floatContent) (#deadband x),
-          fmap (("RequestedSamplingRate",) . int32Content) (#requestedSamplingRate x),
+          fmap (("RequestedSamplingRate",) . intContent) (#requestedSamplingRate x),
           fmap (("EnableBuffering",) . booleanContent) (#enableBuffering x)
         ]
     )
@@ -174,7 +174,26 @@ itemValueElement elementName x =
 valueElement :: Text -> Value -> X.Element
 valueElement elementName x =
   case x of
-    StringValue x -> primitive "string" $ X.textContent x
+    StringValue x -> primitive "string" $ stringContent x
+    BooleanValue x -> primitive "boolean" $ booleanContent x
+    FloatValue x -> primitive "float" $ floatContent x
+    DoubleValue x -> primitive "double" $ doubleContent x
+    DecimalValue x -> primitive "decimal" $ decimalContent x
+    LongValue x -> primitive "long" $ longContent x
+    IntValue x -> primitive "int" $ intContent x
+    ShortValue x -> primitive "short" $ shortContent x
+    ByteValue x -> primitive "byte" $ byteContent x
+    UnsignedLongValue x -> primitive "unsignedLong" $ unsignedLongContent x
+    UnsignedIntValue x -> primitive "unsignedInt" $ unsignedIntContent x
+    UnsignedShortValue x -> primitive "unsignedShort" $ unsignedShortContent x
+    UnsignedByteValue x -> primitive "unsignedByte" $ unsignedByteContent x
+    Base64BinaryValue x -> primitive "base64Binary" $ base64BinaryContent x
+    DateTimeValue x -> primitive "dateTime" $ dateTimeContent x
+    TimeValue x -> primitive "time" $ timeContent x
+    DateValue x -> primitive "date" $ dateContent x
+    DurationValue x -> primitive "duration" $ durationContent x
+    QNameValue x -> primitive "QName" $ qNameContent x
+    _ -> error "TODO"
   where
     element typeQName =
       X.element (opcQName elementName) [(xsiQName "type", X.qNameContent typeQName)]
@@ -191,7 +210,7 @@ opcQualityElement elementName x =
     (opcQName elementName)
     [ ("QualityField", qualityBitsContent (#qualityField x)),
       ("LimitField", limitBitsContent (#limitField x)),
-      ("VendorField", showContent (#vendorField x))
+      ("VendorField", shownContent (#vendorField x))
     ]
     []
 
@@ -224,7 +243,7 @@ readRequestItemElement elementName x =
           ("ReqType",) . qNameContent <$> #reqType x,
           ("ItemName",) . X.textContent <$> #itemName x,
           ("ClientItemHandle",) . X.textContent <$> #clientItemHandle x,
-          ("MaxAge",) . int32Content <$> #maxAge x
+          ("MaxAge",) . intContent <$> #maxAge x
         ]
     )
     []
@@ -236,7 +255,7 @@ readRequestItemListElement elementName x =
     ( catMaybes
         [ ("ItemPath",) . X.textContent <$> #itemPath x,
           ("ReqType",) . qNameContent <$> #reqType x,
-          ("MaxAge",) . int32Content <$> #maxAge x
+          ("MaxAge",) . intContent <$> #maxAge x
         ]
     )
     (X.elementNode . readRequestItemElement "Items" <$> toList (#items x))
@@ -258,7 +277,7 @@ subscriptionPolledRefreshElement elementName x =
     (opcQName elementName)
     ( catMaybes
         [ ("HoldTime",) . dateTimeContent <$> #holdTime x,
-          pure ("WaitTime", int32Content (#waitTime x)),
+          pure ("WaitTime", intContent (#waitTime x)),
           pure ("ReturnAllItems", booleanContent (#returnAllItems x))
         ]
     )
@@ -291,7 +310,7 @@ browseElement elementName x =
           ("ItemPath",) . X.textContent <$> #itemPath x,
           ("ItemName",) . X.textContent <$> #itemName x,
           ("ContinuationPoint",) . X.textContent <$> #continuationPoint x,
-          pure ("MaxElementsReturned", int32Content (#maxElementsReturned x)),
+          pure ("MaxElementsReturned", intContent (#maxElementsReturned x)),
           pure ("BrowseFilter", browseFilterContent (#browseFilter x)),
           ("ElementNameFilter",) . X.textContent <$> #elementNameFilter x,
           ("VendorFilter",) . X.textContent <$> #vendorFilter x,
@@ -341,23 +360,62 @@ itemIdentifierElement elementName x =
 
 -- * Content
 
-showContent :: Show a => a -> X.Content
-showContent = stringContent . show
+shownContent :: Show a => a -> X.Content
+shownContent = X.textContent . fromString . show
 
-stringContent :: String -> X.Content
-stringContent = X.textContent . fromString
-
-dateTimeContent :: UTCTime -> X.Content
-dateTimeContent = stringContent . Time.iso8601Show
+stringContent :: Text -> X.Content
+stringContent = X.textContent
 
 booleanContent :: Bool -> X.Content
 booleanContent = X.textContent . bool "false" "true"
 
 floatContent :: Float -> X.Content
-floatContent = showContent
+floatContent = shownContent
 
-int32Content :: Int32 -> X.Content
-int32Content = showContent
+doubleContent :: Double -> X.Content
+doubleContent = shownContent
+
+decimalContent :: Scientific -> X.Content
+decimalContent = shownContent
+
+longContent :: Int64 -> X.Content
+longContent = shownContent
+
+intContent :: Int32 -> X.Content
+intContent = shownContent
+
+shortContent :: Int16 -> X.Content
+shortContent = shownContent
+
+byteContent :: Int8 -> X.Content
+byteContent = shownContent
+
+unsignedLongContent :: Word64 -> X.Content
+unsignedLongContent = shownContent
+
+unsignedIntContent :: Word32 -> X.Content
+unsignedIntContent = shownContent
+
+unsignedShortContent :: Word16 -> X.Content
+unsignedShortContent = shownContent
+
+unsignedByteContent :: Word8 -> X.Content
+unsignedByteContent = shownContent
+
+base64BinaryContent :: ByteString -> X.Content
+base64BinaryContent = error "TODO"
+
+dateTimeContent :: UTCTime -> X.Content
+dateTimeContent = X.textContent . fromString . Time.iso8601Show
+
+timeContent :: LocalTime -> X.Content
+timeContent = error "TODO"
+
+dateContent :: Day -> X.Content
+dateContent = error "TODO"
+
+durationContent :: DiffTime -> X.Content
+durationContent = error "TODO"
 
 qNameContent :: QName -> X.Content
 qNameContent = X.qNameContent . qNameQName
