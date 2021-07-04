@@ -127,62 +127,6 @@ OpcError:
     text: Maybe Text
     id: QName
 
-ArrayOfFloat:
-  product:
-    float: Vector Float
-
-ArrayOfInt:
-  product:
-    int: Vector Int32
-
-ArrayOfUnsignedInt:
-  product:
-    unsignedInt: Vector Word32
-
-ArrayOfLong:
-  product:
-    long: Vector Int64
-
-ArrayOfUnsignedLong:
-  product:
-    unsignedLong: Vector Word64
-
-ArrayOfDouble:
-  product:
-    double: Vector Double
-
-ArrayOfUnsignedShort:
-  product:
-    unsignedShort: Vector Word16
-
-ArrayOfBoolean:
-  product:
-    boolean: Vector Bool
-
-ArrayOfString:
-  product:
-    string: Vector (Maybe Text)
-
-ArrayOfDateTime:
-  product:
-    dateTime: Vector UTCTime
-
-ArrayOfAnyType:
-  product:
-    anyType: Vector (Maybe Value)
-
-ArrayOfDecimal:
-  product:
-    decimal: Vector Scientific
-
-ArrayOfByte:
-  product:
-    byte: Vector Int8
-
-ArrayOfShort:
-  product:
-    short: Vector Int16
-
 Write:
   product:
     options: Maybe RequestOptions
