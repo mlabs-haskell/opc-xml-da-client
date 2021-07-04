@@ -220,17 +220,18 @@ value = do
                                   then return Nothing
                                   else fmap Just $ value
                     _ -> fail $ "Unexpected OPC type: " <> show _typeName
-                  else return $
-                    fmap (#nonStandard . ValueNonStandard (NamespacedQName _typeNs _typeName)) $ do
-                      Xml.Element _ _ children <- astElement
-                      return children
-          Nothing ->
-            error "TODO"
+                  else nonStandard (NamespacedQName _typeNs _typeName)
+          Nothing -> nonStandard (UnnamespacedQName _typeName)
   where
     primitive constructor contentParser =
       return $ fmap constructor $ children $ contentNode contentParser
     arrayOfPrimitive elementName constructor contentParser =
       return $ fmap constructor $ childrenByName $ VectorUtil.many $ byName (Just Ns.opc) elementName $ children $ contentNode contentParser
+    nonStandard _type =
+      return $
+        fmap (#nonStandard . ValueNonStandard _type) $ do
+          Xml.Element _ _ _children <- astElement
+          return _children
 
 opcQuality :: Element OpcQuality
 opcQuality =
