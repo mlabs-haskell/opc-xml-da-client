@@ -440,7 +440,7 @@ qualityBitsContent = \case
   UncertainQualityBits -> "uncertain"
   UncertainLastUsableValueQualityBits -> "uncertainLastUsableValue"
   UncertainSensorNotAccurateQualityBits -> "uncertainSensorNotAccurate"
-  UncertainEUExceededQualityBits -> "uncertainEUExceededQualityBits"
+  UncertainEUExceededQualityBits -> "uncertainEUExceeded"
   UncertainSubNormalQualityBits -> "uncertainSubNormal"
   GoodQualityBits -> "good"
   GoodLocalOverrideQualityBits -> "goodLocalOverride"
