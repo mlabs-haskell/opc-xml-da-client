@@ -164,65 +164,69 @@ itemValue =
 
 value :: Element Value
 value = do
-  (_typeNs, _typeName) <- attributesByName $ byName (Just Ns.xsi) "type" qNameContent
-  case _typeNs of
-    Just _typeNs ->
-      if _typeNs == Ns.xsd
-        then case _typeName of
-          "string" -> primitive #string stringContent
-          "boolean" -> primitive #boolean booleanContent
-          "float" -> primitive #float floatContent
-          "double" -> primitive #double doubleContent
-          "decimal" -> primitive #decimal decimalContent
-          "long" -> primitive #long longContent
-          "int" -> primitive #int intContent
-          "short" -> primitive #short shortContent
-          "byte" -> primitive #byte byteContent
-          "unsignedLong" -> primitive #unsignedLong unsignedLongContent
-          "unsignedInt" -> primitive #unsignedInt unsignedIntContent
-          "unsignedShort" -> primitive #unsignedShort unsignedShortContent
-          "unsignedByte" -> primitive #unsignedByte unsignedByteContent
-          "base64Binary" -> primitive #base64Binary base64BinaryContent
-          "dateTime" -> primitive #dateTime dateTimeContent
-          "time" -> primitive #time timeContent
-          "date" -> primitive #date dateContent
-          "duration" -> primitive #duration durationContent
-          "QName" -> primitive #qName adaptedQNameContent
-          _ -> error "TODO"
-        else
-          if _typeNs == Ns.opc
-            then case _typeName of
-              "arrayOfByte" -> arrayOfPrimitive "byte" #arrayOfByte byteContent
-              "arrayOfShort" -> arrayOfPrimitive "short" #arrayOfShort shortContent
-              "arrayOfUnsignedShort" -> arrayOfPrimitive "unsignedShort" #arrayOfUnsignedShort unsignedShortContent
-              "arrayOfInt" -> arrayOfPrimitive "int" #arrayOfInt intContent
-              "arrayOfUnsignedInt" -> arrayOfPrimitive "unsignedInt" #arrayOfUnsignedInt unsignedIntContent
-              "arrayOfLong" -> arrayOfPrimitive "long" #arrayOfLong longContent
-              "arrayOfUnsignedLong" -> arrayOfPrimitive "unsignedLong" #arrayOfUnsignedLong unsignedLongContent
-              "arrayOfFloat" -> arrayOfPrimitive "float" #arrayOfFloat floatContent
-              "arrayOfDecimal" -> arrayOfPrimitive "decimal" #arrayOfDecimal decimalContent
-              "arrayOfDouble" -> arrayOfPrimitive "double" #arrayOfDouble doubleContent
-              "arrayOfBoolean" -> arrayOfPrimitive "boolean" #arrayOfBoolean booleanContent
-              "arrayOfString" -> arrayOfPrimitive "string" #arrayOfString stringContent
-              "arrayOfDateTime" -> arrayOfPrimitive "dateTime" #arrayOfDateTime dateTimeContent
-              "arrayOfAnyType" ->
-                fmap #arrayOfAnyType $
-                  childrenByName $
-                    VectorUtil.many $
-                      byName (Just Ns.opc) "anyType" $ do
-                        _isNil <- attributesByName isNil
-                        if _isNil
-                          then return Nothing
-                          else fmap Just $ value
-              _ -> error "TODO"
-            else error "TODO"
-    Nothing ->
-      error "TODO"
+  join $
+    attributesByName $
+      byName (Just Ns.xsi) "type" $ do
+        (_typeNs, _typeName) <- qNameContent
+        case _typeNs of
+          Just _typeNs ->
+            if _typeNs == Ns.xsd
+              then case _typeName of
+                "string" -> primitive #string stringContent
+                "boolean" -> primitive #boolean booleanContent
+                "float" -> primitive #float floatContent
+                "double" -> primitive #double doubleContent
+                "decimal" -> primitive #decimal decimalContent
+                "long" -> primitive #long longContent
+                "int" -> primitive #int intContent
+                "short" -> primitive #short shortContent
+                "byte" -> primitive #byte byteContent
+                "unsignedLong" -> primitive #unsignedLong unsignedLongContent
+                "unsignedInt" -> primitive #unsignedInt unsignedIntContent
+                "unsignedShort" -> primitive #unsignedShort unsignedShortContent
+                "unsignedByte" -> primitive #unsignedByte unsignedByteContent
+                "base64Binary" -> primitive #base64Binary base64BinaryContent
+                "dateTime" -> primitive #dateTime dateTimeContent
+                "time" -> primitive #time timeContent
+                "date" -> primitive #date dateContent
+                "duration" -> primitive #duration durationContent
+                "QName" -> primitive #qName adaptedQNameContent
+                _ -> fail $ "Unexpected type name: " <> show _typeName
+              else
+                if _typeNs == Ns.opc
+                  then case _typeName of
+                    "arrayOfByte" -> arrayOfPrimitive "byte" #arrayOfByte byteContent
+                    "arrayOfShort" -> arrayOfPrimitive "short" #arrayOfShort shortContent
+                    "arrayOfUnsignedShort" -> arrayOfPrimitive "unsignedShort" #arrayOfUnsignedShort unsignedShortContent
+                    "arrayOfInt" -> arrayOfPrimitive "int" #arrayOfInt intContent
+                    "arrayOfUnsignedInt" -> arrayOfPrimitive "unsignedInt" #arrayOfUnsignedInt unsignedIntContent
+                    "arrayOfLong" -> arrayOfPrimitive "long" #arrayOfLong longContent
+                    "arrayOfUnsignedLong" -> arrayOfPrimitive "unsignedLong" #arrayOfUnsignedLong unsignedLongContent
+                    "arrayOfFloat" -> arrayOfPrimitive "float" #arrayOfFloat floatContent
+                    "arrayOfDecimal" -> arrayOfPrimitive "decimal" #arrayOfDecimal decimalContent
+                    "arrayOfDouble" -> arrayOfPrimitive "double" #arrayOfDouble doubleContent
+                    "arrayOfBoolean" -> arrayOfPrimitive "boolean" #arrayOfBoolean booleanContent
+                    "arrayOfString" -> arrayOfPrimitive "string" #arrayOfString stringContent
+                    "arrayOfDateTime" -> arrayOfPrimitive "dateTime" #arrayOfDateTime dateTimeContent
+                    "arrayOfAnyType" ->
+                      return $
+                        fmap #arrayOfAnyType $
+                          childrenByName $
+                            VectorUtil.many $
+                              byName (Just Ns.opc) "anyType" $ do
+                                _isNil <- attributesByName isNil
+                                if _isNil
+                                  then return Nothing
+                                  else fmap Just $ value
+                    _ -> error "TODO"
+                  else error "TODO"
+          Nothing ->
+            error "TODO"
   where
     primitive constructor contentParser =
-      fmap constructor $ children $ contentNode contentParser
+      return $ fmap constructor $ children $ contentNode contentParser
     arrayOfPrimitive elementName constructor contentParser =
-      fmap constructor $ childrenByName $ VectorUtil.many $ byName (Just Ns.opc) elementName $ children $ contentNode contentParser
+      return $ fmap constructor $ childrenByName $ VectorUtil.many $ byName (Just Ns.opc) elementName $ children $ contentNode contentParser
 
 opcQuality :: Element OpcQuality
 opcQuality =
