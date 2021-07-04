@@ -172,8 +172,14 @@ itemValueElement elementName x =
     )
 
 valueElement :: Text -> Value -> X.Element
-valueElement =
-  error "TODO"
+valueElement elementName x =
+  case x of
+    StringValue x -> primitive "string" $ X.textContent x
+  where
+    element typeQName =
+      X.element (opcQName elementName) [(xsiQName "type", X.qNameContent typeQName)]
+    primitive typeName content =
+      element (X.namespacedQName Ns.xsd typeName) [X.contentNode content]
 
 diagnosticInfoElement :: Text -> Text -> X.Element
 diagnosticInfoElement elementName x =
