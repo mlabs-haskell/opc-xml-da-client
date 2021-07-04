@@ -8,6 +8,7 @@ import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
+import qualified Text.XML as Xml
 import XmlParser
 
 -- * Responses
@@ -218,8 +219,11 @@ value = do
                                 if _isNil
                                   then return Nothing
                                   else fmap Just $ value
-                    _ -> error "TODO"
-                  else error "TODO"
+                    _ -> fail $ "Unexpected OPC type: " <> show _typeName
+                  else return $
+                    fmap (#nonStandard . ValueNonStandard (NamespacedQName _typeNs _typeName)) $ do
+                      Xml.Element _ _ children <- astElement
+                      return children
           Nothing ->
             error "TODO"
   where
