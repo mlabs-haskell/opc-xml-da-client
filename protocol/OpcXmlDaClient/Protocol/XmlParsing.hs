@@ -191,7 +191,7 @@ value = do
                 "date" -> primitive #date dateContent
                 "duration" -> primitive #duration durationContent
                 "QName" -> primitive #qName adaptedQNameContent
-                _ -> fail $ "Unexpected type name: " <> show _typeName
+                _ -> fail $ "Unexpected XSD type: " <> show _typeName
               else
                 if _typeNs == Ns.opc
                   then case _typeName of
