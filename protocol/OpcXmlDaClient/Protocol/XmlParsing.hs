@@ -8,6 +8,8 @@ import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
+import qualified OpcXmlDaClient.XmlSchemaValues.Attoparsec as XmlSchemaValuesAttoparsec
+import OpcXmlDaClient.XmlSchemaValues.Types
 import qualified Text.XML as Xml
 import XmlParser
 
@@ -433,22 +435,22 @@ base64BinaryContent = refinedContent $ Base64.decodeBase64 . TextEncoding.encode
 -- |
 -- A specific instance in time.
 dateTimeContent :: Content UTCTime
-dateTimeContent = attoparsedContent AttoparsecData.utcTimeInISO8601
+dateTimeContent = attoparsedContent XmlSchemaValuesAttoparsec.dateTime
 
 -- |
 -- An instant of time that recurs every day.
-timeContent :: Content LocalTime
-timeContent = error "TODO"
+timeContent :: Content Time
+timeContent = attoparsedContent XmlSchemaValuesAttoparsec.time
 
 -- |
 -- A Gregorian calendar date.
 dateContent :: Content Date
-dateContent = attoparsedContent $ error "TODO"
+dateContent = attoparsedContent XmlSchemaValuesAttoparsec.date
 
 -- |
 -- A duration of time as specified by Gregorian year, month, day, hour, minute, and second components.
-durationContent :: Content DiffTime
-durationContent = attoparsedContent $ error "TODO"
+durationContent :: Content Duration
+durationContent = attoparsedContent XmlSchemaValuesAttoparsec.duration
 
 -- |
 -- An XML qualified name comprising of a name and a namespace.

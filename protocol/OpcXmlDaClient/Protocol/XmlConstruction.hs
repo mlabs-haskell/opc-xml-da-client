@@ -10,12 +10,15 @@ module OpcXmlDaClient.Protocol.XmlConstruction
   )
 where
 
-import qualified Data.Time.Format.ISO8601 as Time
+import qualified Data.ByteString.Base64 as Base64
 import qualified Data.Vector.Generic as Gv
 import OpcXmlDaClient.Base.Prelude hiding (Read, read)
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
 import qualified OpcXmlDaClient.XmlBuilder as X
+import qualified OpcXmlDaClient.XmlSchemaValues.Rendering as XmlSchemaValuesRendering
+import OpcXmlDaClient.XmlSchemaValues.Types
+import qualified Text.Builder as Tb
 
 -- * Documents
 
@@ -431,19 +434,19 @@ unsignedByteContent :: Word8 -> X.Content
 unsignedByteContent = shownContent
 
 base64BinaryContent :: ByteString -> X.Content
-base64BinaryContent = error "TODO"
+base64BinaryContent = X.textContent . Base64.encodeBase64
 
 dateTimeContent :: UTCTime -> X.Content
-dateTimeContent = X.textContent . fromString . Time.iso8601Show
+dateTimeContent = X.textContent . Tb.run . XmlSchemaValuesRendering.dateTime
 
-timeContent :: LocalTime -> X.Content
-timeContent = error "TODO"
+timeContent :: Time -> X.Content
+timeContent = X.textContent . Tb.run . XmlSchemaValuesRendering.time
 
 dateContent :: Date -> X.Content
-dateContent = error "TODO"
+dateContent = X.textContent . Tb.run . XmlSchemaValuesRendering.date
 
-durationContent :: DiffTime -> X.Content
-durationContent = error "TODO"
+durationContent :: Duration -> X.Content
+durationContent = X.textContent . Tb.run . XmlSchemaValuesRendering.duration
 
 qNameContent :: QName -> X.Content
 qNameContent = X.qNameContent . qNameQName

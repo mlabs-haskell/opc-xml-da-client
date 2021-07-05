@@ -21,6 +21,7 @@ module OpcXmlDaClient
 
     -- * Value types
     module OpcXmlDaClient.Protocol.Types,
+    module OpcXmlDaClient.XmlSchemaValues.Types,
   )
 where
 
@@ -30,6 +31,7 @@ import OpcXmlDaClient.Base.Prelude hiding (Read, read)
 import OpcXmlDaClient.Protocol.Types
 import qualified OpcXmlDaClient.Protocol.XmlConstruction as XmlConstruction
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
+import OpcXmlDaClient.XmlSchemaValues.Types
 import qualified XmlParser
 
 -- * Operations
