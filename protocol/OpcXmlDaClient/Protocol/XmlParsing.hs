@@ -443,7 +443,7 @@ timeContent = error "TODO"
 -- |
 -- A Gregorian calendar date.
 dateContent :: Content Day
-dateContent = attoparsedContent $ AttoparsecData.lenientParser
+dateContent = attoparsedContent $ error "TODO"
 
 -- |
 -- A duration of time as specified by Gregorian year, month, day, hour, minute, and second components.
