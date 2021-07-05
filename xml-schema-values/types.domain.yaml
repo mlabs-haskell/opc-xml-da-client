@@ -1,0 +1,15 @@
+
+Date:
+  product:
+    day: Day
+    timeZone: Maybe TimeZone
+
+Duration:
+  product:
+    positive: Bool
+    years: Maybe Word
+    months: Maybe Word
+    days: Maybe Word
+    hours: Maybe Word
+    minutes: Maybe Word
+    seconds: Maybe Scientific
