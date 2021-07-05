@@ -196,20 +196,20 @@ value = do
               else
                 if _typeNs == Ns.opc
                   then case _typeName of
-                    "arrayOfByte" -> arrayOfPrimitive "byte" #arrayOfByte byteContent
-                    "arrayOfShort" -> arrayOfPrimitive "short" #arrayOfShort shortContent
-                    "arrayOfUnsignedShort" -> arrayOfPrimitive "unsignedShort" #arrayOfUnsignedShort unsignedShortContent
-                    "arrayOfInt" -> arrayOfPrimitive "int" #arrayOfInt intContent
-                    "arrayOfUnsignedInt" -> arrayOfPrimitive "unsignedInt" #arrayOfUnsignedInt unsignedIntContent
-                    "arrayOfLong" -> arrayOfPrimitive "long" #arrayOfLong longContent
-                    "arrayOfUnsignedLong" -> arrayOfPrimitive "unsignedLong" #arrayOfUnsignedLong unsignedLongContent
-                    "arrayOfFloat" -> arrayOfPrimitive "float" #arrayOfFloat floatContent
-                    "arrayOfDecimal" -> arrayOfPrimitive "decimal" #arrayOfDecimal decimalContent
-                    "arrayOfDouble" -> arrayOfPrimitive "double" #arrayOfDouble doubleContent
-                    "arrayOfBoolean" -> arrayOfPrimitive "boolean" #arrayOfBoolean booleanContent
-                    "arrayOfString" -> arrayOfPrimitive "string" #arrayOfString stringContent
-                    "arrayOfDateTime" -> arrayOfPrimitive "dateTime" #arrayOfDateTime dateTimeContent
-                    "arrayOfAnyType" ->
+                    "ArrayOfByte" -> arrayOfPrimitive "byte" #arrayOfByte byteContent
+                    "ArrayOfShort" -> arrayOfPrimitive "short" #arrayOfShort shortContent
+                    "ArrayOfUnsignedShort" -> arrayOfPrimitive "unsignedShort" #arrayOfUnsignedShort unsignedShortContent
+                    "ArrayOfInt" -> arrayOfPrimitive "int" #arrayOfInt intContent
+                    "ArrayOfUnsignedInt" -> arrayOfPrimitive "unsignedInt" #arrayOfUnsignedInt unsignedIntContent
+                    "ArrayOfLong" -> arrayOfPrimitive "long" #arrayOfLong longContent
+                    "ArrayOfUnsignedLong" -> arrayOfPrimitive "unsignedLong" #arrayOfUnsignedLong unsignedLongContent
+                    "ArrayOfFloat" -> arrayOfPrimitive "float" #arrayOfFloat floatContent
+                    "ArrayOfDecimal" -> arrayOfPrimitive "decimal" #arrayOfDecimal decimalContent
+                    "ArrayOfDouble" -> arrayOfPrimitive "double" #arrayOfDouble doubleContent
+                    "ArrayOfBoolean" -> arrayOfPrimitive "boolean" #arrayOfBoolean booleanContent
+                    "ArrayOfString" -> arrayOfPrimitive "string" #arrayOfString stringContent
+                    "ArrayOfDateTime" -> arrayOfPrimitive "dateTime" #arrayOfDateTime dateTimeContent
+                    "ArrayOfAnyType" ->
                       return $
                         fmap #arrayOfAnyType $
                           childrenByName $
