@@ -1,5 +1,6 @@
 module OpcXmlDaClient.XmlSchemaValues.Attoparsec
   ( dateTime,
+    time,
     date,
     duration,
   )
@@ -21,6 +22,16 @@ dateTime :: Parser UTCTime
 dateTime = Ad.utcTimeInISO8601
 
 -- |
+-- XML Schema time.
+--
+-- https://www.w3.org/TR/xmlschema-2/#time
+time :: Parser Time
+time = do
+  _timeOfDay <- Ad.timeOfDayInISO8601
+  _timeZone <- optional Ad.timeZoneInISO8601
+  return $ Time _timeOfDay _timeZone
+
+-- |
 -- XML Schema date.
 --
 -- https://www.w3.org/TR/xmlschema-2/#date
@@ -28,8 +39,8 @@ date :: Parser Date
 date = do
   _applyNeg <- fmap TimeMath.negateDay <$ char '-' <|> pure id
   _day <- _applyNeg Ad.dayInISO8601
-  _tz <- optional Ad.timeZoneInISO8601
-  return $ Date _day _tz
+  _timeZone <- optional Ad.timeZoneInISO8601
+  return $ Date _day _timeZone
 
 -- |
 -- XML Schema duration.

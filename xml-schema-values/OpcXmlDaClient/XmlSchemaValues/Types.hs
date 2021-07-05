@@ -22,5 +22,7 @@ Domain.declare
 
 deriving instance Ord Date
 
+deriving instance Ord Time
+
 instance Ord Duration where
   compare = on compare (\(Duration a (CalendarDiffTime b c)) -> (a, b, c))

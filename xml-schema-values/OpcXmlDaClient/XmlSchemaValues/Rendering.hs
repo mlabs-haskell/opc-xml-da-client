@@ -1,5 +1,6 @@
 module OpcXmlDaClient.XmlSchemaValues.Rendering
   ( dateTime,
+    time,
     date,
     duration,
   )
@@ -12,6 +13,9 @@ import Text.Builder
 
 dateTime :: UTCTime -> Builder
 dateTime = iso8601Show
+
+time :: Time -> Builder
+time (Time a b) = iso8601Show a <> foldMap iso8601Show b
 
 date :: Date -> Builder
 date (Date a b) = iso8601Show a <> foldMap iso8601Show b

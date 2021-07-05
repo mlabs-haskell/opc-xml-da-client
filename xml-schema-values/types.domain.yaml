@@ -4,6 +4,11 @@ Date:
     day: Day
     timeZone: Maybe TimeZone
 
+Time:
+  product:
+    timeOfDay: TimeOfDay
+    timeZone: Maybe TimeZone
+
 Duration:
   product:
     positive: Bool
