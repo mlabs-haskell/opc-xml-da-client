@@ -207,7 +207,14 @@ valueElement elementName x =
     ArrayOfBooleanValue x -> primitiveArray "ArrayOfBoolean" "boolean" booleanContent x
     ArrayOfStringValue x -> primitiveArray "ArrayOfString" "string" stringContent x
     ArrayOfDateTimeValue x -> primitiveArray "ArrayOfDateTime" "dateTime" dateTimeContent x
-    ArrayOfAnyTypeValue _ -> error "TODO"
+    ArrayOfAnyTypeValue x ->
+      element (X.namespacedQName Ns.opc "ArrayOfAnyType") $ fmap item $ toList x
+      where
+        item = \case
+          Just x ->
+            X.elementNode $ valueElement "anyType" x
+          Nothing ->
+            X.elementNode $ X.element (opcQName "anyType") [(xsiQName "isNil", "true")] []
     NonStandardValue _ -> error "TODO"
   where
     element typeQName =
@@ -216,7 +223,7 @@ valueElement elementName x =
       element (X.namespacedQName Ns.xsd typeName) [X.contentNode content]
     primitiveArray :: Gv.Vector v a => Text -> Text -> (a -> X.Content) -> v a -> X.Element
     primitiveArray arrayTypeName itemTagName itemContentRenderer array =
-      element (X.namespacedQName Ns.opc arrayTypeName) $ fmap item $ Gv.foldr (:) [] $ array
+      element (X.namespacedQName Ns.opc arrayTypeName) $ fmap item $ Gv.toList array
       where
         item x =
           X.elementNode $ X.element (opcQName itemTagName) [] [X.contentNode (itemContentRenderer x)]
