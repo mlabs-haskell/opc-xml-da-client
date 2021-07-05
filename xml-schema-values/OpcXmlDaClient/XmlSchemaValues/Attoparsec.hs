@@ -7,6 +7,8 @@ where
 
 import qualified Attoparsec.Data as Ad
 import Data.Attoparsec.Text
+import qualified Data.Text as Text
+import qualified Data.Time.Format.ISO8601 as Iso8601
 import OpcXmlDaClient.Base.Prelude
 import OpcXmlDaClient.XmlSchemaValues.Types
 import qualified OpcXmlDaClient.XmlSchemaValues.Util.TimeMath as TimeMath
@@ -36,16 +38,6 @@ date = do
 duration :: Parser Duration
 duration = do
   _pos <- False <$ char '-' <|> pure True
-  char 'P'
-  _years <- optional $ decimal <* char 'Y'
-  _months <- optional $ decimal <* char 'M'
-  _days <- optional $ decimal <* char 'D'
-  asum
-    [ do
-        char 'T'
-        _hours <- optional $ decimal <* char 'H'
-        _minutes <- optional $ decimal <* char 'M'
-        _seconds <- optional $ scientific <* char 'S'
-        return $ Duration _pos _years _months _days _hours _minutes _seconds,
-      return $ Duration _pos _years _months _days Nothing Nothing Nothing
-    ]
+  _textRemainder <- takeText
+  _diff <- Iso8601.iso8601ParseM $ Text.unpack _textRemainder
+  return $ Duration _pos _diff

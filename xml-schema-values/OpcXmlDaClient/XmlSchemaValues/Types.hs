@@ -10,7 +10,6 @@ Domain.declare
         Domain.boundedDeriver,
         Domain.showDeriver,
         Domain.eqDeriver,
-        Domain.ordDeriver,
         Domain.genericDeriver,
         Domain.dataDeriver,
         Domain.typeableDeriver,
@@ -20,3 +19,8 @@ Domain.declare
       ]
   )
   =<< Domain.loadSchema "xml-schema-values/types.domain.yaml"
+
+deriving instance Ord Date
+
+instance Ord Duration where
+  compare = on compare (\(Duration a (CalendarDiffTime b c)) -> (a, b, c))
