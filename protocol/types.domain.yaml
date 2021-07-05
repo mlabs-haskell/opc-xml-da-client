@@ -414,5 +414,4 @@ Value:
     nonStandard:
       product:
         type: QName
-        # Maybe is used to encode nil values.
-        xml: Maybe [Xml.Node]
+        xml: "[Xml.Node]"

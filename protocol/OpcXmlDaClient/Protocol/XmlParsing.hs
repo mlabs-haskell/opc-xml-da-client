@@ -230,12 +230,8 @@ value = do
     nonStandard _type =
       return $
         fmap (#nonStandard . ValueNonStandard _type) $ do
-          _isNil <- attributesByName isNil
-          if _isNil
-            then return $ Nothing
-            else do
-              Xml.Element _ _ _children <- astElement
-              return $ Just _children
+          Xml.Element _ _ _children <- astElement
+          return _children
 
 opcQuality :: Element OpcQuality
 opcQuality =
