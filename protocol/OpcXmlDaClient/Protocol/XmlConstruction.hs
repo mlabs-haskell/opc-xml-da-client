@@ -11,6 +11,7 @@ module OpcXmlDaClient.Protocol.XmlConstruction
 where
 
 import qualified Data.Time.Format.ISO8601 as Time
+import qualified Data.Vector.Generic as Gv
 import OpcXmlDaClient.Base.Prelude hiding (Read, read)
 import qualified OpcXmlDaClient.Protocol.Namespaces as Ns
 import OpcXmlDaClient.Protocol.Types
@@ -193,12 +194,32 @@ valueElement elementName x =
     DateValue x -> primitive "date" $ dateContent x
     DurationValue x -> primitive "duration" $ durationContent x
     QNameValue x -> primitive "QName" $ qNameContent x
-    _ -> error "TODO"
+    ArrayOfByteValue x -> primitiveArray "ArrayOfByte" "byte" byteContent x
+    ArrayOfShortValue x -> primitiveArray "ArrayOfShort" "short" shortContent x
+    ArrayOfUnsignedShortValue x -> primitiveArray "ArrayOfUnsignedShort" "unsignedShort" unsignedShortContent x
+    ArrayOfIntValue x -> primitiveArray "ArrayOfInt" "int" intContent x
+    ArrayOfUnsignedIntValue x -> primitiveArray "ArrayOfUnsignedInt" "unsignedInt" unsignedIntContent x
+    ArrayOfLongValue x -> primitiveArray "ArrayOfLong" "long" longContent x
+    ArrayOfUnsignedLongValue x -> primitiveArray "ArrayOfUnsignedLong" "unsignedLong" unsignedLongContent x
+    ArrayOfFloatValue x -> primitiveArray "ArrayOfFloat" "float" floatContent x
+    ArrayOfDecimalValue x -> primitiveArray "ArrayOfDecimal" "decimal" decimalContent x
+    ArrayOfDoubleValue x -> primitiveArray "ArrayOfDouble" "double" doubleContent x
+    ArrayOfBooleanValue x -> primitiveArray "ArrayOfBoolean" "boolean" booleanContent x
+    ArrayOfStringValue x -> primitiveArray "ArrayOfString" "string" stringContent x
+    ArrayOfDateTimeValue x -> primitiveArray "ArrayOfDateTime" "dateTime" dateTimeContent x
+    ArrayOfAnyTypeValue _ -> error "TODO"
+    NonStandardValue _ -> error "TODO"
   where
     element typeQName =
       X.element (opcQName elementName) [(xsiQName "type", X.qNameContent typeQName)]
     primitive typeName content =
       element (X.namespacedQName Ns.xsd typeName) [X.contentNode content]
+    primitiveArray :: Gv.Vector v a => Text -> Text -> (a -> X.Content) -> v a -> X.Element
+    primitiveArray arrayTypeName itemTagName itemContentRenderer array =
+      element (X.namespacedQName Ns.opc arrayTypeName) $ fmap item $ Gv.foldr (:) [] $ array
+      where
+        item x =
+          X.elementNode $ X.element (opcQName itemTagName) [] [X.contentNode (itemContentRenderer x)]
 
 diagnosticInfoElement :: Text -> Text -> X.Element
 diagnosticInfoElement elementName x =
