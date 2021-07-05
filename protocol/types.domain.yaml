@@ -414,4 +414,6 @@ Value:
     nonStandard:
       product:
         type: QName
+        # Whether the value can be considered nil
+        nil: Bool
         xml: "[Xml.Node]"

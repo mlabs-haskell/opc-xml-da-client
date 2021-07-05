@@ -228,10 +228,10 @@ value = do
     arrayOfPrimitive elementName constructor contentParser =
       return $ fmap constructor $ childrenByName $ VectorUtil.many $ byName (Just Ns.opc) elementName $ children $ contentNode contentParser
     nonStandard _type =
-      return $
-        fmap (#nonStandard . ValueNonStandard _type) $ do
-          Xml.Element _ _ _children <- astElement
-          return _children
+      return $ do
+        _isNil <- attributesByName isNil
+        Xml.Element _ _ _children <- astElement
+        return $ #nonStandard $ ValueNonStandard _type _isNil _children
 
 opcQuality :: Element OpcQuality
 opcQuality =
