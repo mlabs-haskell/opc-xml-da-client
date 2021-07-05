@@ -40,7 +40,6 @@ library opc-xml-da-client-protocol
   ghc-options: -funbox-strict-fields
   exposed-modules:
     OpcXmlDaClient.Protocol.Types
-    OpcXmlDaClient.Protocol.ValueParsing
     OpcXmlDaClient.Protocol.XmlConstruction
     OpcXmlDaClient.Protocol.XmlParsing
   other-modules:
