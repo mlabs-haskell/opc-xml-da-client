@@ -13,28 +13,34 @@ import Prelude
 
 main =
   defaultMain $
-    let Right response =
+    let parsingResult =
           unsafePerformIO $
             Xp.parseFile XmlParsing.subscribeResponse "samples/680.response.xml"
      in testGroup
           "Subscribe Response"
           [ testCase "Top level properties" $ do
-              assertEqual "" (Just "Handle1") (#serverSubHandle response),
+              assertEqual
+                ""
+                (Right (Just "Handle1"))
+                (fmap #serverSubHandle parsingResult),
             testCase "DateTime" $ do
-              assertEqual "" (Just (read "2019-09-23 16:01:50.576+00:00")) (fmap #rcvTime (#subscribeResult response)),
+              assertEqual
+                ""
+                (Right (Just (read "2019-09-23 16:01:50.576+00:00")))
+                (fmap (fmap #rcvTime . #subscribeResult) parsingResult),
             testCase "Item value at offset 0" $ do
               assertEqual
                 ""
-                (Just (FloatValue 4.5))
-                ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 0) . fmap #items . #rItemList) response),
+                (Right (Just (FloatValue 4.5)))
+                (fmap (join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 0) . fmap #items . #rItemList) parsingResult),
             testCase "Item value at offset 1" $ do
               assertEqual
                 ""
-                (Just (IntValue 1234))
-                ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 1) . fmap #items . #rItemList) response),
+                (Right (Just (IntValue 1234)))
+                (fmap (join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 1) . fmap #items . #rItemList) parsingResult),
             testCase "Item value at offset 2" $ do
               assertEqual
                 ""
-                (Just (ArrayOfUnsignedShortValue [0, 0, 3, 11, 0, 0]))
-                ((join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 2) . fmap #items . #rItemList) response)
+                (Right (Just (ArrayOfUnsignedShortValue [0, 0, 3, 11, 0, 0])))
+                (fmap (join . fmap #value . fmap #itemValue . join . fmap (Vector.!? 2) . fmap #items . #rItemList) parsingResult)
           ]
