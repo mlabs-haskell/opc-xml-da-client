@@ -439,7 +439,7 @@ dateTimeContent = X.textContent . fromString . Time.iso8601Show
 timeContent :: LocalTime -> X.Content
 timeContent = error "TODO"
 
-dateContent :: Day -> X.Content
+dateContent :: Date -> X.Content
 dateContent = error "TODO"
 
 durationContent :: DiffTime -> X.Content

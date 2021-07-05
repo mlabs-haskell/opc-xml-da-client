@@ -442,7 +442,7 @@ timeContent = error "TODO"
 
 -- |
 -- A Gregorian calendar date.
-dateContent :: Content Day
+dateContent :: Content Date
 dateContent = attoparsedContent $ error "TODO"
 
 -- |

@@ -376,6 +376,11 @@ QName:
       - Text
     unnamespaced: Text
 
+Date:
+  product:
+    day: Day
+    timezone: Maybe TimeZone
+
 Value:
   sum:
     string: Text
@@ -394,7 +399,7 @@ Value:
     base64Binary: ByteString
     dateTime: UTCTime
     time: LocalTime
-    date: Day
+    date: Date
     duration: DiffTime
     qName: QName
     arrayOfByte: Uv.Vector Int8
