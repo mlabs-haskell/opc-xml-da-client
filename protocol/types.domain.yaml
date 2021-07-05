@@ -127,62 +127,6 @@ OpcError:
     text: Maybe Text
     id: QName
 
-ArrayOfFloat:
-  product:
-    float: Vector Float
-
-ArrayOfInt:
-  product:
-    int: Vector Int32
-
-ArrayOfUnsignedInt:
-  product:
-    unsignedInt: Vector Word32
-
-ArrayOfLong:
-  product:
-    long: Vector Int64
-
-ArrayOfUnsignedLong:
-  product:
-    unsignedLong: Vector Word64
-
-ArrayOfDouble:
-  product:
-    double: Vector Double
-
-ArrayOfUnsignedShort:
-  product:
-    unsignedShort: Vector Word16
-
-ArrayOfBoolean:
-  product:
-    boolean: Vector Bool
-
-ArrayOfString:
-  product:
-    string: Vector (Maybe Text)
-
-ArrayOfDateTime:
-  product:
-    dateTime: Vector UTCTime
-
-ArrayOfAnyType:
-  product:
-    anyType: Vector (Maybe Value)
-
-ArrayOfDecimal:
-  product:
-    decimal: Vector Scientific
-
-ArrayOfByte:
-  product:
-    byte: Vector Int8
-
-ArrayOfShort:
-  product:
-    short: Vector Int16
-
 Write:
   product:
     options: Maybe RequestOptions
@@ -433,12 +377,41 @@ QName:
     unnamespaced: Text
 
 Value:
-  product:
-    # Map of namespaces of the context of this element.
-    # Needed for ability to resolve QName values in the element.
-    namaspaceMap: HashMap Text Text
-    # URI of the default namespace of the context of this element.
-    # Needed for ability to resolve QName values in the element.
-    defaultNamespace: Maybe Text
-    # Serialised value element.
-    xml: Xml.Element
+  sum:
+    string: Text
+    boolean: Bool
+    float: Float
+    double: Double
+    decimal: Scientific
+    long: Int64
+    int: Int32
+    short: Int16
+    byte: Int8
+    unsignedLong: Word64
+    unsignedInt: Word32
+    unsignedShort: Word16
+    unsignedByte: Word8
+    base64Binary: ByteString
+    dateTime: UTCTime
+    time: LocalTime
+    date: Day
+    duration: DiffTime
+    qName: QName
+    arrayOfByte: Uv.Vector Int8
+    arrayOfShort: Uv.Vector Int16
+    arrayOfUnsignedShort: Uv.Vector Word16
+    arrayOfInt: Uv.Vector Int32
+    arrayOfUnsignedInt: Uv.Vector Word32
+    arrayOfLong: Uv.Vector Int64
+    arrayOfUnsignedLong: Uv.Vector Word64
+    arrayOfFloat: Uv.Vector Float
+    arrayOfDecimal: Vector Scientific
+    arrayOfDouble: Uv.Vector Double
+    arrayOfBoolean: Uv.Vector Bool
+    arrayOfString: Vector Text
+    arrayOfDateTime: Vector UTCTime
+    arrayOfAnyType: Vector (Maybe Value)
+    nonStandard:
+      product:
+        type: QName
+        xml: "[Xml.Node]"
