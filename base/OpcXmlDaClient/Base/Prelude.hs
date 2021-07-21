@@ -60,6 +60,7 @@ import Data.Semigroup as Exports hiding (First (..), Last (..))
 import Data.String as Exports
 import Data.Text as Exports (Text)
 import Data.Time as Exports (CalendarDiffTime (..), Day (..), DiffTime, LocalTime, TimeOfDay (..), TimeZone, UTCTime)
+import Data.Time.Clock.System as Exports (SystemTime (..))
 import Data.Traversable as Exports
 import Data.Tuple as Exports
 import Data.Unique as Exports
