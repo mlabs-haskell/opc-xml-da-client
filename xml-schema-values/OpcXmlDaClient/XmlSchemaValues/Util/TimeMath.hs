@@ -1,12 +1,9 @@
 module OpcXmlDaClient.XmlSchemaValues.Util.TimeMath where
 
+import Data.Time.Calendar.OrdinalDate
 import OpcXmlDaClient.Base.Prelude
 
 negateDay :: Day -> Day
-negateDay =
-  -- TODO: Test it
-  coerce update
-  where
-    ModifiedJulianDay baseOffset = read "0000-01-01"
-    update x =
-      negate (x + baseOffset) - baseOffset
+negateDay x =
+  case toOrdinalDate x of
+    (year, dayOfYear) -> fromOrdinalDate (negate year) dayOfYear
