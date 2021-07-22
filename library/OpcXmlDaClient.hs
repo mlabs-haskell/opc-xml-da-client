@@ -71,6 +71,9 @@ encDecOp :: (i -> ByteString) -> XmlParser.Element (Either SoapFault o) -> Op i 
 encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
   request
     { Hc.method = "POST",
+      Hc.requestHeaders =
+        [ ("Content-Type", "application/soap+xml; charset=utf-8")
+        ],
       Hc.requestBody = Hc.RequestBodyBS (encode input),
       Hc.responseTimeout = Hc.responseTimeoutMicro (timeout * 1000)
     }
