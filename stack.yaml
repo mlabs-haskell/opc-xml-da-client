@@ -1,4 +1,3 @@
 resolver: nightly-2021-07-20
 extra-deps:
-  - git: https://github.com/nikita-volkov/xml-parser
-    commit: !!str ca89fdd3d11669c6817c3381295e59a128a64efd
+  - xml-parser-0.1
