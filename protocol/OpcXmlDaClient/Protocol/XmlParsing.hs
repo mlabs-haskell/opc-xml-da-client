@@ -15,17 +15,44 @@ import XmlParser
 
 -- * Responses
 
--- |
--- General response SOAP envelope parser.
-inSoapEnvelope :: Maybe Text -> Text -> Element a -> Element a
-inSoapEnvelope ns name parser = do
-  elementNameIs (Just Ns.soapEnv) "Envelope"
-  childrenByName $ byName (Just Ns.soapEnv) "Body" $ childrenByName $ byName ns name $ parser
+opcResponse :: Text -> Element a -> Element (Either SoapFault a)
+opcResponse opcElementName opcElementParser = do
+  elementNameIsOneOf [(Just Ns.soapEnv2, "Envelope"), (Just Ns.soapEnv, "Envelope")]
+  childrenByName $ bySoapEnvName "Body" $ childrenByName body
+  where
+    body =
+      Left <$> soapFault <|> Right <$> opcContent
+      where
+        soapFault =
+          bySoapEnvName "Fault" $
+            childrenByName $ do
+              _code <- bySoapEnvName "Code" $
+                childrenByName $
+                  bySoapEnvName "Value" $
+                    children $
+                      contentNode $ do
+                        (ns, name) <- qNameContent
+                        unless (ns == Just Ns.soapEnv || ns == Just Ns.soapEnv2) $
+                          fail ("Not a SOAP ENV ns: " <> show ns)
+                        case name of
+                          "VersionMismatch" -> return $ #versionMismatch
+                          "MustUnderstand" -> return $ #mustUnderstand
+                          "DataEncodingUnknown" -> return $ #dataEncodingUnknown
+                          "Sender" -> return $ #sender
+                          "Receiver" -> return $ #receiver
+                          _ -> fail ("Unexpected code:" <> show name)
+              -- FIXME: We take the first reason here,
+              -- but the result really can be a map indexed by language
+              _reason <-
+                bySoapEnvName "Reason" $
+                  childrenByName $
+                    bySoapEnvName "Text" $
+                      children $ contentNode $ textContent
+              return $ SoapFault _code _reason
+        opcContent =
+          byName (Just Ns.opc) opcElementName opcElementParser
 
-opcResponse :: Text -> Element a -> Element a
-opcResponse = inSoapEnvelope (Just Ns.opc)
-
-getStatusResponse :: Element GetStatusResponse
+getStatusResponse :: Element (Either SoapFault GetStatusResponse)
 getStatusResponse =
   opcResponse "GetStatusResponse" $
     childrenByName $ do
@@ -33,7 +60,7 @@ getStatusResponse =
       _status <- optional $ byName (Just Ns.opc) "Status" $ serverStatus
       return $ GetStatusResponse _getStatusResult _status
 
-readResponse :: Element ReadResponse
+readResponse :: Element (Either SoapFault ReadResponse)
 readResponse =
   opcResponse "ReadResponse" $
     childrenByName $ do
@@ -42,7 +69,7 @@ readResponse =
       _errors <- VectorUtil.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ ReadResponse _readResult _rItemList _errors
 
-writeResponse :: Element WriteResponse
+writeResponse :: Element (Either SoapFault WriteResponse)
 writeResponse =
   opcResponse "WriteResponse" $
     childrenByName $ do
@@ -51,7 +78,7 @@ writeResponse =
       _errors <- VectorUtil.many $ byName (Just Ns.opc) "Errors" $ opcError
       return $ WriteResponse _writeResult _rItemList _errors
 
-subscribeResponse :: Element SubscribeResponse
+subscribeResponse :: Element (Either SoapFault SubscribeResponse)
 subscribeResponse =
   opcResponse "SubscribeResponse" $
     join $
@@ -64,7 +91,7 @@ subscribeResponse =
             _errors <- VectorUtil.many $ byName (Just Ns.opc) "OPCError" $ opcError
             return $ SubscribeResponse _subscribeResult _rItemList _errors _subHandle
 
-subscriptionPolledRefreshResponse :: Element SubscriptionPolledRefreshResponse
+subscriptionPolledRefreshResponse :: Element (Either SoapFault SubscriptionPolledRefreshResponse)
 subscriptionPolledRefreshResponse =
   opcResponse "SubscriptionPolledRefreshResponse" $
     join $
@@ -78,14 +105,14 @@ subscriptionPolledRefreshResponse =
             _dataBufferOverflow <- byName Nothing "DataBufferOverflow" booleanContent <|> pure False
             return $ SubscriptionPolledRefreshResponse _subscriptionPolledRefreshResult _invalidServerSubHandles _rItemList _errors _dataBufferOverflow
 
-subscriptionCancelResponse :: Element SubscriptionCancelResponse
+subscriptionCancelResponse :: Element (Either SoapFault SubscriptionCancelResponse)
 subscriptionCancelResponse =
   opcResponse "SubscriptionCancelResponse" $
     childrenByName $ do
       _clientRequestHandle <- optional $ byName (Just Ns.opc) "ClientRequestHandle" $ children $ contentNode $ textContent
       return $ SubscriptionCancelResponse _clientRequestHandle
 
-browseResponse :: Element BrowseResponse
+browseResponse :: Element (Either SoapFault BrowseResponse)
 browseResponse =
   opcResponse "BrowseResponse" $
     join $
@@ -99,7 +126,7 @@ browseResponse =
             _moreElements <- byName Nothing "MoreElements" booleanContent <|> pure False
             return $ BrowseResponse _browseResult _elements _errors _continuationPoint _moreElements
 
-getPropertiesResponse :: Element GetPropertiesResponse
+getPropertiesResponse :: Element (Either SoapFault GetPropertiesResponse)
 getPropertiesResponse =
   opcResponse "GetPropertiesResponse" $
     childrenByName $ do
@@ -489,3 +516,26 @@ arrayOfAnyType elementParser =
             else do
               _type <- xsiType
               return $ childrenByName $ fmap Just $ elementParser _type
+
+-- * Helpers
+
+-- |
+-- A workaround for the fact that OPC uses a non-standard URI for the SOAP ENV
+-- namespace.
+bySoapEnvName :: Text -> parser a -> ByName parser a
+bySoapEnvName _name _parser =
+  byName (Just Ns.soapEnv2) _name _parser
+    <|> byName (Just Ns.soapEnv) _name _parser
+
+elementNameIsOneOf :: [(Maybe Text, Text)] -> Element ()
+elementNameIsOneOf _names =
+  elementName $ \_actualNs _actualName ->
+    if elem (_actualNs, _actualName) _names
+      then Right ()
+      else
+        Left $
+          fromString $
+            "Unexpected element name: " <> show (_actualNs, _actualName) <> ". "
+              <> "Expecting one of the following: "
+              <> show _names
+              <> "."

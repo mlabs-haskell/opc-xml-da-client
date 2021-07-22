@@ -67,7 +67,7 @@ browse = encDecOp XmlConstruction.browse XmlParsing.browseResponse
 getProperties :: Op GetProperties GetPropertiesResponse
 getProperties = encDecOp XmlConstruction.getProperties XmlParsing.getPropertiesResponse
 
-encDecOp :: (i -> ByteString) -> XmlParser.Element o -> Op i o
+encDecOp :: (i -> ByteString) -> XmlParser.Element (Either SoapFault o) -> Op i o
 encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
   request
     { Hc.method = "POST",
@@ -86,7 +86,9 @@ encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
           | otherwise -> throwIO exc
         Right response ->
           return $ case XmlParser.parseLazyByteString decode (Hc.responseBody response) of
-            Right res -> Right res
+            Right res -> case res of
+              Right res -> Right res
+              Left err -> Left $ SoapError err
             Left err -> Left $ ParsingError err
 
 -- * Helper types
@@ -124,9 +126,14 @@ data Error
   = HttpError Hc.HttpExceptionContent
   | IoError IOException
   | ParsingError Text
+  | SoapError SoapFault
 
 instance Show Error where
   show = \case
     HttpError a -> showString "HTTP error: " $ show a
     IoError a -> showString "IO error: " $ show a
     ParsingError a -> showString "Parsing error: " $ Text.unpack a
+    SoapError a ->
+      "SOAP fault response with code: " <> show (#code a) <> ". "
+        <> "Reason: "
+        <> Text.unpack (#reason a)

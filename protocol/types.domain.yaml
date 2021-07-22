@@ -415,3 +415,22 @@ Value:
       product:
         type: QName
         xml: "[Xml.Node]"
+
+SoapFault:
+  product:
+    code: SoapFaultCode
+    reason: Text
+
+# https://www.w3.org/TR/soap12-part1/#faultcodes
+SoapFaultCode:
+  enum:
+    # The faulting node found an invalid element information item instead of the expected Envelope element information item. The namespace, local name or both did not match the Envelope element information item required by this recommendation (see 2.8 SOAP Versioning Model and 5.4.7 VersionMismatch Faults)
+    - versionMismatch
+    # An immediate child element information item of the SOAP Header element information item targeted at the faulting node that was not understood by the faulting node contained a SOAP mustUnderstand attribute information item with a value of "true" (see 5.2.3 SOAP mustUnderstand Attribute and 5.4.8 SOAP mustUnderstand Faults)
+    - mustUnderstand
+    # A SOAP header block or SOAP body child element information item targeted at the faulting SOAP node is scoped (see 5.1.1 SOAP encodingStyle Attribute) with a data encoding that the faulting node does not support.
+    - dataEncodingUnknown
+    # The message was incorrectly formed or did not contain the appropriate information in order to succeed. For example, the message could lack the proper authentication or payment information. It is generally an indication that the message is not to be resent without change (see also 5.4 SOAP Fault for a description of the SOAP fault detail sub-element).
+    - sender
+    # The message could not be processed for reasons attributable to the processing of the message rather than to the contents of the message itself. For example, processing could include communicating with an upstream SOAP node, which did not respond. The message could succeed if resent at a later point in time (see also 5.4 SOAP Fault for a description of the SOAP fault detail sub-element).
+    - receiver
