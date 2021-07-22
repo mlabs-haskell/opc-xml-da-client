@@ -124,3 +124,9 @@ data Error
   = HttpError Hc.HttpExceptionContent
   | IoError IOException
   | ParsingError Text
+
+instance Show Error where
+  show = \case
+    HttpError a -> showString "HTTP error: " $ show a
+    IoError a -> showString "IO error: " $ show a
+    ParsingError a -> showString "Parsing error: " $ show a
