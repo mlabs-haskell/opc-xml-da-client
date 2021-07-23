@@ -6,7 +6,7 @@ import qualified OpcXmlDaClient.Base.HashMap as HashMap
 import OpcXmlDaClient.Base.Prelude
 
 -- |
--- Comonad automating incremental indexed value generation.
+-- Abstraction over incremental indexed value generation.
 --
 -- Useful for such things as generating aliases.
 data Identified k v r
