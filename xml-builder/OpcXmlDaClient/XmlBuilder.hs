@@ -39,16 +39,9 @@ elementXml :: Element -> ByteString
 elementXml (Element namespacedElement) =
   case runNamespaced namespacedElement of
     (element, namespaces) ->
-      let newElement =
-            element
-              { Xml.elementAttributes =
-                  foldl'
-                    (\map (uri, prefix) -> Map.insert (Xml.Name prefix Nothing (Just "xmlns")) uri map)
-                    (Xml.elementAttributes element)
-                    namespaces
-              }
-          document = Xml.Document (Xml.Prologue [] Nothing []) newElement []
-       in Lbs.toStrict (Xml.renderLBS def document)
+      let document = Xml.Document (Xml.Prologue [] Nothing []) element []
+          renderingSettings = def {Xml.rsNamespaces = fmap swap namespaces}
+       in Lbs.toStrict (Xml.renderLBS renderingSettings document)
 
 -- *
 
