@@ -3,6 +3,7 @@ module OpcXmlDaClient.Protocol.XmlParsing where
 import qualified Attoparsec.Data as AttoparsecData
 import qualified Data.Attoparsec.Text as Atto
 import qualified Data.ByteString.Base64 as Base64
+import qualified Data.Text as Text
 import qualified Data.Text.Encoding as TextEncoding
 import OpcXmlDaClient.Base.Prelude hiding (Read)
 import qualified OpcXmlDaClient.Base.Vector as VectorUtil
@@ -23,32 +24,48 @@ opcResponse opcElementName opcElementParser = do
     body =
       Left <$> soapFault <|> Right <$> opcContent
       where
-        soapFault =
-          bySoapEnvName "Fault" $
-            childrenByName $ do
+        soapFault = bySoapEnvName "Fault" $ childrenByName $ soapV1P2 <|> soapV1P1
+          where
+            soapV1P2 = do
               _code <- bySoapEnvName "Code" $
                 childrenByName $
                   bySoapEnvName "Value" $
                     children $
-                      contentNode $ do
-                        (ns, name) <- qNameContent
-                        unless (ns == Just Ns.soapEnv || ns == Just Ns.soapEnv2) $
-                          fail ("Not a SOAP ENV ns: " <> show ns)
-                        case name of
-                          "VersionMismatch" -> return $ #versionMismatch
-                          "MustUnderstand" -> return $ #mustUnderstand
-                          "DataEncodingUnknown" -> return $ #dataEncodingUnknown
-                          "Sender" -> return $ #sender
-                          "Receiver" -> return $ #receiver
-                          _ -> fail ("Unexpected code:" <> show name)
+                      contentNode $
+                        do
+                          (ns, name) <- qNameContent
+                          unless (ns == Just Ns.soapEnv || ns == Just Ns.soapEnv2) $
+                            fail ("Not a SOAP ENV ns: " <> show ns)
+                          case name of
+                            "VersionMismatch" -> return $ #versionMismatch
+                            "MustUnderstand" -> return $ #mustUnderstand
+                            "DataEncodingUnknown" -> return $ #dataEncodingUnknown
+                            "Sender" -> return $ #sender
+                            "Receiver" -> return $ #receiver
+                            _ -> fail ("Unexpected code: " <> show name)
               -- FIXME: We take the first reason here,
               -- but the result really can be a map indexed by language
-              _reason <-
-                bySoapEnvName "Reason" $
-                  childrenByName $
-                    bySoapEnvName "Text" $
-                      children $ contentNode $ textContent
+              _reason <- orEmpty $ bySoapEnvName "Reason" $ childrenByName $ orEmpty $ bySoapEnvName "Text" $ children $ contentNode $ textContent
               return $ SoapFault _code _reason
+            soapV1P1 = do
+              _code <- byName Nothing "faultcode" $
+                children $
+                  contentNode $
+                    do
+                      (ns, name) <- qNameContent
+                      unless (ns == Just Ns.soapEnv || ns == Just Ns.soapEnv2) $
+                        fail ("Not a SOAP ENV ns: " <> show ns)
+                      case name of
+                        "VersionMismatch" -> return $ #versionMismatch
+                        "MustUnderstand" -> return $ #mustUnderstand
+                        "Client" -> return $ #sender
+                        "Server" -> return $ #receiver
+                        _ -> fail ("Unexpected code: " <> show name)
+              -- FIXME: We take the first reason here,
+              -- but the result really can be a map indexed by language
+              _reason <- orEmpty $ byName Nothing "faultstring" $ children $ contentNode $ fmap Text.strip $ textContent
+              return $ SoapFault _code _reason
+            orEmpty _p = _p <|> pure mempty
         opcContent =
           byName (Just Ns.opc) opcElementName opcElementParser
 

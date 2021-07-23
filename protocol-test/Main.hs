@@ -53,5 +53,15 @@ main =
                     ""
                     (Right (Left (SoapFault SenderSoapFaultCode "Server was unable to read request. ---> There is an error in XML document (4, 32). ---> The string 'dateTime' is not a valid AllXsd value.")))
                     parsingResult
+              ],
+        testGroup "Fault on old SOAP Response" $
+          let parsingResult =
+                unsafePerformIO $
+                  Xp.parseFile XmlParsing.subscribeResponse "samples/fault-on-old-soap.response.xml"
+           in [ testCase "" $ do
+                  assertEqual
+                    ""
+                    (Right (Left (SoapFault SenderSoapFaultCode "XML syntax error")))
+                    parsingResult
               ]
       ]
