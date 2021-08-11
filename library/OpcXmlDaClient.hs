@@ -33,6 +33,7 @@ import qualified OpcXmlDaClient.Protocol.XmlConstruction as XmlConstruction
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
 import OpcXmlDaClient.XmlSchemaValues.Types
 import qualified XmlParser
+import qualified Data.ByteString.Char8 as BS
 
 -- * Operations
 
@@ -68,13 +69,15 @@ getProperties :: Op GetProperties GetPropertiesResponse
 getProperties = encDecOp XmlConstruction.getProperties XmlParsing.getPropertiesResponse
 
 encDecOp :: (i -> ByteString) -> XmlParser.Element (Either SoapFault o) -> Op i o
-encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
+encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input = do
+  let encodedInput = encode input
+  --BS.putStrLn encodedInput
   request
     { Hc.method = "POST",
       Hc.requestHeaders =
         [ ("Content-Type", "application/soap+xml; charset=utf-8")
         ],
-      Hc.requestBody = Hc.RequestBodyBS (encode input),
+      Hc.requestBody = Hc.RequestBodyBS encodedInput,
       Hc.responseTimeout = Hc.responseTimeoutMicro (timeout * 1000)
     }
     & \request -> do
