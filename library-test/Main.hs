@@ -102,5 +102,26 @@ main = do
           , testCase "Subscribe" $ do
               _res <- op Opc.subscribe $ Opc.Subscribe
                 { Opc._options = Just defRequestOptions 
+                , Opc._returnValuesOnReply = False
+                , Opc._itemList = Just $ Opc.SubscribeRequestItemList
+                  { Opc._itemPath =  Nothing
+                  , Opc._reqType = Nothing
+                  , Opc._deadband = Nothing
+                  , Opc._requestedSamplingRate = Nothing
+                  , Opc._enableBuffering = Nothing
+                  , Opc._items = V.fromList
+                      [ Opc.SubscribeRequestItem
+                          { Opc._itemPath = Nothing
+                          , Opc._reqType = Nothing
+                          , Opc._itemName = Nothing
+                          , Opc._clientItemHandle = Nothing
+                          , Opc._deadband = Nothing
+                          , Opc._requestedSamplingRate = Nothing
+                          , Opc._enableBuffering = Nothing
+                          }
+                      ]
+                  }
+                , Opc._subscriptionPingRate = Nothing
                 }
+              assertBool (show _res) $ isRight _res
           ]
