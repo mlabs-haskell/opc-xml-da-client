@@ -1,6 +1,7 @@
 module OpcXmlDaClient.XmlSchemaValues.Types where
 
 import qualified Domain
+import qualified DomainOptics
 import OpcXmlDaClient.Base.Prelude
 
 Domain.declare
@@ -15,7 +16,8 @@ Domain.declare
         Domain.typeableDeriver,
         Domain.hasFieldDeriver,
         Domain.constructorIsLabelDeriver,
-        Domain.accessorIsLabelDeriver
+        Domain.accessorIsLabelDeriver,
+        DomainOptics.labelOpticDeriver
       ]
   )
   =<< Domain.loadSchema "xml-schema-values/types.domain.yaml"

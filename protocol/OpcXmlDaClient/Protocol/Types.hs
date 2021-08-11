@@ -3,6 +3,7 @@ module OpcXmlDaClient.Protocol.Types where
 import Data.Time.Clock
 import qualified Data.Vector.Unboxed as Uv
 import qualified Domain
+import qualified DomainOptics
 import OpcXmlDaClient.Base.Prelude hiding (Read)
 import OpcXmlDaClient.XmlSchemaValues.Types
 import qualified Text.XML as Xml
@@ -20,7 +21,8 @@ Domain.declare
         Domain.typeableDeriver,
         Domain.hasFieldDeriver,
         Domain.constructorIsLabelDeriver,
-        Domain.accessorIsLabelDeriver
+        Domain.accessorIsLabelDeriver,
+        DomainOptics.labelOpticDeriver
       ]
   )
   =<< Domain.loadSchema "protocol/types.domain.yaml"
