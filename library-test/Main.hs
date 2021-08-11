@@ -64,6 +64,9 @@ defRequestOptions = Opc.RequestOptions
   Nothing
   Nothing
 
+serverSubHandleRef :: IORef Text
+serverSubHandleRef = unsafePerformIO $ newIORef ""
+{-# NOINLINE serverSubHandleRef #-}
 
 main = do
   let manager = unsafePerformIO $ Hc.newManager Hc.defaultManagerSettings
@@ -113,7 +116,7 @@ main = do
                       [ Opc.SubscribeRequestItem
                           { Opc._itemPath = Nothing
                           , Opc._reqType = Nothing
-                          , Opc._itemName = Nothing
+                          , Opc._itemName = listToMaybe $ V.toList itemNames
                           , Opc._clientItemHandle = Nothing
                           , Opc._deadband = Nothing
                           , Opc._requestedSamplingRate = Nothing
@@ -122,6 +125,43 @@ main = do
                       ]
                   }
                 , Opc._subscriptionPingRate = Nothing
+                }
+              case _res of
+                Left err -> assertBool (show err) False
+                Right Opc.SubscribeResponse{..} -> case _serverSubHandle of
+                  Nothing -> error "SubHandle not found"
+                  Just sh -> writeIORef serverSubHandleRef sh
+                
+          , testCase "Subscription polled refresh" $ do
+              sh <- readIORef serverSubHandleRef
+              _res <- op Opc.subscriptionPolledRefresh $ Opc.SubscriptionPolledRefresh
+                { Opc._options = Just defRequestOptions 
+                , Opc._serverSubHandles = V.fromList [sh]
+                , Opc._holdTime = Nothing
+                , Opc._waitTime = 1
+                , Opc._returnAllItems = False
+                }
+              assertBool (show _res) $ isRight _res
+          , testCase "Subscription cancel" $ do
+              sh <- readIORef serverSubHandleRef
+              _res <- op Opc.subscriptionCancel $ Opc.SubscriptionCancel
+                { Opc._serverSubHandle = Just sh
+                , Opc._clientRequestHandle = Nothing
+                }
+              assertBool (show _res) $ isRight _res
+          , testCase "Get properties" $ do
+              _res <- op Opc.getProperties $ Opc.GetProperties
+                { Opc._itemIds = itemNames <&> \n -> Opc.ItemIdentifier
+                      { Opc._itemPath = Nothing
+                      , Opc._itemName = Just n
+                      }
+                , Opc._propertyNames = V.empty
+                , Opc._localeId = Nothing
+                , Opc._clientRequestHandle = Nothing
+                , Opc._itemPath = Nothing
+                , Opc._returnAllProperties = False
+                , Opc._returnPropertyValues = False
+                , Opc._returnErrorText = False
                 }
               assertBool (show _res) $ isRight _res
           ]

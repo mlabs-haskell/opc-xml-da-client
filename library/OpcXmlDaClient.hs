@@ -34,6 +34,7 @@ import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
 import OpcXmlDaClient.XmlSchemaValues.Types
 import qualified XmlParser
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy as BL
 
 -- * Operations
 
@@ -71,7 +72,7 @@ getProperties = encDecOp XmlConstruction.getProperties XmlParsing.getPropertiesR
 encDecOp :: (i -> ByteString) -> XmlParser.Element (Either SoapFault o) -> Op i o
 encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input = do
   let encodedInput = encode input
-  --BS.putStrLn encodedInput
+  -- BS.putStrLn encodedInput
   request
     { Hc.method = "POST",
       Hc.requestHeaders =
@@ -90,7 +91,8 @@ encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input = do
           | Just exc <- fromException @IOException exc ->
             return $ Left $ IoError exc
           | otherwise -> throwIO exc
-        Right response ->
+        Right response -> do
+          -- BS.putStrLn $ BL.toStrict (Hc.responseBody response)
           return $ case XmlParser.parseLazyByteString decode (Hc.responseBody response) of
             Right res -> case res of
               Right res -> Right res
