@@ -99,6 +99,8 @@ test-suite protocol-test
     tasty-quickcheck >=0.9 && <0.11,
     xml-conduit,
     xml-parser,
+    pcap,
+    pcap-conduit,
 
 library opc-xml-da-client-xml-builder
   hs-source-dirs: xml-builder

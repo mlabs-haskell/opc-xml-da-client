@@ -10,8 +10,62 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import qualified XmlParser as Xp
 import Prelude
+import Network.Pcap
+import qualified Data.ByteString.Char8 as B8
+import qualified Data.ByteString as B
+import Data.ByteString.Internal (c2w)
 
-main =
+regroup :: [ByteString] -> [ByteString]
+regroup str = 
+  let (x, y) = foldr
+        (\s (k,ks) -> if B.length s <= 2
+                         then ("", ks <> [k | k /= ""])
+                         else (k <> s, ks)
+        )
+        ("", []) 
+        str
+  in x:y
+
+separate :: [ByteString] -> ([ByteString], [ByteString])
+separate ss = go ss 1 ([], []) where
+  go :: [ByteString] -> Int -> ([ByteString], [ByteString]) -> ([ByteString], [ByteString])
+  go []     _ a     = a
+  go (x:xs) c (a,b) = go xs (c + 1)  if
+      | (c + 2) `mod` 4 == 0 -> (x:a ,  b  )
+      | c       `mod` 4 == 0 -> (a   ,  x:b)
+      | otherwise            -> (a   ,  b  )
+
+
+
+readPcap :: IO ()
+readPcap = do
+  h <- openOffline "/home/freak/Downloads/opcOperations.s0i0.pcap" 
+  (resps, reqs) <- separate . regroup . B.split (c2w '\n') <$> run h ""
+  putStrLn "==="
+  putStrLn "Responses"
+  sequence_ $ fmap B8.putStrLn resps
+  putStrLn "==="
+  putStrLn "Requests"
+  sequence_ $ fmap B8.putStrLn reqs
+  putStrLn "==="
+    where 
+      getLength ph = let l = hdrCaptureLength ph
+                      in if l > 100
+                            then 54
+                            else fromIntegral l
+      run h f = do
+        (ph, bs) <- nextBS h
+        if ph == PktHdr 0 0 0 0
+        then pure f
+        else do
+          let dropped = B.drop (getLength ph) bs
+              dropped' = if B8.take 4 dropped `elem` (["HTTP", "POST"] :: [ByteString])
+                            then "\n\n" <> dropped
+                            else dropped
+          run h (f <> dropped')
+
+main = do
+  readPcap
   defaultMain $
     testGroup "" $
       [ testGroup "Subscribe Response" $
