@@ -218,8 +218,11 @@ valueElement elementName x =
             X.elementNode $ valueElement "anyType" x
           Nothing ->
             X.elementNode $ X.element (opcQName "anyType") [(xsiQName "isNil", "true")] []
-    OpcQualityValue _ ->
-      error "TODO"
+    OpcQualityValue x ->
+      X.element
+        (opcQName elementName)
+        ((xsiQName "type", X.qNameContent "OPCQuality") : opcQualityAttributes x)
+        []
     NonStandardValue (ValueNonStandard a b) -> element (qNameQName a) (fmap X.astNode b)
   where
     element typeQName =
@@ -239,13 +242,7 @@ diagnosticInfoElement elementName x =
 
 opcQualityElement :: Text -> OpcQuality -> X.Element
 opcQualityElement elementName x =
-  X.element
-    (opcQName elementName)
-    [ ("QualityField", qualityBitsContent (#qualityField x)),
-      ("LimitField", limitBitsContent (#limitField x)),
-      ("VendorField", shownContent (#vendorField x))
-    ]
-    []
+  X.element (opcQName elementName) (opcQualityAttributes x) []
 
 writeRequestItemListElement :: Text -> WriteRequestItemList -> X.Element
 writeRequestItemListElement elementName x =
@@ -390,6 +387,15 @@ itemIdentifierElement elementName x =
         ]
     )
     []
+
+-- * Attributes
+
+opcQualityAttributes :: OpcQuality -> [(X.QName, X.Content)]
+opcQualityAttributes x =
+  [ ("QualityField", qualityBitsContent (#qualityField x)),
+    ("LimitField", limitBitsContent (#limitField x)),
+    ("VendorField", shownContent (#vendorField x))
+  ]
 
 -- * Content
 
