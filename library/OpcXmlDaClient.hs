@@ -136,6 +136,13 @@ data Error
   | ParsingError Text
   | SoapError SoapFault
 
+instance Eq Error where
+  (HttpError _) == (HttpError _) = False -- NOTE: HttpEcxceptionContent has not EQ instance
+  (IoError a) == (IoError b) = a == b 
+  (ParsingError a) == (ParsingError b) = a == b 
+  (SoapError a) == (SoapError b) = a == b 
+
+
 instance Show Error where
   show = \case
     HttpError a -> showString "HTTP error: " $ show a
