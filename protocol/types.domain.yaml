@@ -411,6 +411,7 @@ Value:
     arrayOfString: Vector Text
     arrayOfDateTime: Vector UTCTime
     arrayOfAnyType: Vector (Maybe Value)
+    opcQuality: OpcQuality
     nonStandard:
       product:
         type: QName

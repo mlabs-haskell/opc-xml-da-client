@@ -218,6 +218,8 @@ valueElement elementName x =
             X.elementNode $ valueElement "anyType" x
           Nothing ->
             X.elementNode $ X.element (opcQName "anyType") [(xsiQName "isNil", "true")] []
+    OpcQualityValue _ ->
+      error "TODO"
     NonStandardValue (ValueNonStandard a b) -> element (qNameQName a) (fmap X.astNode b)
   where
     element typeQName =
