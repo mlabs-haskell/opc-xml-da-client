@@ -265,6 +265,7 @@ value = do
                                 if _isNil
                                   then return Nothing
                                   else fmap Just $ value
+                    "OPCQuality" -> return $ fmap #opcQuality $ opcQuality
                     _ -> fail $ "Unexpected OPC type: " <> show _typeName
                   else nonStandard (NamespacedQName _typeNs _typeName)
           Nothing -> nonStandard (UnnamespacedQName _typeName)
