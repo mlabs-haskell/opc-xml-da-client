@@ -74,8 +74,14 @@ separate = foldr f ([], [])
 
 readPcap :: IO TestTree
 readPcap = do
-  h <- openOffline "/home/freak/Downloads/opcOperations.s0i0.pcap"
-  (resps, _reqs) <- separate . regroup . B.split (c2w '\n') <$> run h ""
+  h <- openOffline "/home/freak/Downloads/wireshark-OPCXMLDA-missed-status-change.s0i0.pcap"
+  regrouped <-  regroup . B.split (c2w '\n') <$> run h ""
+  putStrLn ""
+  mapM_ B8.putStrLn regrouped
+  putStrLn ""
+  let (resps, _reqs) = separate regrouped
+  putStrLn $ show $ length resps
+  mapM_ B8.putStrLn resps
   pure $
     testGroup "PCAP tests" $
       (zip [1 ..] resps) <&> \(n, resp) ->
@@ -97,6 +103,8 @@ readPcap = do
                 if B8.take 4 dropped `elem` (["HTTP", "POST"] :: [ByteString])
                   then "\n\n" <> dropped
                   else dropped
+          -- putStrLn (hdrCaptureLength ph)
+
           run h (f <> dropped')
 
 main = do
