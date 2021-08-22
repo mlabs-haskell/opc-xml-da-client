@@ -2,9 +2,12 @@
 
 module Main where
 
+import Data.Binary.Bits.Get (block, runBitGet, word8)
+import Data.Binary.Get (runGet)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as B8
 import Data.ByteString.Internal (c2w)
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.Vector as Vector
 import qualified Network.HTTP.Client as Hc
 import Network.Pcap
@@ -48,6 +51,24 @@ checkError decode str = case Xp.parseByteString decode str of
 tryToParse :: ByteString -> Maybe [Error]
 tryToParse str = sequence $ responseParsers <&> \(XmlResponseParser (parser, check)) -> check parser str
 
+unwrapEther :: ByteString -> ByteString
+unwrapEther = B.reverse . B.dropWhile isPaddingByte . B.reverse . B.drop etherHeaderLength
+  where
+    etherHeaderLength = 14
+    isPaddingByte = (== 0)
+
+unwrapIP :: ByteString -> ByteString
+unwrapIP b =
+  let (_, headerLength32) =
+        flip runGet (BL.fromStrict b) $
+          runBitGet $ block $ (,) <$> word8 4 <*> word8 4
+   in B.drop ((fromIntegral headerLength32) * 4) b
+
+unwrapTCP :: ByteString -> ByteString
+unwrapTCP b =
+  let headerLength32 = flip runGet (BL.drop 12 $ BL.fromStrict b) $ runBitGet $ block $ word8 4
+   in B.drop ((fromIntegral headerLength32) * 4) b
+
 regroup :: [ByteString] -> [ByteString]
 regroup str =
   let (x, y) =
@@ -66,49 +87,45 @@ separate = foldr f ([], [])
   where
     f = \x (a, b) ->
       if
-          | B8.take (B8.length prefResp) x == prefResp -> ((B8.drop (B8.length prefResp) x) : a, b)
-          | B8.take (B8.length prefReq) x == prefReq -> (a, x : b)
+          | x `startWith` prefResp -> ((B8.drop (B8.length prefResp) x) : a, b)
+          | x `startWith` prefReq -> (a, x : b)
           | otherwise -> (a, b)
-    prefResp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" -- prefix for responses
-    prefReq = "<SOAP-ENV:Envelope" -- prefix for requests
+    prefResp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    prefReq = "<SOAP-ENV:Envelope"
+    startWith a pref = B8.take (B8.length pref) a == pref
 
-readPcap :: IO TestTree
-readPcap = do
-  h <- openOffline "/home/freak/Downloads/wireshark-OPCXMLDA-missed-status-change.s0i0.pcap"
-  regrouped <-  regroup . B.split (c2w '\n') <$> run h ""
-  putStrLn ""
-  mapM_ B8.putStrLn regrouped
-  putStrLn ""
-  let (resps, _reqs) = separate regrouped
-  putStrLn $ show $ length resps
-  mapM_ B8.putStrLn resps
-  pure $
-    testGroup "PCAP tests" $
-      (zip [1 ..] resps) <&> \(n, resp) ->
-        testCase ("Response #" <> show n) $
-          assertEqual "Parse corrent" Nothing $ tryToParse resp
+readPcap :: FilePath -> IO TestTree
+readPcap fp = do
+  case fp of
+    "" -> pure $ testCase "No .pcap file" $ assertBool "" True
+    path -> do
+      h <- openOffline path
+      regrouped <- regroup . B.split (c2w '\n') <$> run h ""
+      let (resps, _reqs) = separate regrouped
+      pure $
+        testGroup "PCAP tests" $
+          (zip [1 ..] resps) <&> \(n, resp) ->
+            testCase ("Response #" <> show n) $
+              assertEqual "Parse corrent" Nothing $ tryToParse resp
   where
-    getLength ph =
-      let l = hdrCaptureLength ph
-       in if l > 100
-            then 54
-            else fromIntegral l
+    endHeader = PktHdr 0 0 0 0
     run h f = do
       (ph, bs) <- nextBS h
-      if ph == PktHdr 0 0 0 0
+      if ph == endHeader
         then pure f
-        else do
-          let dropped = B.drop (getLength ph) bs
-              dropped' =
-                if B8.take 4 dropped `elem` (["HTTP", "POST"] :: [ByteString])
-                  then "\n\n" <> dropped
-                  else dropped
-          -- putStrLn (hdrCaptureLength ph)
-
-          run h (f <> dropped')
+        else
+          if hdrCaptureLength ph < 100 -- ACK/SYN/etc
+            then run h f
+            else do
+              let payload =
+                    bs & unwrapEther & unwrapIP & unwrapTCP & \x ->
+                      if B8.take 4 x `elem` (["HTTP", "POST"] :: [ByteString])
+                        then "\n\n" <> x
+                        else x
+              run h (f <> payload)
 
 main = do
-  pcapTests <- readPcap
+  pcapTests <- getEnv "PCAP_TEST_FILE_PATH" >>= readPcap
   defaultMain $
     testGroup "" $
       [ pcapTests,

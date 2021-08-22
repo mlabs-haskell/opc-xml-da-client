@@ -103,6 +103,8 @@ test-suite protocol-test
     pcap,
     pcap-conduit,
     http-client,
+    binary,
+    caerbannog,
 
 library opc-xml-da-client-xml-builder
   hs-source-dirs: xml-builder
