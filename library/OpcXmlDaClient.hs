@@ -68,13 +68,14 @@ getProperties :: Op GetProperties GetPropertiesResponse
 getProperties = encDecOp XmlConstruction.getProperties XmlParsing.getPropertiesResponse
 
 encDecOp :: (i -> ByteString) -> XmlParser.Element (Either SoapFault o) -> Op i o
-encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
+encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input = do
+  let encodedInput = encode input
   request
     { Hc.method = "POST",
       Hc.requestHeaders =
         [ ("Content-Type", "application/soap+xml; charset=utf-8")
         ],
-      Hc.requestBody = Hc.RequestBodyBS (encode input),
+      Hc.requestBody = Hc.RequestBodyBS encodedInput,
       Hc.responseTimeout = Hc.responseTimeoutMicro (timeout * 1000)
     }
     & \request -> do
@@ -87,7 +88,7 @@ encDecOp encode decode manager (RequestTimeout timeout) (Uri request) input =
           | Just exc <- fromException @IOException exc ->
             return $ Left $ IoError exc
           | otherwise -> throwIO exc
-        Right response ->
+        Right response -> do
           return $ case XmlParser.parseLazyByteString decode (Hc.responseBody response) of
             Right res -> case res of
               Right res -> Right res
@@ -130,6 +131,13 @@ data Error
   | IoError IOException
   | ParsingError Text
   | SoapError SoapFault
+
+instance Eq Error where
+  (HttpError _) == (HttpError _) = False -- NOTE: HttpEcxceptionContent has not EQ instance
+  (IoError a) == (IoError b) = a == b
+  (ParsingError a) == (ParsingError b) = a == b
+  (SoapError a) == (SoapError b) = a == b
+  (==) _ _ = False
 
 instance Show Error where
   show = \case

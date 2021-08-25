@@ -5,16 +5,20 @@ module Main where
 import qualified Data.Vector as Vector
 import OpcXmlDaClient.Protocol.Types
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
+import qualified Pcap
 import Test.QuickCheck.Instances ()
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified XmlParser as Xp
 import Prelude
 
-main =
+main :: IO ()
+main = do
+  pcapTests <- Pcap.makePcapTests
   defaultMain $
     testGroup "" $
-      [ testGroup "Subscribe Response" $
+      [ pcapTests,
+        testGroup "Subscribe Response" $
           let parsingResult =
                 unsafePerformIO $
                   Xp.parseFile XmlParsing.subscribeResponse "samples/680.response.xml"

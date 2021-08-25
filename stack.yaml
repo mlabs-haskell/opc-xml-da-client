@@ -1,1 +1,5 @@
 resolver: nightly-2021-08-08
+extra-deps:
+  - pcap-0.4.5.2@sha256:9f9f64abf126b9bbbe2698dd2ec31d25b445d70aab6c845aadd75ae79b6cc0b3,1313
+  - pcap-conduit-0.1@sha256:452794ebe9019c19ac26af627869f2d8c54f06c6165a20a6cf7759100ebd30c7,1426
+  - caerbannog-0.6.0.5@sha256:43c9ee81468da3eb0e0a42f16d657c7e8529f3ad637d0ac1dc682b72b09d276c,1751
