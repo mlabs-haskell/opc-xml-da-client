@@ -422,8 +422,13 @@ SoapFault:
     code: SoapFaultCode
     reason: Text
 
-# https://www.w3.org/TR/soap12-part1/#faultcodes
 SoapFaultCode:
+  sum:
+    std: StdSoapFaultCode
+    custom: QName
+
+# https://www.w3.org/TR/soap12-part1/#faultcodes
+StdSoapFaultCode:
   enum:
     # The faulting node found an invalid element information item instead of the expected Envelope element information item. The namespace, local name or both did not match the Envelope element information item required by this recommendation (see 2.8 SOAP Versioning Model and 5.4.7 VersionMismatch Faults)
     - versionMismatch

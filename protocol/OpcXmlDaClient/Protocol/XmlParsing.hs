@@ -33,16 +33,19 @@ opcResponse opcElementName opcElementParser = do
                     children $
                       contentNode $
                         do
-                          (ns, name) <- qNameContent
-                          unless (ns == Just Ns.soapEnv || ns == Just Ns.soapEnv2) $
-                            fail ("Not a SOAP ENV ns: " <> show ns)
-                          case name of
-                            "VersionMismatch" -> return $ #versionMismatch
-                            "MustUnderstand" -> return $ #mustUnderstand
-                            "DataEncodingUnknown" -> return $ #dataEncodingUnknown
-                            "Sender" -> return $ #sender
-                            "Receiver" -> return $ #receiver
-                            _ -> fail ("Unexpected code: " <> show name)
+                          qName <- adaptedQNameContent
+                          case qName of
+                            NamespacedQName ns name ->
+                              if ns == Ns.soapEnv
+                                then fmap StdSoapFaultCode $ case name of
+                                  "VersionMismatch" -> return $ #versionMismatch
+                                  "MustUnderstand" -> return $ #mustUnderstand
+                                  "DataEncodingUnknown" -> return $ #dataEncodingUnknown
+                                  "Sender" -> return $ #sender
+                                  "Receiver" -> return $ #receiver
+                                  _ -> fail ("Unexpected code: " <> show name)
+                                else return $ #custom $ NamespacedQName ns name
+                            _ -> return $ #custom $ qName
               -- FIXME: We take the first reason here,
               -- but the result really can be a map indexed by language
               _reason <- orEmpty $ bySoapEnvName "Reason" $ childrenByName $ orEmpty $ bySoapEnvName "Text" $ children $ contentNode $ textContent
@@ -52,15 +55,18 @@ opcResponse opcElementName opcElementParser = do
                 children $
                   contentNode $
                     do
-                      (ns, name) <- qNameContent
-                      unless (ns == Just Ns.soapEnv || ns == Just Ns.soapEnv2) $
-                        fail ("Not a SOAP ENV ns: " <> show ns)
-                      case name of
-                        "VersionMismatch" -> return $ #versionMismatch
-                        "MustUnderstand" -> return $ #mustUnderstand
-                        "Client" -> return $ #sender
-                        "Server" -> return $ #receiver
-                        _ -> fail ("Unexpected code: " <> show name)
+                      qName <- adaptedQNameContent
+                      case qName of
+                        NamespacedQName ns name ->
+                          if ns == Ns.soapEnv2
+                            then fmap StdSoapFaultCode $ case name of
+                              "VersionMismatch" -> return $ #versionMismatch
+                              "MustUnderstand" -> return $ #mustUnderstand
+                              "Client" -> return $ #sender
+                              "Server" -> return $ #receiver
+                              _ -> fail ("Unexpected code: " <> show name)
+                            else return $ #custom $ NamespacedQName ns name
+                        _ -> return $ #custom $ qName
               -- FIXME: We take the first reason here,
               -- but the result really can be a map indexed by language
               _reason <- orEmpty $ byName Nothing "faultstring" $ children $ contentNode $ fmap Text.strip $ textContent
