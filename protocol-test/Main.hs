@@ -67,5 +67,15 @@ main = do
                     ""
                     (Right (Left (SoapFault (#std SenderStdSoapFaultCode) "XML syntax error")))
                     parsingResult
+              ],
+        testGroup "Fault on old SOAP Response 2" $
+          let parsingResult =
+                unsafePerformIO $
+                  Xp.parseFile XmlParsing.subscribeResponse "samples/fault-on-old-soap-2.response.xml"
+           in [ testCase "" $ do
+                  assertEqual
+                    ""
+                    (Right (Left (SoapFault (#custom (UnnamespacedQName "E_NOSUBSCRIPTION")) "E_NOSUBSCRIPTION")))
+                    parsingResult
               ]
       ]
