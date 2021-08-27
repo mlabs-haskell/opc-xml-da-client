@@ -2,6 +2,9 @@ cabal-version: 3.0
 name: opc-xml-da-client
 version: 0.1
 synopsis: OPC XML-DA Client
+copyright: 2021, Urban Mobility Labs Ltd.
+license: MIT
+license-file: LICENSE
 build-type: Simple
 extra-source-files:
   protocol/*.domain.yaml
