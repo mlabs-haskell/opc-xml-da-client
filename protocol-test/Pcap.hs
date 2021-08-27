@@ -59,7 +59,7 @@ tryToParse str = ((str,) <$>) $ sequence $ responseParsers <&> \(XmlResponsePars
     checkError decode s =
       Xp.parseByteString decode s & either
         do Just . ParsingError
-        do either (Just . SoapError) (const Nothing)
+        do const Nothing
 
 -- |
 -- This function concatinates strings which don't have empty strings between them
