@@ -82,6 +82,17 @@ inSoapEnvelope element =
 
 -- * Elements
 
+-- Some OPC Servers don't like XML elements of the form
+-- <foo attr="bar"/>
+-- but prefer the the form
+-- <foo attr="bar"></foo>
+-- When passing an empty Node list to X.element, 
+-- the former is generated. 
+-- An empty Node coaxes xml-conduit to use the latter form. 
+noContent :: [X.Node]
+noContent = [((X.contentNode . X.textContent) "")]
+
+
 subscribeElement :: Text -> Subscribe -> X.Element
 subscribeElement elementName x =
   X.element
@@ -102,7 +113,7 @@ requestOptionsElement elementName x =
   X.element
     (opcQName elementName)
     ( catMaybes
-        [ if #returnErrorText x then Nothing else Just ("ReturnErrorText", "true"),
+        [ if #returnErrorText x then Just ("ReturnErrorText", "true") else Nothing,
           if #returnDiagnosticInfo x then Just ("ReturnDiagnosticInfo", "true") else Nothing,
           if #returnItemTime x then Just ("ReturnItemTime", "true") else Nothing,
           if #returnItemPath x then Just ("ReturnItemPath", "true") else Nothing,
@@ -112,7 +123,7 @@ requestOptionsElement elementName x =
           fmap (("LocaleID",) . X.textContent) (#localeId x)
         ]
     )
-    []
+    noContent
 
 subscribeRequestItemListElement :: Text -> SubscribeRequestItemList -> X.Element
 subscribeRequestItemListElement elementName x =
@@ -142,7 +153,7 @@ subscribeRequestItemElement elementName x =
           fmap (("EnableBuffering",) . booleanContent) (#enableBuffering x)
         ]
     )
-    []
+    noContent
 
 getStatusElement :: Text -> GetStatus -> X.Element
 getStatusElement elementName x =
@@ -153,7 +164,7 @@ getStatusElement elementName x =
           ("ClientRequestHandle",) . X.textContent <$> #clientRequestHandle x
         ]
     )
-    []
+    noContent
 
 itemValueElement :: Text -> ItemValue -> X.Element
 itemValueElement elementName x =
@@ -276,7 +287,7 @@ readRequestItemElement elementName x =
           ("MaxAge",) . intContent <$> #maxAge x
         ]
     )
-    []
+    noContent
 
 readRequestItemListElement :: Text -> ReadRequestItemList -> X.Element
 readRequestItemListElement elementName x =
@@ -328,7 +339,7 @@ subscriptionCancelElement elementName x =
           ("ServerSubHandle",) . X.textContent <$> #serverSubHandle x
         ]
     )
-    []
+    noContent
 
 browseElement :: Text -> Browse -> X.Element
 browseElement elementName x =
@@ -386,7 +397,7 @@ itemIdentifierElement elementName x =
           ("ItemName",) . X.textContent <$> #itemName x
         ]
     )
-    []
+    noContent
 
 -- * Attributes
 
