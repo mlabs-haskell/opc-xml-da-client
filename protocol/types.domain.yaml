@@ -233,7 +233,7 @@ Browse:
     elementNameFilter: Maybe Text
     vendorFilter: Maybe Text
     returnAllProperties: Bool
-    returnAllPropertyValues: Bool
+    returnPropertyValues: Bool
     returnErrorText: Bool
 
 BrowseFilter:
