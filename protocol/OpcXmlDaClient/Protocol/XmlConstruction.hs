@@ -86,12 +86,11 @@ inSoapEnvelope element =
 -- <foo attr="bar"/>
 -- but prefer the the form
 -- <foo attr="bar"></foo>
--- When passing an empty Node list to X.element, 
--- the former is generated. 
--- An empty Node coaxes xml-conduit to use the latter form. 
+-- When passing an empty Node list to X.element,
+-- the former is generated.
+-- An empty Node coaxes xml-conduit to use the latter form.
 noContent :: [X.Node]
 noContent = [((X.contentNode . X.textContent) "")]
-
 
 subscribeElement :: Text -> Subscribe -> X.Element
 subscribeElement elementName x =
