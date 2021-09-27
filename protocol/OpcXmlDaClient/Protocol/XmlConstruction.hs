@@ -355,7 +355,7 @@ browseElement elementName x =
           ("ElementNameFilter",) . X.textContent <$> #elementNameFilter x,
           ("VendorFilter",) . X.textContent <$> #vendorFilter x,
           pure ("ReturnAllProperties", booleanContent (#returnAllProperties x)),
-          pure ("ReturnAllPropertyValues", booleanContent (#returnAllPropertyValues x)),
+          pure ("ReturnPropertyValues", booleanContent (#returnAllPropertyValues x)),
           pure ("ReturnErrorText", booleanContent (#returnErrorText x))
         ]
     )
