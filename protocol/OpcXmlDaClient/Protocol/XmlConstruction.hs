@@ -98,7 +98,7 @@ subscribeElement elementName x =
     (opcQName elementName)
     ( catMaybes
         [ Just ("ReturnValuesOnReply", booleanContent (#returnValuesOnReply x)),
-          ("SubcriptionPingRate",) . intContent <$> #subscriptionPingRate x
+          ("SubscriptionPingRate",) . intContent <$> #subscriptionPingRate x
         ]
     )
     ( catMaybes
