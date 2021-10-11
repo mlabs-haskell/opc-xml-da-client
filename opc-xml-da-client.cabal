@@ -2,6 +2,11 @@ cabal-version: 3.0
 name: opc-xml-da-client
 version: 0.1
 synopsis: OPC XML-DA Client
+description:
+  An implementation of OPC XML-DA protocol for client applications. The specification for the protocol can be found [here](http://www.diit.unict.it/users/scava/dispense/II/OPCDataAccessXMLSpecification.pdf).
+homepage: https://github.com/mlabs-haskell/opc-xml-da-client
+category: Network
+maintainer: Nikita Volkov, Yan Shkurinsky
 copyright: 2021, Urban Mobility Labs Ltd.
 license: MIT
 license-file: LICENSE
