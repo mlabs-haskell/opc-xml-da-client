@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: opc-xml-da-client
-version: 0.1
+version: 0.1.1
 synopsis: OPC XML-DA Client
 description:
   An implementation of OPC XML-DA protocol for client applications. The specification for the protocol can be found [here](http://www.diit.unict.it/users/scava/dispense/II/OPCDataAccessXMLSpecification.pdf).
@@ -20,22 +20,34 @@ source-repository head
   location: git://github.com/mlabs-haskell/opc-xml-da-client.git
 
 library
-  hs-source-dirs: library
+  hs-source-dirs: library, protocol
   default-extensions: ApplicativeDo, BangPatterns, BinaryLiterals, BlockArguments, ConstraintKinds, DataKinds, DefaultSignatures, DeriveDataTypeable, DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveLift, DeriveTraversable, DerivingVia, DuplicateRecordFields, EmptyDataDecls, FlexibleContexts, FlexibleInstances, FunctionalDependencies, GADTs, GeneralizedNewtypeDeriving, HexFloatLiterals, InstanceSigs, LambdaCase, LiberalTypeSynonyms, MagicHash, MultiParamTypeClasses, MultiWayIf, NamedFieldPuns, NoImplicitPrelude, NoMonomorphismRestriction, NumericUnderscores, OverloadedLabels, OverloadedStrings, PatternGuards, PatternSynonyms, ParallelListComp, QuasiQuotes, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, StrictData, TemplateHaskell, TupleSections, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns
   default-language: Haskell2010
   ghc-options: -funbox-strict-fields
   exposed-modules:
     OpcXmlDaClient
+    OpcXmlDaClient.Protocol.Types
+    OpcXmlDaClient.Protocol.XmlConstruction
+    OpcXmlDaClient.Protocol.XmlParsing
+  other-modules:
+    OpcXmlDaClient.Protocol.Namespaces
   build-depends:
+    attoparsec >=0.13.2.5 && <0.15,
+    attoparsec-data ^>=1.0.5.2,
     base >=4.14 && <5,
+    base64 ^>=0.4.2.3,
     bytestring >=0.10 && <0.12,
     containers ^>=0.6.2.1,
+    domain ^>=0.1.1,
+    domain-optics ^>=0.1.0.1,
     http-client >=0.7.8 && <0.8,
     opc-xml-da-client-base,
-    opc-xml-da-client-protocol,
+    opc-xml-da-client-xml-builder,
     opc-xml-da-client-xml-schema-values,
     scientific ^>=0.3.6.2,
     text >=1 && <2,
+    text-builder >=0.6.6.2 && <0.7,
+    time >=1.9.3 && <2,
     transformers ^>=0.5,
     vector ^>=0.12,
     xml-conduit ^>=1.9.1.1,
@@ -59,37 +71,6 @@ test-suite library-test
     tasty-hunit >=0.9 && <0.11,
     tasty-quickcheck >=0.9 && <0.11,
 
-library opc-xml-da-client-protocol
-  hs-source-dirs: protocol
-  default-extensions: ApplicativeDo, BangPatterns, BinaryLiterals, BlockArguments, ConstraintKinds, DataKinds, DefaultSignatures, DeriveDataTypeable, DeriveFoldable, DeriveFunctor, DeriveGeneric, DeriveLift, DeriveTraversable, DerivingVia, DuplicateRecordFields, EmptyDataDecls, FlexibleContexts, FlexibleInstances, FunctionalDependencies, GADTs, GeneralizedNewtypeDeriving, HexFloatLiterals, InstanceSigs, LambdaCase, LiberalTypeSynonyms, MagicHash, MultiParamTypeClasses, MultiWayIf, NamedFieldPuns, NoImplicitPrelude, NoMonomorphismRestriction, NumericUnderscores, OverloadedLabels, OverloadedStrings, PatternGuards, PatternSynonyms, ParallelListComp, QuasiQuotes, RankNTypes, RecordWildCards, ScopedTypeVariables, StandaloneDeriving, StrictData, TemplateHaskell, TupleSections, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, ViewPatterns
-  default-language: Haskell2010
-  ghc-options: -funbox-strict-fields
-  exposed-modules:
-    OpcXmlDaClient.Protocol.Types
-    OpcXmlDaClient.Protocol.XmlConstruction
-    OpcXmlDaClient.Protocol.XmlParsing
-  other-modules:
-    OpcXmlDaClient.Protocol.Namespaces
-  build-depends:
-    attoparsec >=0.13.2.5 && <0.15,
-    attoparsec-data ^>=1.0.5.2,
-    base >=4.14 && <5,
-    base64 ^>=0.4.2.3,
-    bytestring >=0.10 && <0.12,
-    containers ^>=0.6.2.1,
-    domain ^>=0.1.1,
-    domain-optics ^>=0.1.0.1,
-    opc-xml-da-client-base,
-    opc-xml-da-client-xml-builder,
-    opc-xml-da-client-xml-schema-values,
-    scientific ^>=0.3.6.2,
-    text >=1 && <2,
-    text-builder >=0.6.6.2 && <0.7,
-    time >=1.9.3 && <2,
-    vector ^>=0.12,
-    xml-conduit ^>=1.9.1.1,
-    xml-parser ^>=0.1,
-
 test-suite protocol-test
   type: exitcode-stdio-1.0
   hs-source-dirs: protocol-test
@@ -100,7 +81,6 @@ test-suite protocol-test
   build-depends:
     QuickCheck >=2.8.1 && <3,
     quickcheck-instances >=0.3.11 && <0.4,
-    opc-xml-da-client-protocol,
     opc-xml-da-client,
     rerebase >=1.13.0.1 && <2,
     tasty >=0.12 && <2,
