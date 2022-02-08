@@ -51,7 +51,7 @@ library
     transformers ^>=0.5,
     vector ^>=0.12,
     xml-conduit ^>=1.9.1.1,
-    xml-parser ^>=0.1.0.1,
+    xml-parser ^>=0.1.1,
 
 test-suite library-test
   type: exitcode-stdio-1.0
