@@ -20,7 +20,7 @@ Domain.declare
         DomainOptics.labelOpticDeriver
       ]
   )
-  =<< Domain.loadSchema "xml-schema-values/types.domain.yaml"
+  =<< Domain.loadSchema "domain/xml-schema-values.domain.yaml"
 
 deriving instance Ord Date
 

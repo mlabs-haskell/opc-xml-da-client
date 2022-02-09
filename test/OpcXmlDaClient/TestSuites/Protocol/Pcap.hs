@@ -1,4 +1,4 @@
-module Pcap where
+module OpcXmlDaClient.TestSuites.Protocol.Pcap where
 
 import Data.Binary.Bits.Get (block, runBitGet, word8)
 import Data.Binary.Get (getWord32le, runGet)
@@ -6,13 +6,14 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as B8
 import Data.ByteString.Internal (c2w)
 import qualified Data.ByteString.Lazy as BL
+import Data.Time
 import OpcXmlDaClient (Error (..))
+import OpcXmlDaClient.Base.Prelude
 import OpcXmlDaClient.Protocol.Types
 import qualified OpcXmlDaClient.Protocol.XmlParsing as XmlParsing
 import Test.Tasty
 import Test.Tasty.HUnit
 import qualified XmlParser as Xp
-import Prelude
 
 data XmlResponseParser
   = forall a.

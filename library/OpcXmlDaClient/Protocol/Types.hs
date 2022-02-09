@@ -25,4 +25,4 @@ Domain.declare
         DomainOptics.labelOpticDeriver
       ]
   )
-  =<< Domain.loadSchema "protocol/types.domain.yaml"
+  =<< Domain.loadSchema "domain/protocol.domain.yaml"

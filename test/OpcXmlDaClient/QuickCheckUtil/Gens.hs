@@ -1,10 +1,12 @@
 module OpcXmlDaClient.QuickCheckUtil.Gens where
 
 import qualified Data.Text as Text
+import Data.Time
 import qualified Data.Time.Calendar.OrdinalDate as Time
+import Data.Time.Clock.System
 import qualified Data.Time.LocalTime as Time
+import OpcXmlDaClient.Base.Prelude hiding (choose, optional)
 import Test.QuickCheck
-import Prelude hiding (choose, optional)
 
 -- * General
 
