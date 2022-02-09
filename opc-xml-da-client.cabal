@@ -66,7 +66,6 @@ library
     OpcXmlDaClient.XmlSchemaValues.Rendering
     OpcXmlDaClient.XmlSchemaValues.Types
     OpcXmlDaClient.XmlSchemaValues.Util.TimeMath
-  build-depends:
 
 test-suite test
   import: shared-settings
